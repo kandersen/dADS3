@@ -17,7 +17,7 @@ struct node {
 struct heap { 
   node** forest;
   int size;
-  node* min;
+  node* min_node;
 };
 
 heap* make_heap() {
@@ -26,7 +26,6 @@ heap* make_heap() {
 
 void insert(int key, void* i, heap* h) {
   heap* new_h = make_heap();
-  new_h->min_key = key;
   new_h->size = 1;
   new_h->forest = (node**)malloc(1000 * sizeof(node*));
 
@@ -40,12 +39,13 @@ void insert(int key, void* i, heap* h) {
   n->left_sibling = n;
   n->right_sibling = n;
   new_h->forest[0] = n;
+  new_h->min_node = n;
 
   *h = *meld(h, new_h);
 }
 
 void* find_min (heap* h) {
-  return h->min_key_item;
+  return h->min_node->value;
 }
 
 heap* meld         (heap* h1, heap* h2) {
