@@ -13,5 +13,6 @@ item* delete_min   (heap* h);
 heap* meld         (heap* h1, heap* h2);
 void  decrease_key (int delta, item* i, heap* h);
 void  delete       (item* i, heap* h);
+void  to_dot	   (heap* h);
 
 #endif
