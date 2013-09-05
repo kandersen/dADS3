@@ -14,6 +14,6 @@ void  delete       (void* i, heap* h);
 void  to_dot	   (heap* h);
 int   is_empty     (heap* h);
 int   count        (heap* h);
-heap* make_queue   (void** items, int count);
+heap* make_queue   (void* items[], int keys[], int count);
 
 #endif

@@ -46,7 +46,7 @@ void insert(int key, void* item, heap* h) {
     i = j;
   }
   h->array[i] = p;
-  h->count = h->count+1;
+  h->count = h->count + 1;
 }
     
 void* find_min(heap* h) {
@@ -55,7 +55,24 @@ void* find_min(heap* h) {
 
 void* delete_min(heap* h) {
   void* min = h->array[0]->value;
-  
+  h->count = h->count - 1;
+  pair* in = h->array[h->count];
+  int i = 0;
+  int j;
+  while ((j = 2 * i + 1) <= h->count) {
+    pair* temp = h->array[j];
+    pair* temp1 = h->array[j + 1];
+    if (temp1->key < temp->key) {
+      temp = temp1;
+      j = j+1;
+    }
+    if (temp->key >= in->key) {
+      break;
+    }
+    h->array[i] = temp;
+    i = j;
+  }
+  h->array[i] = in;
   return min;
 }
 
@@ -66,7 +83,10 @@ int is_empty(heap* h) {
 int count(heap* h) {
   return h->count;
 }
-    
+
+
+
+// "Testing code"
 
 typedef struct foo {
   int v;
@@ -80,11 +100,13 @@ foo* new_foo(int i) {
 
 int main() {
   heap* h = make_heap();
-  insert(13, new_foo(78), h);
-  insert(7, new_foo(42), h);
-  insert(0, new_foo(7), h);
-  
-  printf("Hello, %i!\n", ((foo*)find_min(h))->v);
+  insert(13, new_foo(13), h);
+  insert(0, new_foo(0), h);
+  insert(0, new_foo(0), h);
+
+  printf("Hello, %i!\n", ((foo*)delete_min(h))->v);
+  printf("Hello, %i!\n", ((foo*)delete_min(h))->v);
+  printf("Hello, %i!\n", ((foo*)delete_min(h))->v);
   return 0;
 }
 
