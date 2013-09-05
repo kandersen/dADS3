@@ -1,4 +1,4 @@
-COMMON = src/main.c
+COMMON = src/main.c src/fibonacci_v1.c
 
 all: clean compile
 
