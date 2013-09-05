@@ -15,3 +15,8 @@
 *.exe
 *.out
 *.app
+
+# emacs temp
+#*
+*~
+.DS_Store
