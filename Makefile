@@ -6,7 +6,7 @@ clean:
 	rm -rf bin/*
 
 compile:
-	clang -Wall -O3 -o bin/a $(COMMON)
+	clang -Wall -O3 -o bin/a.out $(COMMON)
 
 
 
