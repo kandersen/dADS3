@@ -12,6 +12,8 @@ heap* meld         (heap* h1, heap* h2);
 void  decrease_key (int delta, void* i, heap* h);
 void  delete       (void* i, heap* h);
 void  to_dot	   (heap* h);
-
+int   is_empty     (heap* h);
+int   count        (heap* h);
+heap* make_queue   (void** items, int count);
 
 #endif
