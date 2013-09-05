@@ -1,4 +1,4 @@
-COMMON = src/main.cpp
+COMMON = src/main.c
 
 all: clean compile
 
@@ -6,7 +6,7 @@ clean:
 	rm -rf bin/*
 
 compile:
-	clang -wall -O3 -o bin/a $(COMMON)
+	clang -Wall -O3 -o bin/a $(COMMON)
 
 
 
