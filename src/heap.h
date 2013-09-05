@@ -3,13 +3,15 @@
 
 struct heap;
 struct item;
+typedef struct heap heap;
+typedef struct item item;
 
-struct heap* make_heap    ();
-       void  insert       (struct item* i, struct heap* h);
-struct item* find_min     (struct heap* h);
-struct item* delete_min   (struct heap* h);
-struct heap* meld         (struct heap* h1, struct heap* h2);
-       void  decrease_key (int delta, struct item* i, struct heap* h);
-       void  delete       (struct item* i, struct heap* h);
+heap* make_heap    ();
+void  insert       (item* i, heap* h);
+item* find_min     (heap* h);
+item* delete_min   (heap* h);
+heap* meld         (heap* h1, heap* h2);
+void  decrease_key (int delta, item* i, heap* h);
+void  delete       (item* i, heap* h);
 
 #endif
