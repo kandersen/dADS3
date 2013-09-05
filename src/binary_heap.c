@@ -1,6 +1,6 @@
 #include "heap.h"
+#include <stdio.h>
 #include <stdlib.h>
-#include "heap.h"
 
 #define INITIAL_HEAP_SIZE 1024
 
@@ -53,6 +53,12 @@ void* find_min(heap* h) {
   return h->array[0]->value;
 }
 
+void* delete_min(heap* h) {
+  void* min = h->array[0]->value;
+  
+  return min;
+}
+
 int is_empty(heap* h) {
   return h->count == 0;
 }
@@ -61,5 +67,25 @@ int count(heap* h) {
   return h->count;
 }
     
+
+typedef struct foo {
+  int v;
+} foo;
+
+foo* new_foo(int i) {
+  foo* f = (foo*) malloc(sizeof(foo));
+  f->v = i;
+  return f;
+}
+
+int main() {
+  heap* h = make_heap();
+  insert(13, new_foo(78), h);
+  insert(7, new_foo(42), h);
+  insert(0, new_foo(7), h);
+  
+  printf("Hello, %i!\n", ((foo*)find_min(h))->v);
+  return 0;
+}
 
 
