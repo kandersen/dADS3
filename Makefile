@@ -8,9 +8,11 @@ clean:
 compile:
 	clang -Wall -O3 -o bin/a.out $(COMMON)
 
-bh:
-	clang -Wall -O3 -o bin/bh.out src/binary_heap_array.c
+bha:
+	clang -Wall -O3 -o bin/bha.out src/binary_heap_array.c
 
+bhp:
+	clang -Wall -O3 -o bin/bhp.out src/binary_heap_pointer.c
 
 
 
