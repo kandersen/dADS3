@@ -1,4 +1,5 @@
-COMMON = src/main.c src/fibonacci_v1.c
+COMMON = src/main.cpp
+FLAGS = -Wall -O3 -std=c++11
 
 all: clean compile
 
@@ -6,9 +7,16 @@ clean:
 	rm -rf bin/*
 
 compile:
-	clang -Wall -O3 -o bin/a.out $(COMMON)
+	clang $(FLAGS) -o bin/a.out $(COMMON)
 
+bha:
+	clang $(FLAGS) -o bin/bha.out src/binary_heap_array.c $(COMMON)
 
+bhp:
+	clang $(FLAGS) -o bin/bhp.out src/binary_heap_pointer.c $(COMMON)
+
+fh1:
+	clang $(FLAGS) -o bin/fh1.out src/fibonacci_v1.cpp $(COMMON)
 
 
 
