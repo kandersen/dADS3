@@ -7,7 +7,7 @@
 typedef struct node node;
 void concat_list(node*, node*);
 void remove_node_in_list(node*);
-void join_trees(node*,node*);
+node* join_trees(node*,node*);
 int max_rank(heap *);
 void to_dot(heap*, char*);
 
@@ -76,7 +76,7 @@ void* delete_min (heap* h) {
   
   if (min_node != NULL) {
 
-    if (min_node->left_sibling = min_node->right_sibling) { // only one root
+    if (min_node->left_sibling == min_node->right_sibling) { // only one root
       h->min_node = NULL;
       list_to_concat = min_node->child;
     } else { 
@@ -98,28 +98,32 @@ void* delete_min (heap* h) {
     
     int mr = max_rank(h);
     node* ranks[mr];
-    memset (ranks, NULL, sizeof(node)*mr);
+    for (int i = 0; i < mr; i++) {
+      ranks[i] = NULL;
+    }
+    //    memset (ranks, NULL, sizeof(node)*mr);
     
     node* last_ref = list_to_concat;
 
     do {
 
-      node* existing_tree = ranks[last_ref->rank];
-      existing_tree->parent = NULL; // remember to set parent 0 - all is root nodes
+      last_ref->parent = NULL; // remember to set parent 0 - all is root nodes
 
-      if (existing_tree != NULL) {
-        join_trees(existing_tree, last_ref);
-      } else {
-        ranks[last_ref->rank] = last_ref;
+      node* existing_tree = ranks[last_ref->rank];
+
+      // a while is necessary if we join trees
+      while (existing_tree != NULL) {
+        last_ref = join_trees(existing_tree, last_ref);
+        existing_tree = ranks[last_ref->rank];
       }
-      
+
+      ranks[last_ref->rank] = last_ref;
       last_ref = last_ref->right_sibling;
       
     } while (last_ref != list_to_concat);
 
     node* new_min_node = NULL;
-    int i;
-    for (i = 0; i < mr; i++) {
+    for (int i = 0; i < mr; i++) {
       
       node* curr_tree = ranks[i];
 
@@ -213,14 +217,16 @@ void remove_node_in_list(node* node) {
   node->left_sibling->right_sibling = node->right_sibling->left_sibling;
 }
 
-void join_trees(node* n1, node* n2) {
+node* join_trees(node* n1, node* n2) {
 
   if (n1->key <= n2->key) {
     concat_list(n1->child, n2);
     n1->rank = n1->rank + 1;
+    return n1;
   } else {
     concat_list(n2->child, n1);
     n2->rank = n2->rank + 1;
+    return n2;
   }
 }
 
