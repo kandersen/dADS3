@@ -7,7 +7,7 @@ clean:
 	rm -rf bin/*
 
 compile:
-	clang $(FLAGS) -o bin/a.out $(COMMON)
+	bha bhp fh1
 
 bha:
 	clang $(FLAGS) -o bin/bha.out src/binary_heap_array.c $(COMMON)
