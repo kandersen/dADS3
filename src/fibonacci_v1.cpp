@@ -9,6 +9,7 @@ void concat_list(node*, node*);
 void remove_node_in_list(node*);
 void join_trees(node*,node*);
 int max_rank(heap *);
+void to_dot(heap*, char*);
 
 struct node {
   int key;
@@ -225,4 +226,35 @@ void join_trees(node* n1, node* n2) {
 
 int max_rank(heap* h) {
   return 1000 + 1; // What should be the max possible rank?
+}
+
+int counter;
+
+void dot_node (char* parent, node* child, FILE* out) {
+  node* curr = child;
+  char node_name[10];
+  do {
+    sprintf(node_name, "node%05d", ++counter);
+    fprintf(out, "%s", node_name);
+    fprintf(out, "%s --> %s", parent, node_name);
+
+    if (curr->child)
+      dot_node(node_name, curr->child, out);
+
+    curr = child->left_sibling;
+  }
+  while (curr != child);
+}
+
+
+void  to_dot (heap* h, char* filename) {
+  FILE * out_file = fopen(filename, "w");
+
+  if (out_file == NULL) {
+    fprintf(stderr, "Error, couldn't open file: %s!", filename);
+    return;
+  }
+
+  dot_node(NULL, h->min_node->child, out_file);
+  fclose(out_file);
 }
