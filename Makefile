@@ -1,5 +1,11 @@
 COMMON = src/main.cpp
-FLAGS = -Wall -O3 -std=c++11 -stdlib=libc++
+FLAGS = -Wall -O3 -std=c++11
+OSNAME := ${shell uname}
+
+ifeq ($(OSNAME), Darwin)
+	FLAGS += -stdlib=libc++
+endif
+
 
 all: clean compile
 
