@@ -233,6 +233,7 @@ int counter;
 void dot_node (char* parent, node* child, FILE* out) {
   node* curr = child;
   char node_name[10];
+
   do {
     sprintf(node_name, "node%05d", ++counter);
     fprintf(out, "%s", node_name);
@@ -245,7 +246,6 @@ void dot_node (char* parent, node* child, FILE* out) {
   }
   while (curr != child);
 }
-
 
 void  to_dot (heap* h, char* filename) {
   FILE * out_file = fopen(filename, "w");
