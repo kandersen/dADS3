@@ -1,8 +1,17 @@
 #ifndef DADS3_HEAP_H
 #define DADS3_HEAP_H
 
-struct item;
+
 struct heap;
+struct node;
+struct item {
+  int key;
+  node* n;
+  void* value;
+};
+
+
+typedef struct item item;
 typedef struct heap heap;
 
 heap* make_heap    ();

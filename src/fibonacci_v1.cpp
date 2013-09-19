@@ -5,18 +5,13 @@
 #include "heap.h"
 
 typedef struct node node;
+
 void concat_list(node*, node*);
 void remove_node_in_list(node*);
 node* join_trees(node*,node*);
 int max_rank(heap *);
 void update_parent_marked(node*,heap*);
 void to_dot(heap*, char*);
-
-struct item {
-  int key;
-  node* n;
-  void* value;
-};
 
 struct node {
   int key;
