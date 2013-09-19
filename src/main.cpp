@@ -5,10 +5,11 @@
 int main() {
   heap* h = make_heap();
 
-  for (int k = 0; k < 100; k++) {
+  for (int k = 0; k < 3; k++) {
     item* i = (item*)malloc(sizeof(item));
     i->key = k;
     i->value = NULL;
+    printf("inserting %i\n", k);
     insert(i, h);
   }
   puts("inserts DONE");
