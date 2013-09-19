@@ -51,6 +51,10 @@ void insert(item* i, heap* h) {
   new_h->min_node = n;
   i->n = n;
 
+  puts("testing insert");
+  printf("%p %p %p %p\n", n, n->child, n->parent, n->left_sibling);
+  puts("test done");
+
   *h = *meld(h, new_h);  
 }
 
@@ -77,22 +81,22 @@ heap* meld (heap* h1, heap* h2) {
 }
 
 item* delete_min (heap* h) {
-
+  puts("entry delete min");
   node* min_node = h->min_node;
 
   node* list_to_concat = NULL;
-  
-  if (min_node != NULL) {
 
+  if (min_node != NULL) {
+    
     if (min_node->left_sibling == min_node) { // only one root
       h->min_node = NULL;
       list_to_concat = min_node->child;
     } else { 
-      // remove min root from forest
-      remove_node_in_list(min_node);
-
       // save an arbitrary reference to the new list
       list_to_concat = min_node->left_sibling;
+
+      // remove min root from forest
+      remove_node_in_list(min_node);
       
       if (min_node->child != NULL) {
         // If we have to append childs from the min root
@@ -100,39 +104,43 @@ item* delete_min (heap* h) {
       }
     }
   }    
-
+  puts("del min a");
   h->rank = h->rank - 1;
   
   if (list_to_concat != NULL) {
-    
+
     int mr = max_rank(h);
     node* ranks[mr]; //calloc?
     for (int i = 0; i < mr; i++) {
       ranks[i] = NULL;
     }
-
+    puts("del min b");
     //    memset (ranks, NULL, sizeof(node)*mr);
     
     node* last_ref = list_to_concat; //which is actually just a pointer to an item
-
+    puts("del min c");
     do {
 
       last_ref->parent = NULL; // remember to set parent 0 - all is root nodes
 
       node* existing_tree = ranks[last_ref->rank];
-
+      puts("del min before loop");
       // a while is necessary if we join trees
       while (existing_tree != NULL) {
+        ranks[last_ref->rank] = NULL;
+        printf("One: %p %p\n", existing_tree, last_ref);
         last_ref = join_trees(existing_tree, last_ref);
+        printf("Two: %p %p\n", existing_tree, last_ref);
         existing_tree = ranks[last_ref->rank];
       }
-
+      puts("del min after loop");
       ranks[last_ref->rank] = last_ref;
       last_ref = last_ref->right_sibling;
       
     } while (last_ref != list_to_concat); 
+    puts("del min d");
     // this way, we go through the circular list, until we reach the starting point
-
+    puts("del min e");
     node* new_min_node = last_ref; // set an arbitrary one
     for (int i = 0; i < mr; i++) {
       
@@ -145,13 +153,13 @@ item* delete_min (heap* h) {
         }
       }
     }
+    puts("del min f");
 
     h->min_node = new_min_node;
   }
-  
+  puts("del min g");
   if (min_node != NULL) {
     item* val = min_node->item;
-    free(min_node); // Should we free mem? It takes time...
     return val;
   } else {
     return NULL;
@@ -223,7 +231,7 @@ void remove (item* i, heap* h) {
     concat_list(h->min_node, n->child);    
   }
 
-  free(n); // should we delete?
+
 }
 
 void update_parent_marked(node* n, heap* h) {
@@ -244,6 +252,21 @@ void update_parent_marked(node* n, heap* h) {
 }
 
 void concat_list(node* n1, node* n2) {
+  printf("concat args: %p %p\n", n1, n2);
+  puts("lame");
+  printf("concat args: %p %p %p %p\n", n1->right_sibling, n1->left_sibling, n2->right_sibling, n2->left_sibling);
+  puts("lame");
+  node n;
+  puts("lol? ");
+  n = *(n1->right_sibling);
+  printf("1 %p\n", &n);
+  n = *(n1->left_sibling);
+  printf("2 %p\n", &n);
+  n = *(n2->right_sibling);
+  printf("3 %p\n", &n);
+  n = *(n2->left_sibling);
+  printf("4 %p\n", &n);
+
   node* h1_curr_right = n1->right_sibling;
   node* h2_curr_left = n2->left_sibling;
 
@@ -252,22 +275,41 @@ void concat_list(node* n1, node* n2) {
 
   h2_curr_left->right_sibling = h1_curr_right;
   h1_curr_right->left_sibling = h2_curr_left;
+  puts("concat done");
 }
 
-void remove_node_in_list(node* node) {
-  node->right_sibling->left_sibling = node->left_sibling->right_sibling;
-  node->left_sibling->right_sibling = node->right_sibling->left_sibling;
+void remove_node_in_list(node* n) {
+  node* prev_sibling = n->left_sibling;
+  node* next_sibling = n->right_sibling;
+  
+  prev_sibling->right_sibling = next_sibling;
+  next_sibling->left_sibling = prev_sibling;
 }
 
 node* join_trees(node* n1, node* n2) {
-
+  puts("join trees entry");
   if (n1->key <= n2->key) {
-    concat_list(n1->child, n2);
+    puts("true branch");
+    if (n1->child == NULL) {
+      n1->child = n2;
+    } else {
+      puts("case ?");
+      concat_list(n1->child, n2);
+    }
+    puts("true end");
     n1->rank = n1->rank + 1;
     n2->marked = 0;
     return n1;
+
   } else {
-    concat_list(n2->child, n1);
+    puts("false branch");
+    if (n2->child == NULL) {
+      n2->child = n1;
+    } else {
+      puts("case ?");
+      concat_list(n2->child, n1);
+    }
+    puts("false end");
     n2->rank = n2->rank + 1;
     n1->marked = 0;
     return n2;
