@@ -307,6 +307,8 @@ int counter;
 void node_name (node* n, FILE* out) {
   node* curr = n;
   char buf[10];
+  
+  fprintf(out, "{ rank=same;\n");
   do {
     sprintf(buf, "node%05d", ++counter);
 
@@ -314,13 +316,19 @@ void node_name (node* n, FILE* out) {
     strcpy(curr->name, buf);
 
     fprintf(out, "%s [label=\"%d\", shape=%s];\n", curr->name, curr->key, curr->marked ? "box" : "oval");
-
-    if (curr->child)
-      node_name(curr->child, out);
-
     curr = curr->left_sibling;
   }
   while (curr != n);
+  fprintf(out, "}\n");
+
+  curr = n;
+  do {
+    if (curr->child)
+      node_name(curr->child, out);
+    curr = curr->left_sibling;
+  }
+  while (curr != n);
+
 }
 
 
@@ -346,11 +354,11 @@ void dot_node (node* n, FILE* out) {
     fprintf(out, "%s -> %s\n", curr->name, curr->left_sibling->name);
     if (curr->child) {
       dot_node(curr->child, out);
-      fprintf(out, "%s -> %s\n", curr->name, curr->child->name);
+      fprintf(out, "%s -> %s [color=\"red\"]\n", curr->name, curr->child->name);
     }
 
     if (curr->parent)
-      fprintf(out, "%s -> %s\n", curr->name, curr->parent->name);
+      fprintf(out, "%s -> %s [color=\"blue\"]\n", curr->name, curr->parent->name);
     curr = curr->left_sibling;
   }
   while (curr != n);
@@ -368,8 +376,6 @@ void  to_dot (node* n, char* filename) {
   node* curr = n;
   while (curr->parent != NULL)
     curr = curr->parent;
-
-
 
   fprintf(out_file, "digraph {\n");
   node_name(curr, out_file);
