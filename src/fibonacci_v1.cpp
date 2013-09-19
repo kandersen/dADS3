@@ -285,32 +285,60 @@ int max_rank(heap* h) {
   return 1000 + 1; // What should be the max possible rank?
 }
 
+void
+ppn(node* n) {
+  printf("%s %p %p %p %p %p\n", n->name, n, n->parent, n->right_sibling, n->child, n->left_sibling);
+}
 int counter;
-void dot_node (node* n, FILE* out) {
-  node* curr;
-
-  curr = n;
+void node_name (node* n, FILE* out) {
+  node* curr = n;
+  char buf[10];
   do {
-    sprintf(n->name, "node%05d", ++counter);
-    fprintf(out, "%s [label=\"%d\", shape=%s];\n", n->name, curr->key, curr->marked ? "box" : "oval");
+    sprintf(buf, "node%05d", ++counter);
+
+    curr->name = (char*) malloc(sizeof(char)*10);
+    strcpy(curr->name, buf);
+
+    fprintf(out, "%s [label=\"%d\", shape=%s];\n", curr->name, curr->key, curr->marked ? "box" : "oval");
+
     if (curr->child)
-      dot_node(curr->child, out);
+      node_name(curr->child, out);
 
     curr = curr->left_sibling;
   }
   while (curr != n);
+}
 
-  curr = n;
+
+void dot_node (node* n, FILE* out) {
+  if (!n) {
+    puts("called dot_node with null");
+    return;
+  }
+
+  if (!(n->left_sibling)) {
+    puts("n has null for left sibling!");
+    return;
+  }
+
+  if (!(n->right_sibling)) {
+    puts("n has null for right sibling!");
+    return;
+  }
+
+  node* curr = n;
   do {
-    fprintf(out, "%s -> %s", n->name, n->right_sibling->name);
-    fprintf(out, "%s -> %s", n->name, n->left_sibling->name);
-    if (n->child)
-      fprintf(out, "%s -> %s", n->name, n->child->name);
-    if (n->parent)
-      fprintf(out, "%s -> %s", n->name, n->parent->name);
+    fprintf(out, "%s -> %s\n", curr->name, curr->right_sibling->name);
+    fprintf(out, "%s -> %s\n", curr->name, curr->left_sibling->name);
+    if (curr->child)
+      fprintf(out, "%s -> %s\n", curr->name, curr->child->name);
+    if (curr->parent)
+      fprintf(out, "%s -> %s\n", curr->name, curr->parent->name);
+    curr = curr->left_sibling;
   }
   while (curr != n);
 }
+
     
 void  to_dot (node* n, char* filename) {
   FILE * out_file = fopen(filename, "w");
@@ -324,7 +352,10 @@ void  to_dot (node* n, char* filename) {
   while (curr->parent != NULL)
     curr = curr->parent;
 
+
+
   fprintf(out_file, "digraph {\n");
+  node_name(curr, out_file);
   dot_node(curr, out_file);
   fprintf(out_file, "}\n");
   fclose(out_file);
