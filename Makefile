@@ -15,7 +15,7 @@ clean:
 compile: fh1
 
 bha:
-	clang++ $(FLAGS) -o bin/bha.out src/binary_heap_array.c $(COMMON)
+	clang++ $(FLAGS) -o bin/bha.out src/binary_heap_array.c 
 
 bhp:
 	clang++ $(FLAGS) -o bin/bhp.out src/binary_heap_pointer.c $(COMMON)
