@@ -334,8 +334,9 @@ void dot_node (node* n, FILE* out) {
     fprintf(out, "%s -> %s\n", curr->name, curr->right_sibling->name);
     fprintf(out, "%s -> %s\n", curr->name, curr->left_sibling->name);
     if (curr->child) {
-      dot_node(curr->child);
+      dot_node(curr->child, out);
       fprintf(out, "%s -> %s\n", curr->name, curr->child->name);
+    }
 
     if (curr->parent)
       fprintf(out, "%s -> %s\n", curr->name, curr->parent->name);
