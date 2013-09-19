@@ -100,6 +100,8 @@ item* delete_min (heap* h) {
     }
   } 
 
+  to_dot(list_to_concat, "test1.dot");
+
   h->rank = h->rank - 1;
   
   if (list_to_concat != NULL) {
@@ -114,7 +116,11 @@ item* delete_min (heap* h) {
   
     do {
 
+      node* next_ref = last_ref->right_sibling;
+      
       last_ref->parent = NULL; // remember to set parent 0 - all is root nodes
+      last_ref->left_sibling = last_ref;
+      last_ref->right_sibling = last_ref;
 
       node* this_ref = last_ref;
 
@@ -126,7 +132,7 @@ item* delete_min (heap* h) {
         existing_tree = ranks[this_ref->rank];
       }
       ranks[this_ref->rank] = this_ref;
-      last_ref = last_ref->right_sibling;
+      last_ref = next_ref;
       
     } while (last_ref != list_to_concat); 
     // this way, we go through the circular list, until we reach the starting point
@@ -262,26 +268,31 @@ void remove_node_in_list(node* n) {
 }
 
 node* join_trees(node* n1, node* n2) {
-  if (n1->key <= n2->key) {
-    if (n1->child == NULL) {
-      n1->child = n2;
-    } else {
-      concat_list(n1->child, n2);
-    }
-    n1->rank = n1->rank + 1;
-    n2->marked = 0;
-    return n1;
 
+  node* lowest_n;
+  node* highest_n;
+  if (n1->key <= n2->key) {
+    lowest_n = n1;
+    highest_n = n2;
   } else {
-    if (n2->child == NULL) {
-      n2->child = n1;
-    } else {
-      concat_list(n2->child, n1);
-    }
-    n2->rank = n2->rank + 1;
-    n1->marked = 0;
-    return n2;
+    lowest_n = n2;
+    highest_n = n1;
   }
+
+  if (lowest_n->child == NULL) {
+      lowest_n->child = highest_n;
+      highest_n->parent = lowest_n;
+  } else {
+    concat_list(lowest_n->child, n2);
+    node* temp_ref = n2;
+    do {
+      temp_ref->parent = lowest_n;
+      temp_ref = temp_ref->right_sibling;
+    } while (temp_ref != n2);
+  }
+  lowest_n->rank = lowest_n->rank + 1;
+  highest_n->marked = 0;
+  return lowest_n;
 }
 
 int max_rank(heap* h) {
