@@ -11,6 +11,7 @@ void remove_node_in_list(node*);
 node* join_trees(node*,node*);
 int max_rank(heap *);
 void update_parent_marked(node*,heap*);
+void to_dot(node*, char*);
 
 struct node {
   int key;
