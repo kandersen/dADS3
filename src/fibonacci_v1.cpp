@@ -38,7 +38,6 @@ heap* make_heap() {
 
 void insert(item* i, heap* h) {
   heap* new_h = make_heap();
-
   node* n = (node*)malloc(sizeof(node));
   n->key = i->key;
   n->rank = 0;
@@ -50,10 +49,9 @@ void insert(item* i, heap* h) {
   n->right_sibling = n;
 
   new_h->min_node = n;
-
   i->n = n;
 
-  *h = *meld(h, new_h);
+  *h = *meld(h, new_h);  
 }
 
 item* find_min (heap* h) {
@@ -61,7 +59,9 @@ item* find_min (heap* h) {
 }
 
 heap* meld (heap* h1, heap* h2) {
-  
+  if (h1->min_node == NULL) return h2;
+  if (h2->min_node == NULL) return h1;
+
   node* h1_min_node = h1->min_node;
   node* h2_min_node = h2->min_node;
 
@@ -244,10 +244,9 @@ void update_parent_marked(node* n, heap* h) {
 }
 
 void concat_list(node* n1, node* n2) {
-
   node* h1_curr_right = n1->right_sibling;
   node* h2_curr_left = n2->left_sibling;
-  
+
   n1->right_sibling = n2;
   n2->left_sibling = n1;
 

@@ -1,7 +1,6 @@
 #ifndef DADS3_HEAP_H
 #define DADS3_HEAP_H
 
-
 struct heap;
 struct node;
 struct item {
@@ -9,7 +8,6 @@ struct item {
   node* n;
   void* value;
 };
-
 
 typedef struct item item;
 typedef struct heap heap;

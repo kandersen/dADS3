@@ -3,7 +3,6 @@
 #include "heap.h"
 
 int main() {
-
   heap* h = make_heap();
 
   for (int k = 0; k < 1000; k++) {
@@ -12,13 +11,17 @@ int main() {
     i->value = NULL;
     insert(i, h);
   }
+  puts("inserts DONE");
 
-  item* j = delete_min(h);
 
-  while (j != NULL) {
+  item* j;
+
+  do {
+    j = delete_min(h); 
+    puts("removed one!");
     printf("%i\n", j->key);
-    j = delete_min(h);
-  }
-
+  } 
+  while (j != NULL);
+  
   return 0;
 }
