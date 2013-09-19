@@ -63,13 +63,6 @@ heap* meld (heap* h1, heap* h2) {
   if (h1->min_node == NULL) { *h1 = *h2; return h1; }
   if (h2->min_node == NULL) {return h1; }
 
-  node* tester = h1->min_node;
-
-  do {
-    printf("before concat: %i\n", tester->key);
-    tester = tester->right_sibling;
-  } while (tester != h1->min_node);
-
   node* h1_min_node = h1->min_node;
   node* h2_min_node = h2->min_node;
 
@@ -80,11 +73,6 @@ heap* meld (heap* h1, heap* h2) {
   }
 
   h1->rank = h1->rank + h2->rank;
-
-  do {
-    printf("after concat: %i\n", tester->key);
-    tester = tester->right_sibling;
-  } while (tester != h1->min_node);
 
   return h1;
 }
@@ -116,28 +104,19 @@ item* delete_min (heap* h) {
   
   if (list_to_concat != NULL) {
 
-    puts("hej 1");
     int mr = max_rank(h);
     node* ranks[mr]; //calloc?
     for (int i = 0; i < mr; i++) {
       ranks[i] = NULL;
     }
-
-    puts("hej 2");
     
     node* last_ref = list_to_concat; //which is actually just a pointer to an item
-
-    puts("hej 3");
   
     do {
-
-      printf("last_ref: %i\n", last_ref->key);
 
       last_ref->parent = NULL; // remember to set parent 0 - all is root nodes
 
       node* this_ref = last_ref;
-
-      puts("<--------");
 
       node* existing_tree = ranks[last_ref->rank];
       // a while is necessary if we join trees
@@ -165,8 +144,6 @@ item* delete_min (heap* h) {
     }
     h->min_node = new_min_node;
   }
-
-  puts("2");
 
   if (min_node != NULL) {
     item* val = min_node->item;
