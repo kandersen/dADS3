@@ -113,7 +113,8 @@ item* delete_min (heap* h) {
     }
     
     node* last_ref = list_to_concat; //which is actually just a pointer to an item
-  
+    int ref_counter = 0;
+
     do {
 
       node* next_ref = last_ref->right_sibling;
@@ -133,7 +134,18 @@ item* delete_min (heap* h) {
       }
       ranks[this_ref->rank] = this_ref;
       last_ref = next_ref;
-      
+
+      char name[50];
+      for (int pic = 0; pic < 2; pic++) {
+        sprintf(name, "pic_%i_%i.dot", ref_counter, pic);
+        node* tree = ranks[pic];
+        if (tree != NULL) {
+          to_dot(tree, name);
+        }
+      }
+
+      ref_counter += 1;
+     
     } while (last_ref != list_to_concat); 
     // this way, we go through the circular list, until we reach the starting point
     node* new_min_node = last_ref; // set an arbitrary one
