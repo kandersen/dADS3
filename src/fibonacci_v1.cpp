@@ -52,7 +52,7 @@ void insert(item* i, heap* h) {
   new_h->min_node = n;
   i->n = n;
 
-  *h = *meld(h, new_h);  
+  meld(h, new_h);  
 }
 
 item* find_min (heap* h) {
@@ -60,8 +60,8 @@ item* find_min (heap* h) {
 }
 
 heap* meld (heap* h1, heap* h2) {
-  if (h1->min_node == NULL) return h2;
-  if (h2->min_node == NULL) return h1;
+  if (h1->min_node == NULL) { *h1 = *h2; return h1; }
+  if (h2->min_node == NULL) {return h1; }
 
   node* h1_min_node = h1->min_node;
   node* h2_min_node = h2->min_node;
@@ -91,16 +91,14 @@ item* delete_min (heap* h) {
       list_to_concat = min_node->left_sibling;
 
       // remove min root from forest
-      remove_node_in_list(min_node);
+      remove_node_in_list(min_node);      
       
       if (min_node->child != NULL) {
         // If we have to append childs from the min root
         concat_list(list_to_concat, min_node->child);
       }
     }
-  }    
-
-  
+  } 
 
   h->rank = h->rank - 1;
   
@@ -113,18 +111,21 @@ item* delete_min (heap* h) {
     }
     
     node* last_ref = list_to_concat; //which is actually just a pointer to an item
+  
     do {
 
       last_ref->parent = NULL; // remember to set parent 0 - all is root nodes
+
+      node* this_ref = last_ref;
 
       node* existing_tree = ranks[last_ref->rank];
       // a while is necessary if we join trees
       while (existing_tree != NULL) {
         ranks[last_ref->rank] = NULL;
-        last_ref = join_trees(existing_tree, last_ref);
-        existing_tree = ranks[last_ref->rank];
+        this_ref = join_trees(existing_tree, this_ref);
+        existing_tree = ranks[this_ref->rank];
       }
-      ranks[last_ref->rank] = last_ref;
+      ranks[this_ref->rank] = this_ref;
       last_ref = last_ref->right_sibling;
       
     } while (last_ref != list_to_concat); 
@@ -143,6 +144,7 @@ item* delete_min (heap* h) {
     }
     h->min_node = new_min_node;
   }
+
   if (min_node != NULL) {
     item* val = min_node->item;
     return val;
@@ -238,14 +240,14 @@ void update_parent_marked(node* n, heap* h) {
 
 void concat_list(node* n1, node* n2) {
 
-  node* h1_curr_right = n1->right_sibling;
-  node* h2_curr_left = n2->left_sibling;
+  node* n1_curr_right = n1->right_sibling;
+  node* n2_curr_left = n2->left_sibling;
 
   n1->right_sibling = n2;
   n2->left_sibling = n1;
 
-  h2_curr_left->right_sibling = n1;
-  h1_curr_right->left_sibling = n2;
+  n1_curr_right->left_sibling = n2_curr_left;
+  n2_curr_left->right_sibling = n1_curr_right;
 }
 
 void remove_node_in_list(node* n) {
