@@ -3,6 +3,7 @@
 #include "heap.h"
 
 int main() {
+  char* file = "test.dot";
   heap* h = make_heap();
 
   for (int k = 0; k < 3; k++) {
@@ -12,8 +13,8 @@ int main() {
     printf("inserting %i\n", k);
     insert(i, h);
   }
-  puts("inserts DONE");
-
+  
+  to_dot(h, file);
   item* j;
 
   do {
@@ -24,6 +25,6 @@ int main() {
     }
   } 
   while (j != NULL);
-  
+
   return 0;
 }

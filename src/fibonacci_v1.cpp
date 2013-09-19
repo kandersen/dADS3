@@ -11,7 +11,7 @@ void remove_node_in_list(node*);
 node* join_trees(node*,node*);
 int max_rank(heap *);
 void update_parent_marked(node*,heap*);
-void to_dot(heap*, char*);
+void to_dot(node*, char*);
 
 struct node {
   int key;
@@ -22,6 +22,7 @@ struct node {
   node* child;
   node* left_sibling;
   node* right_sibling;
+  char* name;
 };
 
 struct heap { 
@@ -310,35 +311,82 @@ int max_rank(heap* h) {
   return 1000 + 1; // What should be the max possible rank?
 }
 
+void
+ppn(node* n) {
+  printf("%s %p %p %p %p %p\n", n->name, n, n->parent, n->right_sibling, n->child, n->left_sibling);
+}
 int counter;
-void dot_node (char* parent, node* child, FILE* out) {
-  node* curr = child;
-  char node_name[10];
-  counter = 0;
-
+void node_name (node* n, FILE* out) {
+  node* curr = n;
+  char buf[10];
   do {
-    sprintf(node_name, "node%05d", ++counter);
-    fprintf(out, "%s", node_name);
-    
-    if (parent != NULL)
-      fprintf(out, "%s --> %s", parent, node_name);
+    sprintf(buf, "node%05d", ++counter);
+
+    curr->name = (char*) malloc(sizeof(char)*10);
+    strcpy(curr->name, buf);
+
+    fprintf(out, "%s [label=\"%d\", shape=%s];\n", curr->name, curr->key, curr->marked ? "box" : "oval");
 
     if (curr->child)
-      dot_node(node_name, curr->child, out);
+      node_name(curr->child, out);
 
-    curr = child->left_sibling;
+    curr = curr->left_sibling;
   }
-  while (curr != child);
+  while (curr != n);
 }
 
-void  to_dot (heap* h, char* filename) {
+
+void dot_node (node* n, FILE* out) {
+  if (!n) {
+    puts("called dot_node with null");
+    return;
+  }
+
+  if (!(n->left_sibling)) {
+    puts("n has null for left sibling!");
+    return;
+  }
+
+  if (!(n->right_sibling)) {
+    puts("n has null for right sibling!");
+    return;
+  }
+
+  node* curr = n;
+  do {
+    fprintf(out, "%s -> %s\n", curr->name, curr->right_sibling->name);
+    fprintf(out, "%s -> %s\n", curr->name, curr->left_sibling->name);
+    if (curr->child)
+      fprintf(out, "%s -> %s\n", curr->name, curr->child->name);
+    if (curr->parent)
+      fprintf(out, "%s -> %s\n", curr->name, curr->parent->name);
+    curr = curr->left_sibling;
+  }
+  while (curr != n);
+}
+
+    
+void  to_dot (node* n, char* filename) {
   FILE * out_file = fopen(filename, "w");
+  counter = 0;
 
   if (out_file == NULL) {
     fprintf(stderr, "Error, couldn't open file: %s!", filename);
     return;
   }
+  node* curr = n;
+  while (curr->parent != NULL)
+    curr = curr->parent;
 
-  dot_node(NULL, h->min_node->child, out_file);
+
+
+  fprintf(out_file, "digraph {\n");
+  node_name(curr, out_file);
+  dot_node(curr, out_file);
+  fprintf(out_file, "}\n");
   fclose(out_file);
+}
+
+void  to_dot (heap* h, char* filename) {
+  to_dot(h->min_node, filename);
 }
