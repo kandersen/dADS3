@@ -3,25 +3,22 @@
 #include "heap.h"
 
 int main() {
+  char* file = "test.dot";
   heap* h = make_heap();
 
-  for (int k = 0; k < 1000; k++) {
+  for (int k = 0; k < 4; k++) {
     item* i = (item*)malloc(sizeof(item));
     i->key = k;
     i->value = NULL;
     insert(i, h);
   }
-  puts("inserts DONE");
 
 
-  item* j;
+    delete_min(h);
 
-  do {
-    j = delete_min(h); 
-    puts("removed one!");
-    printf("%i\n", j->key);
-  } 
-  while (j != NULL);
+  to_dot(h, file);
   
+
+
   return 0;
 }

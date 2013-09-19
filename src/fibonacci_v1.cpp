@@ -11,7 +11,6 @@ void remove_node_in_list(node*);
 node* join_trees(node*,node*);
 int max_rank(heap *);
 void update_parent_marked(node*,heap*);
-void to_dot(heap*, char*);
 
 struct node {
   int key;
@@ -22,6 +21,7 @@ struct node {
   node* child;
   node* left_sibling;
   node* right_sibling;
+  char* name;
 };
 
 struct heap { 
@@ -321,34 +321,50 @@ int max_rank(heap* h) {
 }
 
 int counter;
-void dot_node (char* parent, node* child, FILE* out) {
-  node* curr = child;
-  char node_name[10];
-  counter = 0;
+void dot_node (node* n, FILE* out) {
+  node* curr;
 
+  curr = n;
   do {
-    sprintf(node_name, "node%05d", ++counter);
-    fprintf(out, "%s", node_name);
-    
-    if (parent != NULL)
-      fprintf(out, "%s --> %s", parent, node_name);
-
+    sprintf(n->name, "node%05d", ++counter);
+    fprintf(out, "%s [label=\"%d\", shape=%s];\n", n->name, curr->key, curr->marked ? "box" : "oval");
     if (curr->child)
-      dot_node(node_name, curr->child, out);
+      dot_node(curr->child, out);
 
-    curr = child->left_sibling;
+    curr = curr->left_sibling;
   }
-  while (curr != child);
-}
+  while (curr != n);
 
-void  to_dot (heap* h, char* filename) {
+  curr = n;
+  do {
+    fprintf(out, "%s -> %s", n->name, n->right_sibling->name);
+    fprintf(out, "%s -> %s", n->name, n->left_sibling->name);
+    if (n->child)
+      fprintf(out, "%s -> %s", n->name, n->child->name);
+    if (n->parent)
+      fprintf(out, "%s -> %s", n->name, n->parent->name);
+  }
+  while (curr != n);
+}
+    
+void  to_dot (node* n, char* filename) {
   FILE * out_file = fopen(filename, "w");
+  counter = 0;
 
   if (out_file == NULL) {
     fprintf(stderr, "Error, couldn't open file: %s!", filename);
     return;
   }
+  node* curr = n;
+  while (curr->parent != NULL)
+    curr = curr->parent;
 
-  dot_node(NULL, h->min_node->child, out_file);
+  fprintf(out_file, "digraph {\n");
+  dot_node(curr, out_file);
+  fprintf(out_file, "}\n");
   fclose(out_file);
+}
+
+void  to_dot (heap* h, char* filename) {
+  to_dot(h->min_node, filename);
 }
