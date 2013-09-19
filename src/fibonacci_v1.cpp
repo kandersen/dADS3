@@ -294,7 +294,7 @@ void dot_node (char* parent, node* child, FILE* out) {
     sprintf(node_name, "node%05d", ++counter);
     fprintf(out, "%s", node_name);
     
-    if (parent != null)
+    if (parent != NULL)
       fprintf(out, "%s --> %s", parent, node_name);
 
     if (curr->child)
