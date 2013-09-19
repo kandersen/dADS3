@@ -285,15 +285,17 @@ int max_rank(heap* h) {
 }
 
 int counter;
-
 void dot_node (char* parent, node* child, FILE* out) {
   node* curr = child;
   char node_name[10];
+  counter = 0;
 
   do {
     sprintf(node_name, "node%05d", ++counter);
     fprintf(out, "%s", node_name);
-    fprintf(out, "%s --> %s", parent, node_name);
+    
+    if (parent != null)
+      fprintf(out, "%s --> %s", parent, node_name);
 
     if (curr->child)
       dot_node(node_name, curr->child, out);
