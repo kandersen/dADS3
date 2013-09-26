@@ -13,35 +13,37 @@ void test_7(int);
 
 
 int main(int argc, char* argv[]) {
-  if (argc < 2) {
+  if (argc < 3) {
     printf("Usage: <testno> <testsize>\n");
     return 1;
   }
 
-  switch (atoi(argv[0])) {
+  printf("test_%d\n", atoi(argv[1]));
+  switch (atoi(argv[1])) {
   case 0: 
-    test_0(atoi(argv[1]));
+    test_0(atoi(argv[2]));
     break;
   case 1:
-    test_1(atoi(argv[1]));
+    test_1(atoi(argv[2]));
     break;
   case 2:
-    test_2(atoi(argv[1]));
+    test_2(atoi(argv[2]));
     break;
   case 3:
-    test_3(atoi(argv[1]));
+    test_3(atoi(argv[2]));
     break;
   case 4:
-    test_4(atoi(argv[1]));
+    test_4(atoi(argv[2]));
     break;
   case 5:
-    test_5(atoi(argv[1]));
+    test_5(atoi(argv[2]));
     break;
   case 6:
-    test_6(atoi(argv[1]));
+
+    test_6(atoi(argv[2]));
     break;
   case 7:
-    test_7(atoi(argv[1]));
+    test_7(atoi(argv[2]));
     break;
   default:
     break;
@@ -60,6 +62,8 @@ test_0 (int size) {
     i->value = NULL;
     insert(i, h);
   }
+
+  printf("min: %d\n", find_min(h)->key);
 }
 
 // pure inserts 1 del
