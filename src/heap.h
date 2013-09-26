@@ -1,6 +1,21 @@
 #ifndef DADS3_HEAP_H
 #define DADS3_HEAP_H
 
+#ifndef INSTRUMENT
+#define le(X, Y) ((X) <= (Y))
+#define lt(X, Y) ((X) <  (Y))
+#define ge(X, Y) ((X) >= (Y))
+#define gt(X, Y) ((X) >  (Y))
+#define eq(X, Y) ((X) == (Y))
+#else
+long long cmp_counter = 0;
+#define le(X, Y) ((cmp_counter++, (X) <= (Y)))
+#define lt(X, Y) ((cmp_counter++, (X) <  (Y)))
+#define ge(X, Y) ((cmp_counter++, (X) >= (Y)))
+#define gt(X, Y) ((cmp_counter++, (X) >  (Y)))
+#define eq(X, Y) ((cmp_counter++, (X) == (Y)))
+#endif
+
 struct heap;
 struct node;
 struct item {
