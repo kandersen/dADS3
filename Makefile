@@ -1,4 +1,4 @@
-COMMON = src/main.cpp
+COMMON = src/main.cpp src/graph.c src/dijkstra.c
 FLAGS = -Wall -O3 -std=c++11
 OSNAME := ${shell uname}
 
@@ -22,6 +22,11 @@ bhp:
 
 fh1:
 	clang++ $(FLAGS) -o bin/fh1.out src/fibonacci_v1.cpp $(COMMON)
+
+dc:
+	rm -f *.dot
+	rm -f *.png
+
 
 
 

@@ -1,32 +1,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "heap.h"
+#include "dijkstra.h"
+#include "graph.h"
 
 int main() {
-  char* file = "test.dot";
-  heap* h = make_heap();
-
-  for (int k = 0; k < 4; k++) {
-    item* i = (item*)malloc(sizeof(item));
-    i->key = k;
-    i->value = NULL;
-    printf("inserting %i\n", k);
-    insert(i, h);
-  }
   
-  delete_min(h);
+  int nodes = 1000;
 
-  to_dot(h, file);
-   item* j;
+  Graph* g = create(nodes, 0.9);
 
-   /*do {
-    j = delete_min(h); 
-    if (j != NULL) {
-      puts("removed one!");
-      printf("%i\n", j->key);
+  to_dot(g, "graph.dot");
+
+  item* result[nodes];
+
+  dijkstra(g, 0, result);
+
+  for (int i = 0; i < nodes; i++) {
+    if (result[i] != NULL) {
+      printf("to node %i: %i\n", i, result[i]->key);
     }
-  } 
-  while (j != NULL); */
- 
+  }
+
   return 0;
 }
