@@ -3,91 +3,115 @@
 #include <math.h>
 #include "heap.h"
 
-typedef struct node node;
+//TYPES
 
 struct node { 
-  node* left;
-  node* right;
-  int   key;
-  void* value;
+  item* left;
+  item* right;
+  item* parent;
 };
 
-node* new_node(int key, void* value) {
-  node* n = malloc(sizeof(node));
-  n->key = key;
-  n->value = value;
-  n->left = 0;
-  n->right = 0;
-  return n;
-}
-
-void swap_nodes(node* n1, node* n2) {
-  int temp_key = n1->key;
-  void* temp_value = n1->value;
-  n1->key = n2->key;
-  n1->value = n2->value;
-  n2->key = temp_key;
-  n2->value = temp_value;
-}
-
 struct heap {
-  node* root;
+  item* root;
   int count;
 };
 
+//UTILITY
+
+node* new_node() {
+  node* n = (node*) malloc(sizeof(node));
+  n->left = NULL;
+  n->right = NULL;
+  n->parent = NULL;
+  return n;
+}
+
+//INTERFACE
+
 heap* make_heap() {
-  heap* h = malloc(sizeof(heap));
-  h->root = 0;
+  heap* h = (heap*) malloc(sizeof(heap));
+  h->root = NULL;
   h->count = 0;
   return h;
 }
 
-void  insert (int key, void* i, heap* h) {
-  node* insertee = new_node(key, i);
+void insert (item* k, heap* h) {
+  k->n = new_node();
   if(h->count == 0) {
-    h->root = insertee;
+    h->root = k;
     h->count = 1;
   } else {
     h->count = h->count + 1;
-    int depth = (int) log2(h->count);
-    node* visited[depth + 1];
-    int path = h->count;
-    node* parent = h->root;
-    visited[depth] = parent;
 
+    int depth = (int) log2(h->count);
+
+    int path = h->count;
+    item* parent = h->root;
+    
     for (int i = depth - 1; i > 0; --i) {
       if ((path >> i) & 1) {
-	parent = parent->right;
+	parent = parent->n->right;
       } else {
-	parent = parent->left;
+	parent = parent->n->left;
       }
-      visited[i] = parent;
     }
 
     if(path & 1) {
-      parent->right = insertee;
+      parent->n->right = k;
     } else {
-      parent->left = insertee;
+      node* foo =  parent->n;
+      foo->left = k;
     }
-    
-    visited[0] = insertee;
 
-    for (int i = 0; i < depth; i++) {
-      if (visited[i]->key < visited[i+1]->key) {
-	swap_nodes(visited[i], visited[i+1]);
-      } else {
+    k->n->parent = parent;
+
+    item* current = k;
+    while(current->n->parent) {
+      item* parent = current->n->parent;
+      if(parent->key <= current->key) {
 	break;
-      }
+      } else {
+	parent->n->left = current->n->left;
+	if(parent->n->left) {
+	  parent->n->left->n->parent = parent;
+	}
+
+	item* parentright_temp = parent->n->right;
+	parent->n->right = current->n->right;
+	if(parent->n->right) {
+	  parent->n->right->n->parent = parent;
+	}
+	current->n->right = parentright_temp;
+	if(parent->n->right) {
+	  current->n->right->n->parent = parent;
+	}
+
+	if (parent->n->parent != NULL) {
+	  if (parent->n->parent->n->left == parent) {
+	    parent->n->parent->n->left = current;
+	  } else {
+	    parent->n->parent->n->right = current;
+	  }
+	}
+
+	current->n->parent = parent->n->parent;
+	parent->n->parent = current;
+
+	if (current->n->right != NULL) {
+	  current->n->right->n->parent = current;
+	}
+      } 
     }
   }
-};
-
-void* find_min (heap* h) {
-  return h->root->value;
 }
 
-void* delete_min (heap* h) {
-  void* result = h->root->value;
+item* find_min (heap* h) {
+  return h->root;
+}
+
+/*
+item* delete_min (heap* h) {
+  item* result = h->root;
   if(h->count == 1) {
     free(h->root);
     h->count = 0;
@@ -95,23 +119,23 @@ void* delete_min (heap* h) {
   }
   
   int path = h->count;
-  node* parent = h->root;
+  item* parent = h->root;
   
   for (int i = log2(path) - 1; i > 0; --i) {
     if ((path >> i) & 1) {
-      parent = parent->right;
+      parent = parent->n->right;
     } else {
-      parent = parent->left;
+      parent = parent->n->left;
     }
   }
   
-  node* last_node;
+  item* last_node;
   if(path & 1) {
-    last_node = parent->right;
-    parent->right = NULL;
+    last_node = parent->n->right;
+    parent->n->right = NULL;
   } else {
-    last_node = parent->left;
-    parent->left = NULL;
+    last_node = parent->n->left;
+    parent->n->left = NULL;
   }
   
   h->root->key = last_node->key;
@@ -119,48 +143,26 @@ void* delete_min (heap* h) {
   free(last_node);
   h->count = h->count - 1;
 
-  node* n = h->root;
-  while(n->left) {
-    if(n->right) {
-      if(n->key <= n->left->key && n->key <= n->right->key) {
+  parent = h->root;
+  while(parent->n->left) {
+    if(parent->n->right) {
+      if(parent->key <= parent->n->left->key && parent->key <= parent->n->right->key) {
 	break;
-      } else if(n->left->key <= n->key && n->left->key <= n->right->key) {
-	swap_nodes(n, n->left);
-	n = n->left;
+      } else if(parent->n->left->key <= parent->key && parent->n->left->key <= parent->n->right->key) {
+	swap_nodes(parent, parent->n->left);
+	parent = parent->n->left;
       } else {
-	swap_nodes(n, n->right);
-	n = n->right;
+	swap_nodes(parent, parent->n->right);
+	parent = parent->n->right;
       }
     } else {
-      if (n->key >= n->left->key) {
-	swap_nodes(n, n->left);
+      if (parent->key >= parent->n->left->key) {
+	swap_nodes(parent, parent->n->left);
       } 
       break;
     }
   }
   return result;
-}
-
-void node_to_dot(node* n) {
-  if(n->left) {
-    printf("    %i -> %i;\n", n->key, n->left->key);
-    node_to_dot(n->left);
-  } else {
-    printf("    %i -> NULL;\n", n->key);
-  }
-  if(n->right) {
-    printf("    %i -> %i;\n", n->key, n->right->key);
-    node_to_dot(n->right);
-  } else {
-    printf("    %i -> NULL;\n", n->key);
-  }
-}
-
-int to_dot_count = 0;
-void to_dot(heap* h) {
-  printf("digraph bin_heap_points_%i {\n", to_dot_count++);
-  node_to_dot(h->root);
-  printf("}\n");
 }
 
 int is_empty(heap* h) {
@@ -170,8 +172,10 @@ int is_empty(heap* h) {
 int count (heap* h) {
   return h->count;
 }
+*/
 
-// TESTS
+//TESTING CODE
+
 typedef struct foo {
   int v;
 } foo;
@@ -182,17 +186,34 @@ foo* new_foo(int i) {
   return f;
 }
 
+item* new_item(void* value, int key) {
+  item* i = (item*) malloc(sizeof(item));
+  i->value = value;
+  i->key = key;
+  i->n = 0;
+  return i;
+}
+
+
 int main() {
   heap* h = make_heap();
+  item* t = new_item(new_foo(9), 9);
 
-  int numbers[10] = { 4, 7, 2, 3, 8, 5, 6, 1, 0, 9 };
-  for(int i = 0; i < 10; ++i) {
-    insert(numbers[i], new_foo(numbers[i]), h);
-  }
+  insert(t, h);
+  insert(new_item(new_foo(4), 4), h);
+  insert(new_item(new_foo(1), 1), h);
+  //insert(new_item(new_foo(7), 7), h);
+  /* insert(new_item(new_foo(5), 5), h); */
+  /* insert(new_item(new_foo(5), 5), h); */
+  /* insert(new_item(new_foo(2), 2), h); */
+  //   insert(new_item(new_foo(0), 0), h);
+  /* insert(new_item(new_foo(8), 8), h); */
+  /* insert(new_item(new_foo(3), 3), h); */
 
+  //decrease_key(10, t, h);
   for(int i = 0; i < 10; i++) {
-    printf("%i ", ((foo*)delete_min(h))->v);
+    printf("Hello, %i!\n", ((foo*)find_min(h))->v);
   }
-  printf("\n");
   return 0;
 }
+
