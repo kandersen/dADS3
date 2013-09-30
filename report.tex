@@ -1,0 +1,100 @@
+\documentclass[12pt,a4paper,twoside,danish,article]{memoir}
+\usepackage{memhfixc} % Dynamic updates to memoir class
+
+\setulmarginsandblock{1.3in}{1.3in}{*} % 1-inch margins on top and bottom
+\setlrmarginsandblock{1.3in}{1.3in}{*} % 1-inch margins on left and right
+\checkandfixthelayout
+
+
+\makeatletter % Suppress various auxiliary commands in bib-file
+\newcommand\Firstpublished[1]{\expandafter\ignorespaces\@gobble}
+\newcommand\Editedby[1]{\expandafter\ignorespaces\@gobble}
+\newcommand\biband{\expandafter\ignorespaces\@gobble}
+\newcommand\Bookreview{\expandafter\ignorespaces\@gobble}
+\newcommand\Moviereview{\expandafter\ignorespaces\@gobble}
+\makeatother
+
+\usepackage{natbib} 
+\citestyle{chicago} % Chicago Manual of Style citations
+\bibliographystyle{dkchicago}
+
+\usepackage[T1]{fontenc} % Font encoding
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{caption}
+
+\usepackage{eurosym} % Symbol for \euro
+
+\begin{document}
+
+\frontmatter
+\begin{titlingpage}
+  \begin{center}
+    \mbox{}\vfill
+    \Huge{\textsc{Dynamic transitive closure problem for unweighted directed graphs}} \\
+    \vspace{3cm}
+    \Large{20095039 : Troels Leth Jensen \\ 20094924 : Jens Olaf Svanholm Fogh \\ 20022362 : Morten Krogh-Jespersen}\\
+    \vspace{10cm}
+    \vspace{1cm}
+    Supervisor: Gudmund Skovbjerg Frandsen,\\ Department of Computer Science, Aarhus Universitet\\
+    \today
+    \vfill
+    \vfill\mbox{}
+  \end{center}
+  \clearpage
+  \tableofcontents*
+\end{titlingpage}
+
+\mainmatter
+
+\raggedbottom
+
+\renewcommand{\labelitemi}{$\bullet$}
+
+\renewcommand{\baselinestretch}{1.2}\normalsize % Increase line spacing
+
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.
+    #1}{\thechapter. #1}} % Chapter marks
+\renewcommand{\bibmark}{\markboth{\bibname}{\bibname}} % Formatting of
+                                % default chapter marks
+\renewcommand{\tocmark}{\markboth{\contentsname}{\contentsname}}
+
+\setlength{\parindent}{10pt} 
+
+\chapter{Introduction}
+
+\chapter{Binary heaps}
+
+\section{Binary heap with array}
+
+\section{Implementing decrease key}
+
+\chapter{Binary heap with pointers}
+
+\section{Implementing decrease key}
+
+\chapter{Testing correctness of Binary Heaps}
+
+\chapter{Fibonacci version 1}
+
+\section{Worst case time-complexity for fib-v1}
+
+\chapter{Fibonacci version 2}
+
+\section{Worst case time-complexity for fib-v2}
+
+\chapter{Testing correctness of Fibonacci Heaps}
+
+\chapter{Test-results}
+
+\chapter{Dijkstra}
+
+\chapter{Binary heap vs Fibonacci heap}
+
+\chapter{Test-results}
+
+\chapter{Conlusion}

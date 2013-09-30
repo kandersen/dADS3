@@ -38,5 +38,6 @@ void  to_dot	   (heap* h, char* filename);
 int   is_empty     (heap* h);
 int   count        (heap* h);
 heap* make_queue   (void* items[], int keys[], int count);
+int   check_consistency (void * h, int parentKey);
 
 #endif

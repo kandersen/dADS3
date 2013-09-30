@@ -3,28 +3,8 @@
 #include "heap.h"
 #include "dijkstra.h"
 #include "graph.h"
+#include <time.h>
 
-<<<<<<< HEAD
-int main() {
-  
-  int nodes = 1000;
-
-  Graph* g = create(nodes, 0.9);
-
-  to_dot(g, "graph.dot");
-
-  item* result[nodes];
-
-  dijkstra(g, 0, result);
-
-  for (int i = 0; i < nodes; i++) {
-    if (result[i] != NULL) {
-      printf("to node %i: %i\n", i, result[i]->key);
-    }
-  }
-
-  return 0;
-=======
 void test_0(int);
 void test_1(int);
 void test_2(int);
@@ -248,5 +228,80 @@ test_7 (int size) {
       remove(items[half-((kk+1)/2)], h);
     }
   }  
->>>>>>> bdb25cd25a10ff444dbef20ab9e9f522a63e5bb2
+}
+
+int random_in_range (unsigned int min, unsigned int max)
+{
+  int base_random = rand(); /* in [0, RAND_MAX] */
+  if (RAND_MAX == base_random) return random_in_range(min, max);
+  /* now guaranteed to be in [0, RAND_MAX) */
+  int range       = max - min,
+    remainder   = RAND_MAX % range,
+    bucket      = RAND_MAX / range;
+  /* There are range buckets, plus one smaller interval
+     within remainder of RAND_MAX */
+  if (base_random < RAND_MAX - remainder) {
+    return min + base_random/bucket;
+  } else {
+    return random_in_range (min, max);
+  }
+}
+
+// CHECK consistency for X operations
+void consistency(int operations) {
+  
+  srand(time(NULL));
+
+  heap* h = make_heap();
+
+  item* items[operations];
+
+  for (int i = 0; i < operations; i++) {
+    items[i] = NULL;
+  }
+
+  int elements_in_list = 0;
+  for (int k = 0; k < operations; k++) {
+
+    double r = ((double) rand() / (RAND_MAX));
+    
+    if (r > 0.3) { // INSERT
+      item* i = (item*)malloc(sizeof(item));
+      items[k] = i;
+      i->key = random_in_range(0,100);
+      int* val = (int*)malloc(sizeof(int));
+      *(val) = k;
+      i->value = val;
+      insert(items[i], h);
+      elements_in_list = elements_in_list + 1;
+    } else {
+      
+      double r2 = ((double) rand() / (RAND_MAX));
+      
+      if (r2 > 0.5) {
+        item* it = delete_min(h);
+        int index = *(it->value);
+        items[index] = NULL;
+        free(it);
+      } else  {
+        int r3 = random_in_range(0, elements_in_list -1);
+        item* selected_item = items[r3];
+        if (selected_item == NULL) {
+          item* it = delete_min(h);
+          int index = *(it->value);
+          items[index] = NULL;
+          free(it);
+        } else {
+          if (r2 > 0.2) {
+            decrease_key(selected_item->key / 2, selected_item, h);
+          } else {
+            remove(selected_item, h);
+            int index = *(selected_item->value);
+            items[index] = NULL;
+            free(selected_item);
+          }
+        } 
+      }
+    }
+  }
 }

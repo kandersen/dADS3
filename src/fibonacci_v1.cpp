@@ -31,7 +31,6 @@ struct heap {
 
 heap* make_heap() {
   heap* h =  (heap*)malloc(sizeof(heap));
-  //printf("item: %d, heap: %d, node: %d\n", sizeof(item), sizeof(heap), sizeof(node));
   h->min_node = NULL;
   h->rank = 0;
   return h;
@@ -114,8 +113,6 @@ item* delete_min (heap* h) {
     
     node* last_ref = list_to_concat; //which is actually just a pointer to an item
     do {
-
-      char name[50];
 
       node* next_ref = last_ref->right_sibling;
       
@@ -253,28 +250,6 @@ void update_marked(node* n, heap* h) {
     }
   }
 }
-
-/*
-void update_parent_marked(node* n, heap* h) {
-
-  if (n->parent != NULL && n->parent->parent != NULL) {
-    // we are not root and parent is not root
-
-    if (n->parent->marked == 1) {
-      update_parent_marked(n->parent->parent, h);
-      if (n->parent->right_sibling == n->parent) {
-        n->parent->
-      } else {
-
-      }
-      remove_node_in_list(n->parent);
-      n->parent->parent = NULL;
-      concat_list(h->min_node, n->parent); 
-    } else {
-      n->parent->marked = 1;
-    }    
-  }
- } */
 
 void concat_list(node* n1, node* n2) {
 
@@ -422,3 +397,41 @@ void  to_dot (heap* h, char* filename) {
     to_dot(h->min_node, filename);
   }
 }
+
+int check_consistency (node* n, int parentKey) {
+  
+  int key = n->key;
+  int item_key = n->item->key;
+
+  if (key != item_key) {
+    printf("ERROR: item key not set!!!");
+  }
+
+  if (key < parentKey) {
+    printf("ERROR: child key smaller than parent key!!!");
+  }
+
+  node* parent_pointer = n->parent;
+  node* sibling = n;
+  node* prev_sibling = n->left_sibling;
+
+  do{    
+
+    if (sibling->parent != parent_pointer) {
+      printf("ERROR: parent pointer not set!!!");
+    }
+
+    check_consistency(sibling, sibling->key);
+
+    if (sibling->left_sibling != prev_sibling) {
+      printf("ERROR: left sibling not set for right sibling!!!");
+    }
+
+    prev_sibling = sibling;
+    sibling = sibling->right_sibling;
+
+  } while (sibling != n);
+
+}
+
+
