@@ -42,7 +42,7 @@ void insert(item* k, heap* h) {
   int i = h->count;
   while (i > 0) {
     int j = i / 2;
-    if (k->key >= h->array[j]->key) {
+    if (GE(k->key, h->array[j]->key)) {
       break;
     }
     h->array[i] = h->array[j];
@@ -67,11 +67,11 @@ item* delete_min(heap* h) {
   while ((j = 2 * i + 1) <= h->count) {
     item* temp = h->array[j];
     item* temp1 = h->array[j + 1];
-    if (temp1->key < temp->key) {
+    if (LT(temp1->key, temp->key)) {
       temp = temp1;
       j = j+1;
     }
-    if (temp->key >= in->key) {
+    if (GE(temp->key, in->key)) {
       break;
     }
     h->array[i] = temp;
@@ -89,7 +89,7 @@ void decrease_key(int delta, item* k, heap* h) {
   int i = k->n->index;
   while (i > 0) {
     int j = i / 2;
-    if (k->key >= h->array[j]->key) {
+    if (GE(k->key, h->array[j]->key)) {
       break;
     }
     h->array[i] = h->array[j];
@@ -107,48 +107,3 @@ int is_empty(heap* h) {
 int count(heap* h) {
   return h->count;
 }
-
-// "Testing code"
-/*
-typedef struct foo {
-  int v;
-} foo;
-
-foo* new_foo(int i) {
-  foo* f = (foo*) malloc(sizeof(foo));
-  f->v = i;
-  return f;
-}
-
-item* new_item(void* value, int key) {
-  item* i = (item*) malloc(sizeof(item));
-  i->value = value;
-  i->key = key;
-  i->n = 0;
-  return i;
-}
-
-int main() {
-  heap* h = make_heap();
-  item* t = new_item(new_foo(9), 9);
-
-  insert(t, h);
-  insert(new_item(new_foo(4), 4), h);
-  insert(new_item(new_foo(1), 1), h);
-  insert(new_item(new_foo(7), 7), h);
-  insert(new_item(new_foo(5), 5), h);
-  insert(new_item(new_foo(5), 5), h);
-  insert(new_item(new_foo(2), 2), h);
-  insert(new_item(new_foo(0), 0), h);
-  insert(new_item(new_foo(8), 8), h);
-  insert(new_item(new_foo(3), 3), h);
-
-  decrease_key(10, t, h);
-
-  for(int i = 0; i < 10; i++) {
-    printf("Hello, %i!\n", ((foo*)delete_min(h))->v);
-  }
-  return 0;
-}
-*/
-
