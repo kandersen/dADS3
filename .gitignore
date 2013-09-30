@@ -23,3 +23,7 @@
 
 *.png
 *.dot
+
+#TeX Junk
+*.log
+*.aux
