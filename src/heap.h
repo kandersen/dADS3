@@ -2,18 +2,18 @@
 #define DADS3_HEAP_H
 
 #ifndef INSTRUMENT
-#define le(X, Y) ((X) <= (Y))
-#define lt(X, Y) ((X) <  (Y))
-#define ge(X, Y) ((X) >= (Y))
-#define gt(X, Y) ((X) >  (Y))
-#define eq(X, Y) ((X) == (Y))
+#define LE(X, Y) ((X) <= (Y))
+#define LT(X, Y) ((X) <  (Y))
+#define GE(X, Y) ((X) >= (Y))
+#define GT(X, Y) ((X) >  (Y))
+#define EQ(X, Y) ((X) == (Y))
 #else
 long long cmp_counter = 0;
-#define le(X, Y) ((cmp_counter++, (X) <= (Y)))
-#define lt(X, Y) ((cmp_counter++, (X) <  (Y)))
-#define ge(X, Y) ((cmp_counter++, (X) >= (Y)))
-#define gt(X, Y) ((cmp_counter++, (X) >  (Y)))
-#define eq(X, Y) ((cmp_counter++, (X) == (Y)))
+#define LE(X, Y) ((cmp_counter++, (X) <= (Y)))
+#define LT(X, Y) ((cmp_counter++, (X) <  (Y)))
+#define GE(X, Y) ((cmp_counter++, (X) >= (Y)))
+#define GT(X, Y) ((cmp_counter++, (X) >  (Y)))
+#define EQ(X, Y) ((cmp_counter++, (X) == (Y)))
 #endif
 
 struct heap;
@@ -38,6 +38,6 @@ void  to_dot	   (heap* h, char* filename);
 int   is_empty     (heap* h);
 int   count        (heap* h);
 heap* make_queue   (void* items[], int keys[], int count);
-int   check_consistency (void * h, int parentKey);
+int   is_consistent(heap* h);
 
 #endif
