@@ -401,7 +401,7 @@ void  to_dot (heap* h, char* filename) {
   }
 }
 
-int check_consistency (node* n, int parentKey) {
+int is_consistent (node* n, int parentKey) {
   
   int key = n->key;
   int item_key = n->item->key;
@@ -434,7 +434,12 @@ int check_consistency (node* n, int parentKey) {
     sibling = sibling->right_sibling;
 
   } while (sibling != n);
+}
 
+int is_consistent(heap* h) {
+  if (h->min_node != NULL) {
+    is_consistent(h->min_node, 0);               
+  }
 }
 
 
