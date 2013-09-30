@@ -272,7 +272,7 @@ void consistency(int operations) {
       int* val = (int*)malloc(sizeof(int));
       *(val) = k;
       i->value = val;
-      insert(items[i], h);
+      insert(i, h);
       elements_in_list = elements_in_list + 1;
     } else {
       
@@ -280,7 +280,7 @@ void consistency(int operations) {
       
       if (r2 > 0.5) {
         item* it = delete_min(h);
-        int index = *(it->value);
+        int index = *((int*)(it->value));
         items[index] = NULL;
         free(it);
       } else  {
@@ -288,7 +288,7 @@ void consistency(int operations) {
         item* selected_item = items[r3];
         if (selected_item == NULL) {
           item* it = delete_min(h);
-          int index = *(it->value);
+          int index = *((int*)(it->value));
           items[index] = NULL;
           free(it);
         } else {
@@ -296,7 +296,7 @@ void consistency(int operations) {
             decrease_key(selected_item->key / 2, selected_item, h);
           } else {
             remove(selected_item, h);
-            int index = *(selected_item->value);
+            int index = *((int*)(selected_item->value));
             items[index] = NULL;
             free(selected_item);
           }

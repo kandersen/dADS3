@@ -55,7 +55,10 @@ void insert(item* i, heap* h) {
 }
 
 item* find_min (heap* h) {
-  return h->min_node->item;
+  if (h->min_node != NULL) {
+    return h->min_node->item;
+  }
+  return NULL;
 }
 
 heap* meld (heap* h1, heap* h2) {

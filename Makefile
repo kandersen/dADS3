@@ -1,4 +1,4 @@
-COMMON = src/main.cpp src/graph.c src/dijkstra.c
+COMMON = src/graph.c src/dijkstra.c
 FLAGS = -Wall -O3 -std=c++11
 OSNAME := ${shell uname}
 
@@ -18,10 +18,10 @@ bha:
 	clang++ $(FLAGS) -o bin/bha.out src/binary_heap_array.c 
 
 bhp:
-	clang++ $(FLAGS) -o bin/bhp.out src/binary_heap_pointer.c $(COMMON)
+	clang++ $(FLAGS) -o bin/bhp.out src/binary_heap_pointer_mkj.c $(COMMON)
 
 fh1:
-	clang++ $(FLAGS) -o bin/fh1.out src/fibonacci_v1.cpp $(COMMON)
+	clang++ $(FLAGS) -o bin/fh1.out src/main.cpp src/fibonacci_v1.cpp $(COMMON)
 
 dc:
 	rm -f *.dot

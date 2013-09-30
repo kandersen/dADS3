@@ -9,6 +9,7 @@ struct node {
   item* left;
   item* right;
   item* parent;
+  char* name;
 };
 
 struct heap {
@@ -25,6 +26,8 @@ node* new_node() {
   n->parent = NULL;
   return n;
 }
+
+
 
 //INTERFACE
 
