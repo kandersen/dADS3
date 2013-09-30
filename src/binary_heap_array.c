@@ -46,6 +46,7 @@ void insert(item* k, heap* h) {
       break;
     }
     h->array[i] = h->array[j];
+    h->array[i]->n->index = i;
     i = j;
   }
   h->array[i] = k;
@@ -83,6 +84,22 @@ item* delete_min(heap* h) {
   return min;
 }
 
+void decrease_key(int delta, item* k, heap* h) {
+  k->key -= delta;  
+  int i = k->n->index;
+  while (i > 0) {
+    int j = i / 2;
+    if (k->key >= h->array[j]->key) {
+      break;
+    }
+    h->array[i] = h->array[j];
+    h->array[i]->n->index = j;
+    i = j;
+  }
+  h->array[i] = k;
+  k->n->index = i;
+}
+
 int is_empty(heap* h) {
   return h->count == 0;
 }
@@ -92,7 +109,7 @@ int count(heap* h) {
 }
 
 // "Testing code"
-
+/*
 typedef struct foo {
   int v;
 } foo;
@@ -113,7 +130,9 @@ item* new_item(void* value, int key) {
 
 int main() {
   heap* h = make_heap();
-  insert(new_item(new_foo(9), 9), h);
+  item* t = new_item(new_foo(9), 9);
+
+  insert(t, h);
   insert(new_item(new_foo(4), 4), h);
   insert(new_item(new_foo(1), 1), h);
   insert(new_item(new_foo(7), 7), h);
@@ -123,11 +142,13 @@ int main() {
   insert(new_item(new_foo(0), 0), h);
   insert(new_item(new_foo(8), 8), h);
   insert(new_item(new_foo(3), 3), h);
-  
+
+  decrease_key(10, t, h);
+
   for(int i = 0; i < 10; i++) {
     printf("Hello, %i!\n", ((foo*)delete_min(h))->v);
   }
   return 0;
 }
-
+*/
 
