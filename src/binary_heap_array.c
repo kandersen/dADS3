@@ -42,7 +42,7 @@ void insert(item* k, heap* h) {
   int i = h->count;
   while (i > 0) {
     int j = i / 2;
-    if (k->key >= h->array[j]->key) {
+    if (GE(k->key, h->array[j]->key)) {
       break;
     }
     h->array[i] = h->array[j];
@@ -68,11 +68,11 @@ item* delete_min(heap* h) {
   while ((j = 2 * i + 1) <= h->count) {
     item* temp = h->array[j];
     item* temp1 = h->array[j + 1];
-    if (temp1->key < temp->key) {
+    if (LT(temp1->key, temp->key)) {
       temp = temp1;
       j = j+1;
     }
-    if (temp->key >= in->key) {
+    if (GE(temp->key, in->key)) {
       break;
     }
     h->array[i] = temp;
@@ -90,7 +90,7 @@ void decrease_key(int delta, item* k, heap* h) {
   int i = k->n->index;
   while (i > 0) {
     int j = i / 2;
-    if (k->key >= h->array[j]->key) {
+    if (GE(k->key, h->array[j]->key)) {
       break;
     }
     h->array[i] = h->array[j];
@@ -108,6 +108,7 @@ int is_empty(heap* h) {
 int count(heap* h) {
   return h->count;
 }
+<<<<<<< HEAD
 
 // DOTTING
 
@@ -205,3 +206,5 @@ int main() {
 }
 
 
+=======
+>>>>>>> 74db49f479dd6d99975c9d1e6fde9e5bbe02edf2

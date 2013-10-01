@@ -18,7 +18,7 @@ bha:
 	clang++ $(FLAGS) -o bin/bha.out src/binary_heap_array.c 
 
 bhp:
-	clang++ $(FLAGS) -o bin/bhp.out src/binary_heap_pointer_mkj.c $(COMMON)
+	clang++ $(FLAGS) -o bin/bhp.out src/binary_heap_pointer.c $(COMMON)
 
 fh1:
 	clang++ $(FLAGS) -o bin/fh1.out src/main.cpp src/fibonacci_v1.cpp $(COMMON)
@@ -36,6 +36,10 @@ dijkstra:
 dc:
 	rm -f *.dot
 	rm -f *.png
+
+texclean: 
+	rm -f *.log
+	rm -f *.aux
 
 
 
