@@ -27,11 +27,16 @@ fh2:
 	clang++ $(FLAGS) -o bin/fh2.out src/fibonacci_v2.c $(COMMON)
 
 graph:
-	clang++ $(FLAGS) -o bin/graphls.out src/graph.c src/main_gen_graph.c	
+	clang++ $(FLAGS) -o bin/graph.out src/graph.c src/main_gen_graph.c	
 
-dijkstra:
-	clang++ $(FLAGS) -o bin/fh2.out src/fibonacci_v2.c $(COMMON)
+dijkstra_bhp:
+	clang++ $(FLAGS) -o bin/dijkstra.out src/binary_heap_pointer.c src/main_dijkstra.c $(COMMON)
 
+dijkstra_fib1:
+	clang++ $(FLAGS) -o bin/dijkstra.out src/fibonacci_v1.cpp src/main_dijkstra.c $(COMMON)
+
+dijkstra_fib2:
+	clang++ $(FLAGS) -o bin/dijkstra.out src/fibonacci_v2.c src/main_dijkstra.c $(COMMON)
 
 dc:
 	rm -f *.dot

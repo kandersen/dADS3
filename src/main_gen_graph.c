@@ -9,7 +9,7 @@ int main() {
 
   srand(time(NULL));
 
-  int max_size = 10000;
+  int max_size = 1000;
   int start_size = 10;
 
   puts("creating");
