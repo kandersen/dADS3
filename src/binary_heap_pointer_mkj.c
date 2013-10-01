@@ -315,6 +315,7 @@ item* new_item(void* value, int key) {
   return i;
 }
 
+/*
 int main() {
   heap* h = make_heap();
   
@@ -339,6 +340,8 @@ int main() {
 
   return 0;
 }
+
+*/
 
 // DOTTING
 

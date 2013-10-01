@@ -6,8 +6,6 @@
 
 Graph* create(int nodes, double prob) {
 
-  srand(time(NULL));
-
   Graph* newMat = (Graph*)malloc(sizeof(Graph));
   
   newMat->nodes = nodes;
@@ -81,4 +79,52 @@ void print(Graph * m) {
     printf("\n");
   }
 
+}
+
+void to_file(Graph* m, char* filename) {
+
+  FILE * out_file = fopen(filename, "w");
+
+  if (out_file == NULL) {
+    fprintf(stderr, "Error, couldn't open file: %s!", filename);
+    return;
+  }
+
+  for (int i = 0; i < m->nodes; i++) {
+    for (int j = 0; j < m->nodes; j++) {
+
+      int edge = get(m, i, j);
+      if (edge > 0) {
+        fprintf(out_file, "%i %i %i\n", i, j, edge);
+      }
+    }
+  }
+
+  fclose(out_file);
+}
+
+Graph* from_file(char* filename, int nodes) {
+  
+  Graph* newMat = (Graph*)malloc(sizeof(Graph));
+  
+  newMat->nodes = nodes;
+  newMat->mat = (int*)malloc(nodes * nodes * sizeof(int));
+  
+  char str[100];
+
+  FILE * pFile = fopen (filename , "r");
+  if (pFile == NULL) {
+    fprintf(stderr, "Error, couldn't open file: %s!", filename);
+    return NULL;
+  } else {
+    int a, b, c;
+    while ( fgets(str, 100, pFile) != NULL ) {      
+      sscanf(str, "%d %d %d", &a, &b, &c);
+      set(newMat, a, b, c);
+    }
+  }
+
+  fclose(pFile);
+
+  return newMat;
 }

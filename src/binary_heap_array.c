@@ -59,6 +59,7 @@ item* find_min(heap* h) {
 }
 
 item* delete_min(heap* h) {
+
   item* min = h->array[0];
   h->count = h->count - 1;
   item* in = h->array[h->count];
@@ -108,8 +109,57 @@ int count(heap* h) {
   return h->count;
 }
 
+// DOTTING
+
+void item_names (heap* h, FILE* out) {
+  char buf[10];
+  
+  fprintf(out, "{ \n");
+
+  int i = 0;
+  while (i < h->count) {
+    sprintf(buf, "node%05d", i);    
+    fprintf(out, "%s [label=\"%d\"];\n", buf, h->array[i]->key);
+    i += 1;
+  }
+    
+  fprintf(out, "}\n");
+}
+
+
+void dot_items (heap* h, FILE* out) {
+  int i = 0;
+  char buf1[10];
+  char buf2[10];
+  while (i < h->count) {
+    if (i > 0) {
+      int j = i / 2;
+      sprintf(buf1, "node%05d", i);    
+      sprintf(buf2, "node%05d", j);    
+      fprintf(out, "%s -> %s [color=\"red\"]\n", buf2,buf1);
+    } 
+    i += 1;
+  }
+}
+    
+void  to_dotarr (heap* h, char* filename) {
+  FILE * out_file = fopen(filename, "w");
+
+  if (out_file == NULL) {
+    fprintf(stderr, "Error, couldn't open file: %s!", filename);
+    return;
+  }
+
+  fprintf(out_file, "digraph {\n");
+  item_names(h, out_file);
+  dot_items(h, out_file);
+  fprintf(out_file, "}\n");
+  fclose(out_file);
+}
+
+
 // "Testing code"
-/*
+
 typedef struct foo {
   int v;
 } foo;
@@ -130,25 +180,28 @@ item* new_item(void* value, int key) {
 
 int main() {
   heap* h = make_heap();
-  item* t = new_item(new_foo(9), 9);
-
-  insert(t, h);
-  insert(new_item(new_foo(4), 4), h);
-  insert(new_item(new_foo(1), 1), h);
-  insert(new_item(new_foo(7), 7), h);
-  insert(new_item(new_foo(5), 5), h);
-  insert(new_item(new_foo(5), 5), h);
-  insert(new_item(new_foo(2), 2), h);
-  insert(new_item(new_foo(0), 0), h);
-  insert(new_item(new_foo(8), 8), h);
-  insert(new_item(new_foo(3), 3), h);
-
-  decrease_key(10, t, h);
-
-  for(int i = 0; i < 10; i++) {
-    printf("Hello, %i!\n", ((foo*)delete_min(h))->v);
+ 
+  item* items[50];
+  for (int i = 49; i >= 0; i--) {
+    item* t = new_item(new_foo(i), i);
+    items[i] = t;
+    insert(t, h);
   }
+  
+  puts("inserted");
+  to_dotarr(h, "after_insert.dot");
+  
+  puts("deleting");
+  char filename[50];
+  for (int i = 0; i < 50; i++) {
+    item* min = delete_min(h);
+    sprintf(filename, "file_%i.dot", i);
+    to_dotarr(h, filename);
+    printf("delete_min: %i\n", min->key);
+  }
+  puts("deleted");
+
   return 0;
 }
-*/
+
 

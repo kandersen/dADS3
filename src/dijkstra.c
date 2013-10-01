@@ -26,7 +26,8 @@ void dijkstra(Graph* g, int source, item** ph) {
     insert(itm, h);
   }
 
-  item* val = delete_min(h);
+  item* val = find_min(h);
+  delete_min(h);
 
   while (val != NULL) {
     
@@ -48,6 +49,7 @@ void dijkstra(Graph* g, int source, item** ph) {
       }
     }
 
-    val = delete_min(h);
+    val = find_min(h);
+    delete_min(h);
   }
 }

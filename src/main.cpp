@@ -94,7 +94,7 @@ test_2(int size) {
   }
 
   for (int kk = 0; kk < size; kk++) {
-    delete_min(h);
+    item* t = delete_min(h);
   }
 }
 

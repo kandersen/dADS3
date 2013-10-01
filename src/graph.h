@@ -13,5 +13,7 @@ int get(Graph * m, int i, int j);
 void set(Graph * m, int i, int j, int val);
 void to_dot(Graph * m, char* filename);
 void print(Graph * m);
+void to_file(Graph* m, char* filename);
+Graph* from_file(char* filename, int node);
 
 #endif

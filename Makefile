@@ -23,6 +23,16 @@ bhp:
 fh1:
 	clang++ $(FLAGS) -o bin/fh1.out src/main.cpp src/fibonacci_v1.cpp $(COMMON)
 
+fh2:
+	clang++ $(FLAGS) -o bin/fh2.out src/fibonacci_v2.c $(COMMON)
+
+graph:
+	clang++ $(FLAGS) -o bin/graphls.out src/graph.c src/main_gen_graph.c	
+
+dijkstra:
+	clang++ $(FLAGS) -o bin/fh2.out src/fibonacci_v2.c $(COMMON)
+
+
 dc:
 	rm -f *.dot
 	rm -f *.png

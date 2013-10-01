@@ -54,80 +54,76 @@ void insert(item* i, heap* h) {
   meld(h, new_h);  
 }
 
+
 item* find_min (heap* h) {
-  if (h->min_node != NULL) {
+  if (h->min_node == NULL) {
+    return NULL;
+  }
+  
+  if (h->min_node->item != NULL) {
     return h->min_node->item;
   }
-  return NULL;
-}
 
-heap* meld (heap* h1, heap* h2) {
-
-  if (h1->min_node == NULL) { *h1 = *h2; return h1; }
-  if (h2->min_node == NULL) {return h1; }
-
-  node* h1_min_node = h1->min_node;
-  node* h2_min_node = h2->min_node;
-
-  concat_list(h1_min_node, h2_min_node);
-
-  if (GT(h1_min_node->key, h2_min_node->key)) {
-    h1->min_node = h2->min_node;
+  // at this point, we have to destroy vacant nodes
+  int removed_min_node = 1;
+  node* current;
+  while (removed_min_node == 1) {
+    removed_min_node = 0;
+    current = h->min_node;
+    
+    if (current != NULL && current->item == NULL) {
+      removed_min_node = 1;
+      if (current->right_sibling == current) {
+        h->min_node = current->child;
+      } else {
+        if (current->child != NULL) {
+          concat_list(current, current->child);
+        }
+        h->min_node = current->right_sibling;
+        remove_node_in_list(current);
+      }
+      
+      free(current);
+    }
   }
 
-  h1->rank = h1->rank + h2->rank;
-  
-  free(h2);
-
-  return h1;
-}
-
-item* delete_min (heap* h) {
-  node* min_node = h->min_node;
-  node* list_to_concat = NULL;
-
-  if (min_node != NULL) {
-    
-    if (min_node->left_sibling == min_node) { // only one root
-      h->min_node = NULL;
-      list_to_concat = min_node->child;
-    } else { 
-      // save an arbitrary reference to the new list
-      list_to_concat = min_node->left_sibling;
-
-      // remove min root from forest
-      remove_node_in_list(min_node);      
-      
-      if (min_node->child != NULL) {
-        // If we have to append childs from the min root
-        concat_list(list_to_concat, min_node->child);
+  // Now, we have a fixpoint to stop at
+  current = h->min_node;
+  if (current != NULL) {
+    do {
+      node* next_current;        
+      if (current->item == NULL) {
+        if (current->child != NULL) {
+          concat_list(current, current->child);
+        }
+        next_current = current->right_sibling;
+        remove_node_in_list(current);
+        free(current);
+      } else {
+        next_current = current->right_sibling;
       }
-    }
-  } 
-
-  h->rank = h->rank - 1;
+      current = next_current;          
+    } while (current != h->min_node);
   
-  if (list_to_concat != NULL) {
-    
     int mr = max_rank(h);
     node* ranks[mr]; //calloc?
     for (int i = 0; i < mr; i++) {
       ranks[i] = NULL;
     }
     
-    node* last_ref = list_to_concat; //which is actually just a pointer to an item
+    node* last_ref = h->min_node; 
+          
     do {
-
+      
       node* next_ref = last_ref->right_sibling;
       
       last_ref->parent = NULL; // remember to set parent 0 - all is root nodes
       last_ref->left_sibling = last_ref;
       last_ref->right_sibling = last_ref;
-
-      node* this_ref = last_ref;      
-
+      
+      node* this_ref = last_ref;            
       node* existing_tree = ranks[this_ref->rank];
-
+      
       // a while is necessary if we join trees
       while (existing_tree != NULL) {
         ranks[this_ref->rank] = NULL;
@@ -136,9 +132,9 @@ item* delete_min (heap* h) {
       }
       ranks[this_ref->rank] = this_ref;
       last_ref = next_ref;
-     
-    } while (last_ref != list_to_concat); 
-
+      
+    } while (last_ref != current); 
+    
     // this way, we go through the circular list, until we reach the starting point
     node* new_min_node = NULL; // set an arbitrary one
     
@@ -153,17 +149,49 @@ item* delete_min (heap* h) {
         }
       }
     }
-
+    
     h->min_node = new_min_node;
+  } 
+  
+  if (h->min_node != NULL) {
+    return h->min_node->item;
   }
+  
+  return NULL;
+}
 
-  if (min_node != NULL) {
-    item* val = min_node->item;
-    free(min_node);
-    return val;
-  } else {
-    return NULL;
+heap* meld (heap* h1, heap* h2) {
+
+  if (h1->min_node == NULL) { *h1 = *h2; return h1; }
+  if (h2->min_node == NULL) { free(h2); return h1; }
+
+  node* h1_min_node = h1->min_node;
+  node* h2_min_node = h2->min_node;
+
+  concat_list(h1_min_node, h2_min_node);
+  
+  if (h1_min_node->item == NULL) {
+    h1->min_node = h1_min_node;
+  } else if (h2_min_node->item == NULL) {
+    h1->min_node = h2_min_node;
+  } else {  
+    if (GT(h1_min_node->key, h2_min_node->key)) {
+      h1->min_node = h2_min_node;
+    }
   }
+  
+  h1->rank = h1->rank + h2->rank;
+  
+  return h1;
+}
+
+item* delete_min (heap* h) {
+
+  node* min_node = h->min_node;
+  if (min_node != NULL) {
+    min_node->item = NULL;
+  }
+  return NULL;
 }
 
 void decrease_key (int delta, item* i, heap* h) {
@@ -201,38 +229,10 @@ void decrease_key (int delta, item* i, heap* h) {
 void remove(item* i, heap* h) {
   
   node* n = i->n;
+  n->item = NULL;
+  n->key = -1;
+  h->rank = h->rank - 1;
 
-  if (h->min_node == n) {
-    delete_min(h);
-  } else {
-
-    if (n->parent != NULL) {
-
-      update_marked(n->parent, h);
-
-      if (n->right_sibling == n) {
-        n->parent->child = NULL;
-      } else {
-        n->parent->child = n->right_sibling;
-      }
-
-      n->parent->rank = n->parent->rank - 1;
-    } 
-
-    remove_node_in_list(n);
-
-    if (n->child != NULL) {
-      // move the node up to the root
-      concat_list(h->min_node, n->child);    
-
-      // should this be a constant operation?
-      node* last_ref = n->child;
-      do {
-        last_ref->parent = NULL;
-        last_ref = last_ref->right_sibling;
-      } while (last_ref != n->child);     
-    }
-  } 
 }
 
 void update_marked(node* n, heap* h) {
@@ -327,7 +327,13 @@ void node_name (node* n, FILE* out) {
     curr->name = (char*) malloc(sizeof(char)*10);
     strcpy(curr->name, buf);
 
-    fprintf(out, "%s [label=\"%d\", shape=%s];\n", curr->name, curr->key, curr->marked ? "box" : "oval");
+    if (curr->item == NULL) {
+      fprintf(out, "%s [label=\" \", shape=%s];\n", curr->name, curr->marked ? "box" : "oval");
+    
+    } else {
+      fprintf(out, "%s [label=\"%d\", shape=%s];\n", curr->name, curr->key, curr->marked ? "box" : "oval");
+
+    }
     curr = curr->left_sibling;
   }
   while (curr != n);
@@ -448,6 +454,55 @@ int is_consistent(heap* h) {
     return is_consistent(h->min_node, 0);               
   }
   return 1;
+}
+
+typedef struct foo {
+  int v;
+} foo;
+
+foo* new_foo(int i) {
+  foo* f = (foo*) malloc(sizeof(foo));
+  f->v = i;
+  return f;
+}
+
+item* new_item(void* value, int key) {
+  item* i = (item*) malloc(sizeof(item));
+  i->value = value;
+  i->key = key;
+  i->n = 0;
+  return i;
+}
+
+int main() {
+  heap* h = make_heap();
+
+  int nodes = 65;
+
+  item* items[nodes];
+  for (int i = nodes - 1; i >= 0; i--) {
+    item* t = new_item(new_foo(i), i);
+    items[i] = t;
+    insert(t, h);
+  }
+  
+  to_dot(h, "after_insert.dot");
+
+  delete_min(h);
+  find_min(h);
+
+  char filename[50];
+  for (int i = 0; i < 40; i++) {
+    remove(items[i], h);
+    sprintf(filename, "delete_%i.dot", i);
+    to_dot(h, filename);
+  }
+
+  item* itm = find_min(h);
+  to_dot(h, "find_min.dot");
+  printf("find_min: %i\n", itm->key);
+
+  return 0;
 }
 
 
