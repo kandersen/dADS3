@@ -3,6 +3,9 @@
 #include <stdlib.h>
 
 #define INITIAL_HEAP_SIZE 1024
+#define INDEX_OF_ITEM(I) (I - 1)
+#define ITEM_OF_INDEX(I) (I + 1)
+
 
 // TYPES
 
@@ -37,37 +40,37 @@ heap* make_heap() {
 
 void insert(item* k, heap* h) {
   if(h->count == h->size) {
-    h->array = (item**)realloc(h->array, (sizeof(item*) * (h-> size = h->size * 2)));
+    h->array = (item**)realloc(h->array, (sizeof(item*) * (h->size = h->size * 2)));
   }
+  h->count = h->count + 1;
   int i = h->count;
-  while (i > 0) {
+  while (i > 1) {
     int j = i / 2;
-    if (GE(k->key, h->array[j]->key)) {
+    if (GE(k->key, h->array[INDEX_OF_ITEM(j)]->key)) {
       break;
     }
-    h->array[i] = h->array[j];
-    h->array[i]->n->index = i;
+    h->array[INDEX_OF_ITEM(i)] = h->array[INDEX_OF_ITEM(j)];
+    h->array[INDEX_OF_ITEM(i)]->n->index = INDEX_OF_ITEM(i);
     i = j;
   }
-  h->array[i] = k;
-  k->n = new_node(i);
-  h->count = h->count + 1;
+  h->array[INDEX_OF_ITEM(i)] = k;
+  k->n = new_node(INDEX_OF_ITEM(i));
+
 }
     
 item* find_min(heap* h) {
-  return h->array[0];
+  return h->array[INDEX_OF_ITEM(1)];
 }
 
 item* delete_min(heap* h) {
-
-  item* min = h->array[0];
+  item* min = h->array[INDEX_OF_ITEM(1)];
+  item* in = h->array[INDEX_OF_ITEM(h->count)];
   h->count = h->count - 1;
-  item* in = h->array[h->count];
-  int i = 0;
+  int i = 1;
   int j;
-  while ((j = 2 * i + 1) <= h->count) {
-    item* temp = h->array[j];
-    item* temp1 = h->array[j + 1];
+  while ((j = 2 * i) <= h->count) {
+    item* temp = h->array[INDEX_OF_ITEM(j)];
+    item* temp1 = h->array[INDEX_OF_ITEM(j + 1)];
     if (LT(temp1->key, temp->key)) {
       temp = temp1;
       j = j+1;
@@ -75,11 +78,11 @@ item* delete_min(heap* h) {
     if (GE(temp->key, in->key)) {
       break;
     }
-    h->array[i] = temp;
+    h->array[INDEX_OF_ITEM(i)] = temp;
     temp->n->index = i;
     i = j;
   }
-  h->array[i] = in;
+  h->array[INDEX_OF_ITEM(i)] = in;
   in->n->index = i;
   free(min->n);
   return min;
@@ -87,18 +90,18 @@ item* delete_min(heap* h) {
 
 void decrease_key(int delta, item* k, heap* h) {
   k->key -= delta;  
-  int i = k->n->index;
-  while (i > 0) {
+  int i = ITEM_OF_INDEX(k->n->index);
+  while (i > 1) {
     int j = i / 2;
-    if (GE(k->key, h->array[j]->key)) {
+    if (GE(k->key, h->array[INDEX_OF_ITEM(j)]->key)) {
       break;
     }
-    h->array[i] = h->array[j];
-    h->array[i]->n->index = j;
+    h->array[INDEX_OF_ITEM(i)] = h->array[INDEX_OF_ITEM(j)];
+    h->array[INDEX_OF_ITEM(i)]->n->index = INDEX_OF_ITEM(j);
     i = j;
   }
-  h->array[i] = k;
-  k->n->index = i;
+  h->array[INDEX_OF_ITEM(i)] = k;
+  k->n->index = INDEX_OF_ITEM(i);
 }
 
 int is_empty(heap* h) {
@@ -108,7 +111,6 @@ int is_empty(heap* h) {
 int count(heap* h) {
   return h->count;
 }
-<<<<<<< HEAD
 
 // DOTTING
 
@@ -117,10 +119,10 @@ void item_names (heap* h, FILE* out) {
   
   fprintf(out, "{ \n");
 
-  int i = 0;
-  while (i < h->count) {
+  int i = 1;
+  while (i <= h->count) {
     sprintf(buf, "node%05d", i);    
-    fprintf(out, "%s [label=\"%d\"];\n", buf, h->array[i]->key);
+    fprintf(out, "%s [label=\"%d\"];\n", buf, h->array[i - 1]->key);
     i += 1;
   }
     
@@ -129,16 +131,14 @@ void item_names (heap* h, FILE* out) {
 
 
 void dot_items (heap* h, FILE* out) {
-  int i = 0;
+  int i = 2;
   char buf1[10];
   char buf2[10];
-  while (i < h->count) {
-    if (i > 0) {
-      int j = i / 2;
-      sprintf(buf1, "node%05d", i);    
-      sprintf(buf2, "node%05d", j);    
-      fprintf(out, "%s -> %s [color=\"red\"]\n", buf2,buf1);
-    } 
+  while (i <= h->count) {
+    int j = i / 2;
+    sprintf(buf1, "node%05d", i);    
+    sprintf(buf2, "node%05d", j);    
+    fprintf(out, "%s -> %s [color=\"red\"]\n", buf2,buf1);
     i += 1;
   }
 }
@@ -150,7 +150,7 @@ void  to_dotarr (heap* h, char* filename) {
     fprintf(stderr, "Error, couldn't open file: %s!", filename);
     return;
   }
-
+  
   fprintf(out_file, "digraph {\n");
   item_names(h, out_file);
   dot_items(h, out_file);
@@ -181,30 +181,32 @@ item* new_item(void* value, int key) {
 
 int main() {
   heap* h = make_heap();
- 
+
+  char filename[50]; 
   item* items[50];
   for (int i = 49; i >= 0; i--) {
     item* t = new_item(new_foo(i), i);
     items[i] = t;
     insert(t, h);
+    sprintf(filename, "file_%i.dot", 49-i);
+    to_dotarr(h, filename);
   }
   
   puts("inserted");
   to_dotarr(h, "after_insert.dot");
   
+  decrease_key(47, items[48], h);
+  puts("Decreased key");
+  
   puts("deleting");
-  char filename[50];
   for (int i = 0; i < 50; i++) {
     item* min = delete_min(h);
-    sprintf(filename, "file_%i.dot", i);
-    to_dotarr(h, filename);
     printf("delete_min: %i\n", min->key);
+    sprintf(filename, "file_%i.dot", 50+i);
+    to_dotarr(h, filename);
+
   }
   puts("deleted");
 
   return 0;
 }
-
-
-=======
->>>>>>> 74db49f479dd6d99975c9d1e6fde9e5bbe02edf2
