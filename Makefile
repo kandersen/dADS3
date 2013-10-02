@@ -29,6 +29,9 @@ fh2:
 graph:
 	clang++ $(FLAGS) -o bin/graph.out src/graph.c src/main_gen_graph.c	
 
+dijkstra_bha:
+	clang++ $(FLAGS) -o bin/dijkstra.out src/binary_heap_array.c src/main_dijkstra.c $(COMMON)
+
 dijkstra_bhp:
 	clang++ $(FLAGS) -o bin/dijkstra.out src/binary_heap_pointer.c src/main_dijkstra.c $(COMMON)
 

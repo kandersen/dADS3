@@ -29,7 +29,9 @@ int main(int argc, char* argv[]) {
    elapsed = clock() - start;
 
  for (int i = 0; i < size; i++) {
-   printf("%i\n", items[i]->key);
+   if (items[i] != NULL) {
+     printf("%i\n", items[i]->key);
+   }
  }
  
  printf("%ld\n", elapsed);

@@ -169,6 +169,7 @@ item* delete_min (heap* h) {
     item* itm = original_root->itm;
     free(original_root);
     h->count = 0;
+    h->root = NULL;
     return itm;
   }
   
@@ -345,4 +346,60 @@ void to_dot (heap* h, char* filename) {
     to_dot(h->root, filename);
   }
 }
+
+// "Testing code"
+
+typedef struct foo {
+  int v;
+} foo;
+
+foo* new_foo(int i) {
+  foo* f = (foo*) malloc(sizeof(foo));
+  f->v = i;
+  return f;
+}
+
+item* new_item(void* value, int key) {
+  item* i = (item*) malloc(sizeof(item));
+  i->value = value;
+  i->key = key;
+  i->n = 0;
+  return i;
+}
+
+/*
+int main() {
+  heap* h = make_heap();
+
+  char filename[50]; 
+  item* items[50];
+  for (int i = 99; i >= 50; i--) {
+    item* t = new_item(new_foo(i), i);
+    items[i-50] = t;
+    insert(t, h);
+    sprintf(filename, "insert_%i.dot", i);
+    //    to_dot(h, filename);
+  }
+  
+  puts("inserted");
+  to_dot(h, "after_insert.dot");
+    
+  puts("deleting");
+  for (int i = 49; i >= 0; i--) {
+    decrease_key(50, items[i], h);
+    sprintf(filename, "decrease_%i.dot", i);
+    to_dot(h, filename);
+
+  }
+  puts("deleted");
+
+  for (int i = 99; i >= 50; i--) {
+    item* t = new_item(new_foo(i), i);
+    items[i-50] = t;
+    insert(t, h);
+    sprintf(filename, "insert_%i.dot", i);
+  }
+
+  return 0;
+  } */
 

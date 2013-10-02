@@ -30,7 +30,7 @@ void dijkstra(Graph* g, int source, item** ph) {
   delete_min(h);
 
   while (val != NULL) {
-    
+
     if (val->key == infinity) {
       break;
     }

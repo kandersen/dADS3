@@ -3,6 +3,7 @@
 #include <cstring>
 #include "heap.h"
 
+
 typedef struct node node;
 
 void concat_list(node*, node*);
