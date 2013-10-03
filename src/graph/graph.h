@@ -3,17 +3,19 @@
 
 #include <stdint.h>
 
-struct Graph {
+struct graph {
   int nodes;
   int * mat;
 };
 
-Graph * create(int nodes, double prob);
-int get(Graph * m, int i, int j);
-void set(Graph * m, int i, int j, int val);
-void to_dot(Graph * m, char* filename);
-void print(Graph * m);
-void to_file(Graph* m, char* filename);
-Graph* from_file(char* filename, int node);
+typedef struct graph graph;
+
+graph * create_graph   (int nodes, double prob);
+int get_distance       (graph * m, int i, int j);
+void set_distance      (graph * m, int i, int j, int val);
+void graph_to_dot      (graph * m, char* filename);
+void print_graph       (graph * m);
+void graph_to_file     (graph* m, char* filename);
+graph* graph_from_file (char* filename, int node);
 
 #endif

@@ -1,5 +1,5 @@
-#include "heap.h"
 #include <stdlib.h>
 #include "graph.h"
+#include "heap.h"
 
-void dijkstra(Graph* g, int source, item** ph);
+void dijkstra(graph* g, int source, item** ph);

@@ -1,47 +1,33 @@
-
+#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "dijkstra.h"
 #include "graph.h"
-#include <time.h>
 
 int main(int argc, char* argv[]) {
 
-  if (argc > 1) {
-
-    int prob = atoi(argv[1]);
-    int size = atoi(argv[2]);
+  if (argc == 4) {
     char filename[50];
-    sprintf(filename, "%i_%i.gra", prob, size);
-    Graph* g = from_file(filename, size);
-    sprintf(filename, "%i_%i.dot", prob, size);
-    to_dot(g, filename);
+    sprintf(filename, "%s.gra", argv[2]);
+    graph* g = graph_from_file(filename, atoi(argv[3]));
+    sprintf(filename, "%s.dot", argv[2]);
+    graph_to_dot(g, filename);
+  } 
+  else if (argc == 3) {
+    double prob = atof(argv[2]);
+    int size = atoi(argv[1]);
+
+    srand(time(NULL));
+    graph* g = create_graph(size, prob);
+    print_graph(g);
 
   } else {
 
-    srand(time(NULL));
-    
-    int max_size = 1000;
-    int start_size = 10;
-    
-    puts("creating");
-    double prob = 0.1;
-    char filename[50];
-    for (int i = 1; i < 10; i++) {
-      double thisprob = prob * i;
-      
-      int this_size = start_size;
-      while (this_size <= max_size) {
-        Graph* g = create(this_size, thisprob);
-        sprintf(filename, "%i_%i.gra", (int)(thisprob * 10), this_size);
-        to_file(g, filename);
-        this_size = this_size * 10;
-      }
+    puts("usage: \t print <graphname> <size> prints dot version");
+    puts("\t <size> <prob> makes new graph");
+  } 
 
-      printf("%f\n", thisprob);
-    }
-
-  }
   
   return 0;
 }

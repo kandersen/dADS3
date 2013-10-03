@@ -1,10 +1,10 @@
-#include "heap.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "heap.h"
 #include "dijkstra.h"
 #include "graph.h"
 
-void dijkstra(Graph* g, int source, item** ph) {
+void dijkstra(graph* g, int source, item** ph) {
   
   int infinity = 100000000;
   int vertices = g->nodes;
@@ -23,7 +23,7 @@ void dijkstra(Graph* g, int source, item** ph) {
     itm->value = item_val;
     
     ph[i] = itm;
-    insert(itm, h);
+    insert_item(itm, h);
   }
 
   item* val = find_min(h);
@@ -38,7 +38,7 @@ void dijkstra(Graph* g, int source, item** ph) {
     int u_index = *((int*)(val->value));
 
     for (int v_index = 0; v_index < vertices; v_index++) {
-      int dist_between = get(g, u_index, v_index);
+      int dist_between = get_distance(g, u_index, v_index);
       if (dist_between > 0) { // it is a neighbor
         item* v = ph[v_index];
         int alt = val->key + dist_between;

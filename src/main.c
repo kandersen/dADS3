@@ -1,9 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+
 #include "heap.h"
 #include "dijkstra.h"
 #include "graph.h"
-#include <time.h>
+
 
 int main(int argc, char* argv[]) {
  
@@ -13,11 +15,10 @@ int main(int argc, char* argv[]) {
   }
 
  int size = atoi(argv[2]);
-
  char filename[50];
- sprintf(filename, "%s_%i.gra", argv[1], size);
-
- Graph* g = from_file(filename, size);
+ sprintf(filename, "%s", argv[1]);
+ 
+ graph* g = graph_from_file(filename, size);
 
  clock_t start = clock(), elapsed = 0;
 
@@ -25,14 +26,13 @@ int main(int argc, char* argv[]) {
 
  dijkstra(g, 0, items);
 
- if (elapsed == 0)
-   elapsed = clock() - start;
-
+ elapsed = clock() - start;
+ /*
  for (int i = 0; i < size; i++) {
    if (items[i] != NULL) {
      printf("%i\n", items[i]->key);
    }
- }
+   }*/
  
  printf("%ld\n", elapsed);
 }

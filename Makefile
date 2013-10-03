@@ -1,12 +1,16 @@
 COMPILER = clang
-FLAGS = -Wall -O3 -I src/heaps/
+FLAGS = -Wall -O3 -I src/heaps/ -I src/graph -lm
 
-all: clean tester
+all: clean dijkstra
 
 clean:
 	rm -rf bin/*
+	rm -f *.dot
+	rm -f *.png
+	rm -f *.log
+	rm -f *.aux
 
-dijkstra: COMMON = lame 
+dijkstra: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra.c
 dijkstra: versions
 
 tester: COMMON = src/tester.c
@@ -26,16 +30,11 @@ fh1:
 fh2:
 	$(COMPILER) $(FLAGS) -o bin/fh2.out src/heaps/fibonacci_v2.c $(COMMON)
 
-graph:
-	$(COMPILER) $(FLAGS) -o bin/graph.out src/graph.c src/main_gen_graph.c	
+run:	dijkstra
+	$(COMPILER) $(FLAGS) -o bin/make.out src/graph/graph.c src/graph/creater.c
+	scripts/go.sh
 
-dc:
-	rm -f *.dot
-	rm -f *.png
 
-texclean: 
-	rm -f *.log
-	rm -f *.aux
 
 
 

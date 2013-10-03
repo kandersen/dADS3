@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <cstring>
+#include <string.h>
 #include <time.h>
 #include "graph.h"
 
-Graph* create(int nodes, double prob) {
+graph* create_graph (int nodes, double prob) {
 
-  Graph* newMat = (Graph*)malloc(sizeof(Graph));
+  graph* newMat = (graph*)malloc(sizeof(graph));
   
   newMat->nodes = nodes;
   newMat->mat = (int*)malloc(nodes * nodes * sizeof(int));
@@ -14,16 +14,16 @@ Graph* create(int nodes, double prob) {
   for (int i = 0; i < nodes; i++) {
     for (int j = 0; j <= i; j++) {
       if (i == j) {
-        set(newMat, i, j, 0);
+        set_distance(newMat, i, j, 0);
       } else {
         double r = ((double) rand() / (RAND_MAX));
         if (r >= prob) {
           double r2 = ((double) rand() / (RAND_MAX)) + 1;
-          set(newMat, i, j, 100 * r2);
-          set(newMat, j, i, 100 * r2);
+          set_distance(newMat, i, j, 100 * r2);
+          set_distance(newMat, j, i, 100 * r2);
         } else {
-          set(newMat, i, j, 0);
-          set(newMat, j, i, 0);
+          set_distance(newMat, i, j, 0);
+          set_distance(newMat, j, i, 0);
         }
       }
     }
@@ -32,19 +32,19 @@ Graph* create(int nodes, double prob) {
   return newMat;
 }
 
-int addr(Graph * m, int i, int j) {
+int addr(graph * m, int i, int j) {
   return m->nodes * j + i;
 }
 
-int get(Graph * m, int i, int j) {
+int get_distance(graph * m, int i, int j) {
   return m->mat[addr(m, i , j)];
 }
 
-void set(Graph * m, int i, int j, int val) {
+void set_distance(graph * m, int i, int j, int val) {
   m->mat[addr(m, i, j)] = val;
 }
 
-void to_dot(Graph * m, char* filename) {
+void graph_to_dot(graph * m, char* filename) {
 
   FILE * out_file = fopen(filename, "w");
 
@@ -57,7 +57,7 @@ void to_dot(Graph * m, char* filename) {
 
   for (int i = 0; i < m->nodes; i++) {
     for (int j = 0; j < i; j++) {
-      int dist = get(m, i, j);
+      int dist = get_distance(m, i, j);
       if (dist > 0) {
         fprintf(out_file, "%i -- %i [label=\"%d\"]\n", i, j, dist);     
       }
@@ -68,20 +68,19 @@ void to_dot(Graph * m, char* filename) {
   fclose(out_file);
 }
 
-void print(Graph * m) {
+void print_graph (graph * m) {
 
-  int nodes = m->nodes;
-
-  for (int i = 0; i < nodes; i++) {
-    for (int j = 0; j < nodes; j++) {
-      printf("%3i ", get(m, i, j));
+  for (int i = 0; i < m->nodes; i++) {
+    for (int j = 0; j < m->nodes; j++) {
+      int edge = get_distance(m, i, j);
+      if (edge > 0) {
+        printf("%i %i %i\n", i, j, edge);
+      }
     }
-    printf("\n");
   }
-
 }
 
-void to_file(Graph* m, char* filename) {
+void graph_to_file(graph* m, char* filename) {
 
   FILE * out_file = fopen(filename, "w");
 
@@ -93,7 +92,7 @@ void to_file(Graph* m, char* filename) {
   for (int i = 0; i < m->nodes; i++) {
     for (int j = 0; j < m->nodes; j++) {
 
-      int edge = get(m, i, j);
+      int edge = get_distance(m, i, j);
       if (edge > 0) {
         fprintf(out_file, "%i %i %i\n", i, j, edge);
       }
@@ -103,9 +102,9 @@ void to_file(Graph* m, char* filename) {
   fclose(out_file);
 }
 
-Graph* from_file(char* filename, int nodes) {
+graph* graph_from_file(char* filename, int nodes) {
   
-  Graph* newMat = (Graph*)malloc(sizeof(Graph));
+  graph* newMat = (graph*)malloc(sizeof(graph));
   
   newMat->nodes = nodes;
   newMat->mat = (int*)malloc(nodes * nodes * sizeof(int));
@@ -120,7 +119,7 @@ Graph* from_file(char* filename, int nodes) {
     int a, b, c;
     while ( fgets(str, 100, pFile) != NULL ) {      
       sscanf(str, "%d %d %d", &a, &b, &c);
-      set(newMat, a, b, c);
+      set_distance(newMat, a, b, c);
     }
   }
 
