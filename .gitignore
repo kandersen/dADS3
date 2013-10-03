@@ -18,6 +18,7 @@
 
 # emacs temp
 #*
+*/#*
 *~
 .DS_Store
 
@@ -27,4 +28,3 @@
 #TeX Junk
 *.log
 *.aux
-/src/#main.c#

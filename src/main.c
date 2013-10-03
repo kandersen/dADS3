@@ -3,18 +3,36 @@
 #include "heap.h"
 #include "dijkstra.h"
 #include "graph.h"
+#include <time.h>
 
-int main() {
-  
-  int nodes = 100;
-  puts("creating");
-  Graph* g = create(nodes, 0.9);
-  puts("to_file");
-  to_file(g, "1000.txt");
-  puts("from_file");
-  Graph* g2 = from_file("1000.txt", nodes);
-  puts("to_dot");
-  to_dot(g2, "1000.dot");
-  
-  return 0;
+int main(int argc, char* argv[]) {
+ 
+ if (argc < 3) {
+    printf("Usage: <prob> <testsize>\n");
+    return 1;
+  }
+
+ int size = atoi(argv[2]);
+
+ char filename[50];
+ sprintf(filename, "%s_%i.gra", argv[1], size);
+
+ Graph* g = from_file(filename, size);
+
+ clock_t start = clock(), elapsed = 0;
+
+ item* items[size];
+
+ dijkstra(g, 0, items);
+
+ if (elapsed == 0)
+   elapsed = clock() - start;
+
+ for (int i = 0; i < size; i++) {
+   if (items[i] != NULL) {
+     printf("%i\n", items[i]->key);
+   }
+ }
+ 
+ printf("%ld\n", elapsed);
 }

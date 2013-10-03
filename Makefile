@@ -1,33 +1,34 @@
-COMMON = src/graph.c src/dijkstra.c
-FLAGS = -Wall -O3 -std=c++11
-OSNAME := ${shell uname}
+COMPILER = clang
+FLAGS = -Wall -O3 -I src/heaps/
 
-ifeq ($(OSNAME), Darwin)
-	FLAGS += -stdlib=libc++
-endif
-
-
-all: clean compile
+all: clean tester
 
 clean:
 	rm -rf bin/*
 
-compile: fh1
+dijkstra: COMMON = lame 
+dijkstra: versions
+
+tester: COMMON = src/tester.c
+tester: versions
+
+
+versions: fh1 fh2
 
 bha:
-	clang++ $(FLAGS) -o bin/bha.out src/binary_heap_array.c 
+	$(COMPILER) $(FLAGS) -o bin/bha.out src/heaps/binary_heap_array.c $(COMMON)
 
 bhp:
-	clang++ $(FLAGS) -o bin/bhp.out src/binary_heap_pointer.c $(COMMON)
+	$(COMPILER) $(FLAGS) -o bin/bhp.out src/heaps/binary_heap_pointer.c $(COMMON)
 
 fh1:
-	clang++ $(FLAGS) -o bin/fh1.out src/main.cpp src/fibonacci_v1.cpp $(COMMON)
+	$(COMPILER) $(FLAGS) -o bin/fh1.out src/heaps/fibonacci_v1.c $(COMMON)
 
 fh2:
-	clang++ $(FLAGS) -o bin/fh2.out src/fibonacci_v2.c $(COMMON)
+	$(COMPILER) $(FLAGS) -o bin/fh2.out src/heaps/fibonacci_v2.c $(COMMON)
 
 graph:
-	clang++ $(FLAGS) -o bin/graph.out src/graph.c src/main_gen_graph.c	
+	$(COMPILER) $(FLAGS) -o bin/graph.out src/graph.c src/main_gen_graph.c	
 
 dijkstra_bha:
 	clang++ $(FLAGS) -o bin/dijkstra.out src/binary_heap_array.c src/main_dijkstra.c $(COMMON)
