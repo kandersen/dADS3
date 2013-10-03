@@ -17,7 +17,8 @@
 \renewcommand*\ttdefault{txtt}
 \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\left(#1\right)}}
 \newcommand{\BigT}[1]{\ensuremath{\Theta\left(#1\right)}}
-
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
 % see http://imf.au.dk/system/latex/bog/
 
 \begin{document}
@@ -77,14 +78,14 @@ needs content
 
 \chapter{Fibonacci heaps}
 
-In this chapter we focus on Fibonacci heaps, which is a data structure that has a forest of rooted trees as opposed to a binary heap that only has one tree ~\cite{FT87}. The data structure was invented by Michael L. Fredman and Robert Endre Tarjan and was published in the Journal of ACM in 1989. It has it name because the size of any subtree in a Fibonacci heap will be lower bounded by $F_{k+2}$ where $k$ is the degree of the root and $F$ is the Fibonacci function. Below is the time-complexities of each of the heap operations listed:
+In this chapter we focus on Fibonacci heaps, which is a data structure that has a forest of rooted trees as opposed to a binary heap that only has one tree \cite{FT87}. The data structure was invented by Michael L. Fredman and Robert Endre Tarjan and was published in the Journal of ACM in 1987. It has it name because the size of any subtree in a Fibonacci heap will be lower bounded by $F_{k+2}$ where $k$ is the degree of the root and $F$ is the Fibonacci function. Below is the time-complexities of each of the heap operations listed:
 
 \begin{center}
   \begin{tabular}{ l | c | c | c }
-    Operation & 2 Binary heap & Fibonacci heap v1 & Fibonacci heap v2 \\ \hline
-    MakeHeap & $\BigT{1}$ & $\BigT{1}$ \\ 
-    FindMin & $\BigT{1}$ & $\BigT{1}$ & $\BigO{\lg n}$\\ 
-    Insert & $\BigT{\lg n}$ & $\BigO{1}$ \\ 
+    Operation & Binary heap & \specialcell{Fibonacci heap v1\\(amortized)} & \specialcell{Fibonacci heap v2\\(amortized)} \\ \hline
+    MakeHeap & $\BigT{1}$ & $\BigT{1}$ & $\BigT{1}$ \\ 
+    FindMin & $\BigT{1}$ & $\BigT{1}$ & $\BigO{l(\lg (\frac{n}{l}) + 1)}$\\ 
+    Insert & $\BigT{\lg n}$ & $\BigT{1}$ & $\BigT{1}$ \\ 
     DeleteMin & $\BigT{\lg n}$ & $\BigO{\lg n}$ & $\BigT{1}$  \\ 
     DecreaseKey & $\BigT{\lg n}$ & $\BigO{1}$ & $\BigO{1}$ \\ 
     Delete & $\BigT{\lg n}$ & $\BigO{\lg n}$ & $\BigT{1}$ \\ 
@@ -92,13 +93,14 @@ In this chapter we focus on Fibonacci heaps, which is a data structure that has 
   \end{tabular}
 \end{center}
 
-
 \section{Fibonacci heap version 1}
 
+The first Fibonacci heap variant we present is the original version proposed in FT87. A potential function is used to analyze the perfomance, thus the above stated time-complexities are amortized.
 
 \section{Worst case time-complexity for fib-v1}
 
-needs content
+
+
 
 \section{Fibonacci heap version 2}
 
