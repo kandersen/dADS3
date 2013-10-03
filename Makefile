@@ -12,8 +12,7 @@ dijkstra: versions
 tester: COMMON = src/tester.c
 tester: versions
 
-
-versions: fh1 fh2
+versions: fh1 fh2 bhp
 
 bha:
 	$(COMPILER) $(FLAGS) -o bin/bha.out src/heaps/binary_heap_array.c $(COMMON)
@@ -29,18 +28,6 @@ fh2:
 
 graph:
 	$(COMPILER) $(FLAGS) -o bin/graph.out src/graph.c src/main_gen_graph.c	
-
-dijkstra_bha:
-	clang++ $(FLAGS) -o bin/dijkstra.out src/binary_heap_array.c src/main_dijkstra.c $(COMMON)
-
-dijkstra_bhp:
-	clang++ $(FLAGS) -o bin/dijkstra.out src/binary_heap_pointer.c src/main_dijkstra.c $(COMMON)
-
-dijkstra_fib1:
-	clang++ $(FLAGS) -o bin/dijkstra.out src/fibonacci_v1.cpp src/main_dijkstra.c $(COMMON)
-
-dijkstra_fib2:
-	clang++ $(FLAGS) -o bin/dijkstra.out src/fibonacci_v2.c src/main_dijkstra.c $(COMMON)
 
 dc:
 	rm -f *.dot

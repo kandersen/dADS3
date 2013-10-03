@@ -1,9 +1,8 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include "heap.h"
-#include <cstring>
 
 //TYPES
 
@@ -98,7 +97,7 @@ heap* make_heap() {
   return h;
 }
 
-void insert (item* k, heap* h) {
+void insert_item (item* k, heap* h) {
   node* n = new_node(k);
   
   if(h->count == 0) {
@@ -322,7 +321,7 @@ void dot_node (node* n, FILE* out) {
     fprintf(out, "%s -> %s [color=\"blue\"]\n", n->name, n->parent->name);
 }
     
-void to_dot (node* n, char* filename) {
+void node_to_dot (node* n, char* filename) {
   FILE * out_file = fopen(filename, "w");
   counter = 0;
 
@@ -343,7 +342,7 @@ void to_dot (node* n, char* filename) {
 
 void to_dot (heap* h, char* filename) {
   if (h->root != NULL) {
-    to_dot(h->root, filename);
+    node_to_dot(h->root, filename);
   }
 }
 
@@ -366,40 +365,3 @@ item* new_item(void* value, int key) {
   i->n = 0;
   return i;
 }
-
-/*
-int main() {
-  heap* h = make_heap();
-
-  char filename[50]; 
-  item* items[50];
-  for (int i = 99; i >= 50; i--) {
-    item* t = new_item(new_foo(i), i);
-    items[i-50] = t;
-    insert(t, h);
-    sprintf(filename, "insert_%i.dot", i);
-    //    to_dot(h, filename);
-  }
-  
-  puts("inserted");
-  to_dot(h, "after_insert.dot");
-    
-  puts("deleting");
-  for (int i = 49; i >= 0; i--) {
-    decrease_key(50, items[i], h);
-    sprintf(filename, "decrease_%i.dot", i);
-    to_dot(h, filename);
-
-  }
-  puts("deleted");
-
-  for (int i = 99; i >= 50; i--) {
-    item* t = new_item(new_foo(i), i);
-    items[i-50] = t;
-    insert(t, h);
-    sprintf(filename, "insert_%i.dot", i);
-  }
-
-  return 0;
-  } */
-
