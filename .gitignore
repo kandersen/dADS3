@@ -27,3 +27,4 @@
 #TeX Junk
 *.log
 *.aux
+/src/#main.c#
