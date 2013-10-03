@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper,twoside,danish,article]{memoir}
+\documentclass[12pt,a4paper,twoside,danish,article]{article}
 \usepackage{memhfixc} % Dynamic updates to memoir class
 
 \setulmarginsandblock{1.3in}{1.3in}{*} % 1-inch margins on top and bottom
@@ -13,10 +13,7 @@
 \newcommand\Moviereview{\expandafter\ignorespaces\@gobble}
 \makeatother
 
-\usepackage{natbib} 
-\citestyle{chicago} % Chicago Manual of Style citations
-\bibliographystyle{dkchicago}
-
+\usepackage{cite}
 \usepackage[T1]{fontenc} % Font encoding
 \usepackage[utf8]{inputenc}
 
@@ -98,7 +95,8 @@ needs content
 
 \chapter{Fibonacci heaps}
 
-In this chapter we focus on Fibonacci heaps, which is a data structure that has a forest of rooted trees as opposed to a binary heap that only has one tree ~\cite{FT87}. The data structure was invented by Michael L. Fredman and Robert Endre Tarjan and was published in the Journal of ACM in 1989. It has it name from 
+In this chapter we focus on Fibonacci heaps, which is a data structure that has a forest of rooted trees as opposed to a binary heap that only has one tree ~\cite{FT87}. The data structure was invented by Michael L. Fredman and Robert Endre Tarjan and was published in the Journal of ACM in 1989. It has it name because the size of any subtree in a Fibonacci heap will be lower bounded by $F_{k+2}$ where $k$ is the degree of the root.
+
 \section{Fibonacci heap version 1}
 
 
@@ -127,7 +125,7 @@ needs content
 needs content
 
 \chapter{Binary heap vs Fibonacci heap}
-
+s
 needs content
 
 \chapter{Test-results}
@@ -137,5 +135,8 @@ needs content
 \chapter{Conlusion}
 
 needs contents
+
+\bibliographystyle{abbrv}
+\bibliography{report}
 
 \end{document}

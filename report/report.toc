@@ -1,0 +1,22 @@
+\select@language {american}
+\contentsline {chapter}{\numberline {1}Introduction}{2}
+\contentsline {chapter}{\numberline {2}Binary heaps}{3}
+\contentsline {section}{\numberline {2.1}Binary heap with array}{3}
+\contentsline {section}{\numberline {2.2}Implementing decrease key}{3}
+\contentsline {section}{\numberline {2.3}Time-complexity for binary heap with array}{3}
+\contentsline {section}{\numberline {2.4}Binary heap with pointers}{3}
+\contentsline {section}{\numberline {2.5}Implementing decrease key}{3}
+\contentsline {section}{\numberline {2.6}Time-complexity for binary heap with pointers}{3}
+\contentsline {section}{\numberline {2.7}Testing correctness of Binary Heaps}{3}
+\contentsline {chapter}{\numberline {3}Fibonacci heaps}{4}
+\contentsline {section}{\numberline {3.1}Fibonacci heap version 1}{4}
+\contentsline {section}{\numberline {3.2}Worst case time-complexity for fib-v1}{4}
+\contentsline {section}{\numberline {3.3}Fibonacci heap version 2}{4}
+\contentsline {section}{\numberline {3.4}Worst case time-complexity for fib-v2}{4}
+\contentsline {section}{\numberline {3.5}Testing correctness of Fibonacci Heaps}{5}
+\contentsline {chapter}{\numberline {4}Test-results}{6}
+\contentsline {chapter}{\numberline {5}Dijkstra}{7}
+\contentsline {chapter}{\numberline {6}Binary heap vs Fibonacci heap}{8}
+\contentsline {chapter}{\numberline {7}Test-results}{9}
+\contentsline {chapter}{\numberline {8}Conlusion}{10}
+\contentsline {chapter}{Bibliography}{10}
