@@ -11,8 +11,9 @@
 \contentsline {chapter}{\numberline {3}Fibonacci heaps}{4}
 \contentsline {section}{\numberline {3.1}Fibonacci heap version 1}{4}
 \contentsline {section}{\numberline {3.2}Worst case time-complexity for fib-v1}{4}
-\contentsline {section}{\numberline {3.3}Fibonacci heap version 2}{4}
-\contentsline {section}{\numberline {3.4}Worst case time-complexity for fib-v2}{4}
+\contentsline {subsection}{\numberline {3.2.1}Worst case time-complexity for DeleteMin}{5}
+\contentsline {section}{\numberline {3.3}Fibonacci heap version 2}{5}
+\contentsline {section}{\numberline {3.4}Worst case time-complexity for fib-v2}{5}
 \contentsline {section}{\numberline {3.5}Testing correctness of Fibonacci Heaps}{5}
 \contentsline {chapter}{\numberline {4}Test-results}{6}
 \contentsline {chapter}{\numberline {5}Dijkstra}{7}

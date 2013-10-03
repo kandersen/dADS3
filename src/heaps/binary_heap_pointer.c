@@ -33,6 +33,7 @@ node* new_node(item* itm) {
   return n;
 }
 
+
 // Swaps either left child or right child of parent and returns the other leg
 node* swap(node* n, node* p) {
   node* temp;
@@ -281,6 +282,10 @@ void decrease_key (int delta, item* i, heap* h) {
       }
     }
   }
+}
+
+void  remove_item   (item* i, heap* h) {
+  
 }
 
 int counter;
