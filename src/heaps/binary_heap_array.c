@@ -4,7 +4,7 @@
 
 #define INITIAL_HEAP_SIZE 1024
 #define INDEX_OF_ITEM(I) (I - 1)
-#define ITEM_OF_INDEX(I) (I + 1)
+#define ITEM_OF_INDEX(I) (I)
 
 
 // TYPES
@@ -38,7 +38,7 @@ heap* make_heap() {
   return res;
 }
 
-void insert(item* k, heap* h) {
+void insert_item(item* k, heap* h) {
   if(h->count == h->size) {
     h->array = (item**)realloc(h->array, (sizeof(item*) * (h->size = h->size * 2)));
   }
@@ -59,57 +59,37 @@ void insert(item* k, heap* h) {
 }
     
 item* find_min(heap* h) {
-  return h->array[INDEX_OF_ITEM(1)];
+  if (h->count == 0) {
+    return NULL;
+  } else {
+    return h->array[INDEX_OF_ITEM(1)];
+  }
 }
 
 item* delete_min(heap* h) {
-  printf("count %i", h->count);
-  puts("1");
+
   if (h->count == 0) {
     return NULL;
   }
 
-  puts("2");
-  item* min = h->array[INDEX_OF_ITEM(1)];
-  puts("3");
+  item* min = (h->array[INDEX_OF_ITEM(1)]);
   item* in = h->array[INDEX_OF_ITEM(h->count)];
-  puts("4");
   h->count = h->count - 1;
-  puts("5");
-  int i = 1;
+  int i = 1;  
   int j;
-  puts("6");
   while ((j = 2 * i) <= h->count) {
-    puts("7");
     item* temp = h->array[INDEX_OF_ITEM(j)];
-    puts("8");
-    item* temp1 = h->array[INDEX_OF_ITEM(j + 1)];
-    puts("9");
-    if (LT(temp1->key, temp->key)) {
-      puts("10");
-      temp = temp1;
-      puts("11");
-      j = j+1;
-    }
-    puts("12");
-    if (GE(temp->key, in->key)) {
-      puts("13");      
+    if (LT(temp->key, in->key)) {
+      h->array[INDEX_OF_ITEM(i)] = temp;
+      temp->n->index = i;
+      i = j;
+    } else {
       break;
     }
-    puts("14");     
-    h->array[INDEX_OF_ITEM(i)] = temp;
-    puts("15");
-    temp->n->index = i;
-    puts("16");
-    i = j;
   }
-  puts("17");
   h->array[INDEX_OF_ITEM(i)] = in;
-  puts("18");
   in->n->index = i;
-  puts("19");
   //free(min->n);
-  puts("20");
   return min;
 }
 

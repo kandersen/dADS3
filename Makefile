@@ -16,9 +16,9 @@ dijkstra: versions
 tester: COMMON = src/tester.c
 tester: versions
 
-versions: fh1 fh2 bhp
+versions: fh1 fh2 bhp bha
 
-bha:
+bha:	
 	$(COMPILER) $(FLAGS) -o bin/bha.out src/heaps/binary_heap_array.c $(COMMON)
 
 bhp:
@@ -27,7 +27,7 @@ bhp:
 fh1:
 	$(COMPILER) $(FLAGS) -o bin/fh1.out src/heaps/fibonacci_v1.c $(COMMON)
 
-fh2:
+fh2:	
 	$(COMPILER) $(FLAGS) -o bin/fh2.out src/heaps/fibonacci_v2.c $(COMMON)
 
 run:	dijkstra
