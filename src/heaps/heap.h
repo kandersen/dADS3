@@ -19,10 +19,18 @@ long long cmp_counter = 0;
 struct heap;
 struct node;
 typedef struct node node;
+/* IFDEF such that this is used for dijkstra and the below for dijkstra2
 struct item {
   int key;
   node* n;
   void* value;
+  }; */
+
+struct item {
+  int key;
+  node* n;
+  void* value;
+  int visited;
 };
 
 typedef struct item item;

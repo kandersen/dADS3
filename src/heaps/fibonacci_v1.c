@@ -232,6 +232,14 @@ void remove_item(item* i, heap* h) {
   } 
 }
 
+int is_empty(heap* h) {
+  if (h->rank > 0) {
+    return 0;
+  } else { 
+    return 1;
+  }
+}
+
 void update_marked(node* n, heap* h) {
   if (n->parent == NULL) {
     return;

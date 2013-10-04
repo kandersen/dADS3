@@ -13,6 +13,9 @@ clean:
 dijkstra: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra.c
 dijkstra: versions
 
+dijkstra2: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra_insert.c
+dijkstra2: versions
+
 tester: COMMON = src/tester.c
 tester: versions
 
@@ -30,9 +33,13 @@ fh1:
 fh2:	
 	$(COMPILER) $(FLAGS) -o bin/fh2.out src/heaps/fibonacci_v2.c $(COMMON)
 
+creator: 
+	$(COMPILER) $(FLAGS) -o bin/creator.out src/graph/graph.c src/graph/creater.c $(COMMON)
+
 run:	dijkstra
 	$(COMPILER) $(FLAGS) -o bin/make.out src/graph/graph.c src/graph/creater.c
 	scripts/go.sh
+
 
 
 
