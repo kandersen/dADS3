@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 for (( i = 50; i <= 20000; i = i + 50 ))
 do
