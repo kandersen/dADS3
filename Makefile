@@ -10,11 +10,13 @@ clean:
 	rm -f *.log
 	rm -f *.aux
 
-dijkstra: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra.c
-dijkstra: versions
+d1: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra.c
+d1: NUM = 1
+d1: versions
 
-dijkstra2: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra_insert.c
-dijkstra2: versions
+d2: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra_insert.c
+d2: NUM = 2
+d2: versions
 
 tester: COMMON = src/tester.c
 tester: versions
@@ -22,21 +24,22 @@ tester: versions
 versions: fh1 fh2 bhp bha
 
 bha:	
-	$(COMPILER) $(FLAGS) -o bin/bha.out src/heaps/binary_heap_array.c $(COMMON)
+	$(COMPILER) $(FLAGS) -o bin/bha$(NUM).out src/heaps/binary_heap_array.c $(COMMON)
 
 bhp:
-	$(COMPILER) $(FLAGS) -o bin/bhp.out src/heaps/binary_heap_pointer.c $(COMMON)
+	$(COMPILER) $(FLAGS) -o bin/bhp$(NUM).out src/heaps/binary_heap_pointer.c $(COMMON)
 
 fh1:
-	$(COMPILER) $(FLAGS) -o bin/fh1.out src/heaps/fibonacci_v1.c $(COMMON)
+	$(COMPILER) $(FLAGS) -o bin/fh1$(NUM).out src/heaps/fibonacci_v1.c $(COMMON)
 
 fh2:	
-	$(COMPILER) $(FLAGS) -o bin/fh2.out src/heaps/fibonacci_v2.c $(COMMON)
+	$(COMPILER) $(FLAGS) -o bin/fh2$(NUM).out src/heaps/fibonacci_v2.c $(COMMON)
 
 creator: 
 	$(COMPILER) $(FLAGS) -o bin/creator.out src/graph/graph.c src/graph/creater.c $(COMMON)
 
-run:	dijkstra
+
+run:
 	$(COMPILER) $(FLAGS) -o bin/make.out src/graph/graph.c src/graph/creater.c
 	scripts/go.sh
 
