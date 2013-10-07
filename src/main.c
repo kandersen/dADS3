@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
  dijkstra(g, 0, items);
 
  elapsed = clock() - start;
+ 
  /* 
   for (int i = 0; i < size; i++) {
    if (items[i] != NULL) {
