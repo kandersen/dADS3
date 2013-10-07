@@ -13,7 +13,7 @@ do
                 for (( r = 1; r <= 3; r++ ))
                 do
                     printf $i"\t"$p"\t"$k"\t"$r"\t"$ex"\t" >> $ex.csv;
-                    ./bin/$ex.out tmp.gra $i >> result.txt;
+                    ./bin/$ex.out tmp.gra $i >> $ex.csv;
                 done
             done
         done
