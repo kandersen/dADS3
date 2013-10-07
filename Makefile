@@ -40,6 +40,8 @@ creator:
 
 
 run:
+	make d1
+	make d2
 	$(COMPILER) $(FLAGS) -o bin/make.out src/graph/graph.c src/graph/creater.c
 	scripts/go.sh
 
