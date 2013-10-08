@@ -19,7 +19,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  printf("test_%d\n", atoi(argv[1]));
   switch (atoi(argv[1])) {
   case 0: 
     test_0(atoi(argv[2]));
@@ -40,7 +39,6 @@ int main(int argc, char* argv[]) {
     test_5(atoi(argv[2]));
     break;
   case 6:
-
     test_6(atoi(argv[2]));
     break;
   case 7:

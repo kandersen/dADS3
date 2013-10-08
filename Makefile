@@ -19,7 +19,7 @@ d2: NUM = 2
 d2: versions
 
 tester: COMMON = src/tester.c
-tester: versions
+tester: fh1 fh2 bhp
 
 versions: fh1 fh2 bhp bha
 
@@ -38,6 +38,8 @@ fh2:
 creator: 
 	$(COMPILER) $(FLAGS) -o bin/creator.out src/graph/graph.c src/graph/creater.c $(COMMON)
 
+test: tester
+	scripts/test.sh
 
 run:
 	make d1
