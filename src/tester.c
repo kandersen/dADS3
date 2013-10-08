@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "heap.h"
 
 
@@ -14,6 +15,8 @@ void test_7(int);
 
 
 int main(int argc, char* argv[]) {
+  clock_t start = clock(), elapsed = 0;
+
   if (argc < 3) {
     printf("Usage: <testno> <testsize>\n");
     return 1;
@@ -48,6 +51,8 @@ int main(int argc, char* argv[]) {
     break;
   }
 
+  elapsed = clock() - start;
+  printf("%ld\n", elapsed);
   return 0;
 }
 
@@ -61,8 +66,6 @@ test_0 (int size) {
     i->value = NULL;
     insert_item(i, h);
   }
-
-  printf("min: %d\n", find_min(h)->key);
 }
 
 // pure inserts 1 del
