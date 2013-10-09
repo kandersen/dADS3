@@ -1,0 +1,10 @@
+C:\Users\Morten Krogh\Dropbox\Universitetet\dDynAlg\Repository\dynamicalgorithms\CreateAverage\CreateAverage\bin\Release\CreateAverage.exe.config
+C:\Users\Morten Krogh\Dropbox\Universitetet\dDynAlg\Repository\dynamicalgorithms\CreateAverage\CreateAverage\bin\Release\CreateAverage.exe
+C:\Users\Morten Krogh\Dropbox\Universitetet\dDynAlg\Repository\dynamicalgorithms\CreateAverage\CreateAverage\bin\Release\CreateAverage.pdb
+C:\Users\Morten Krogh\Dropbox\Universitetet\dDynAlg\Repository\dynamicalgorithms\CreateAverage\CreateAverage\obj\x86\Release\CreateAverage.exe
+C:\Users\Morten Krogh\Dropbox\Universitetet\dDynAlg\Repository\dynamicalgorithms\CreateAverage\CreateAverage\obj\x86\Release\CreateAverage.pdb
+C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\bin\Release\CreateAverage.exe.config
+C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\bin\Release\CreateAverage.exe
+C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\bin\Release\CreateAverage.pdb
+C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\obj\x86\Release\CreateAverage.exe
+C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\obj\x86\Release\CreateAverage.pdb

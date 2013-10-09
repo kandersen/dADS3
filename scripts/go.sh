@@ -6,18 +6,18 @@ do
     do
         for (( k = 1; k <= 3; k++ ))
         do
-            ./bin/make.out $i 0.$p > tmp.gra
-
+            seed=$((($p+1) * 10000000 + $i * 100 + 10 * $k))
             for ex in fh11 fh21 bhp1 bha1 fh12 fh22 bhp2 bha2
             do
                 for (( r = 1; r <= 3; r++ ))
                 do
                     printf $i"\t"$p"\t"$k"\t"$r"\t"$ex"\t" >> $ex.csv;
-                    ./bin/$ex.out tmp.gra $i >> $ex.csv;
+                    ./bin/$ex.out 0.$p $i $seed >> $ex.csv;
                 done
             done
         done
     done
+    echo "size: $i"
 done
 
 

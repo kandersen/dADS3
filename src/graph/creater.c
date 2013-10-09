@@ -7,7 +7,17 @@
 
 int main(int argc, char* argv[]) {
 
-  if (argc == 4) {
+  if (argc == 5) {
+
+    double prob = atof(argv[2]);
+    int size = atoi(argv[1]);
+    long int seed = atol(argv[3]);
+
+    srand(seed);
+    graph* g = create_graph(size, prob);
+    print_graph(g);
+  }
+  else if (argc == 4) {
     char filename[50];
     sprintf(filename, "%s.gra", argv[2]);
     graph* g = graph_from_file(filename, atoi(argv[3]));
@@ -21,7 +31,8 @@ int main(int argc, char* argv[]) {
     srand(time(NULL));
     graph* g = create_graph(size, prob);
     print_graph(g);
-
+  } else if (argc == 2) {
+    printf("%lu", time(NULL));
   } else {
 
     puts("usage: \t print <graphname> <size> prints dot version");

@@ -9,16 +9,18 @@
 
 int main(int argc, char* argv[]) {
  
- if (argc < 3) {
-    printf("Usage: <prob> <testsize>\n");
+ if (argc < 4) {
+    printf("Usage: <prob> <testsize> <seed>\n");
     return 1;
   }
 
+ double prob = atof(argv[1]);
  int size = atoi(argv[2]);
- char filename[50];
- sprintf(filename, "%s", argv[1]);
- 
- graph* g = graph_from_file(filename, size);
+ long int seed = atol(argv[3]);
+
+ srand(seed);
+
+ graph* g = create_graph(size, prob);
 
  clock_t start = clock(), elapsed = 0;
 
@@ -28,12 +30,12 @@ int main(int argc, char* argv[]) {
 
  elapsed = clock() - start;
  
- /* 
+ /*
   for (int i = 0; i < size; i++) {
    if (items[i] != NULL) {
      printf("%i\n", items[i]->key);
    }
-   } */
+   }  */
  
  printf("%ld\n", elapsed);
 }

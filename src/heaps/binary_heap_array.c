@@ -50,12 +50,11 @@ void insert_item(item* k, heap* h) {
       break;
     }
     h->array[INDEX_OF_ITEM(i)] = h->array[INDEX_OF_ITEM(j)];
-    h->array[INDEX_OF_ITEM(i)]->n->index = INDEX_OF_ITEM(i);
+    h->array[INDEX_OF_ITEM(i)]->n->index = i;
     i = j;
   }
   h->array[INDEX_OF_ITEM(i)] = k;
   k->n = new_node(INDEX_OF_ITEM(i));
-
 }
     
 item* find_min(heap* h) {
@@ -102,11 +101,11 @@ void decrease_key(int delta, item* k, heap* h) {
       break;
     }
     h->array[INDEX_OF_ITEM(i)] = h->array[INDEX_OF_ITEM(j)];
-    h->array[INDEX_OF_ITEM(i)]->n->index = INDEX_OF_ITEM(j);
+    h->array[INDEX_OF_ITEM(i)]->n->index = j;
     i = j;
   }
   h->array[INDEX_OF_ITEM(i)] = k;
-  k->n->index = INDEX_OF_ITEM(i);
+  k->n->index = i;
 }
 
 int is_empty(heap* h) {
