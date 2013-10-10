@@ -9,3 +9,9 @@ C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAv
 C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\bin\Debug\CreateAverage.exe
 C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\bin\Debug\CreateAverage.pdb
 C:\Users\Morten Krogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\obj\x86\Debug\CreateAverage.csprojResolveAssemblyReference.cache
+C:\Users\MortenKrogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\bin\Debug\CreateAverage.exe.config
+C:\Users\MortenKrogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\obj\x86\Debug\CreateAverage.exe
+C:\Users\MortenKrogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\obj\x86\Debug\CreateAverage.pdb
+C:\Users\MortenKrogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\bin\Debug\CreateAverage.exe
+C:\Users\MortenKrogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\bin\Debug\CreateAverage.pdb
+C:\Users\MortenKrogh\Dropbox\Universitetet\Algoritmer\Repository\dADS3\CreateAverage\CreateAverage\obj\x86\Debug\CreateAverage.csprojResolveAssemblyReference.cache
