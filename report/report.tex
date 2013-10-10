@@ -52,13 +52,13 @@
 \pagestyle{empty} 
 \pagenumbering{roman} 
 \vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
-{\Huge\sf Binary Heaps, Fibonacci Heaps and\\[2ex]Dijkstras shortest path}\\[4ex]
-{\huge\sf Kristoffer Just Andersen, 20051234\\[2ex]
-\huge\sf Troels Leth Jensen, 20051234 \\[2ex]
-\huge\sf Morten Krogh-Jespersen, 20022362}\\[2ex]
-\noindent\rule{\linewidth}{1mm}\\[4ex]
-\noindent{\Large\sf Project 1, Advanced Data Structures 2013, Computer Science\\[1ex] 
-\monthname\ \the\year  \\[1ex] Advisor: Gerth Stølting Brodal\\[15ex]}\\[\fill]}
+  {\Huge\sf Binary Heaps, Fibonacci Heaps and\\[2ex]Dijkstras shortest path}\\[4ex]
+  {\huge\sf Kristoffer Just Andersen, 20051234\\[2ex]
+    \huge\sf Troels Leth Jensen, 20051234 \\[2ex]
+    \huge\sf Morten Krogh-Jespersen, 20022362}\\[2ex]
+  \noindent\rule{\linewidth}{1mm}\\[4ex]
+  \noindent{\Large\sf Project 1, Advanced Data Structures 2013, Computer Science\\[1ex] 
+    \monthname\ \the\year  \\[1ex] Advisor: Gerth Stølting Brodal\\[15ex]}\\[\fill]}
 \epsfig{file=logo.eps}\clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,31 +75,197 @@ needs content
 
 \chapter{Binary heaps}
 
-needs content
+This chapter explores binary heaps as presented in
+\cite{Forsythe:1964}. A binary heap gets its name from the balanced,
+binary search tree over its elements that it maintains. We shall see
+two ways to achieve this, one maintaining an explicit search tree, the
+other relying on the isomorphism between arrays and balanced trees.
 
-\section{Binary heap with array}
+The key to using a binary tree for the purpose of a priority que is
+the ``heap invariant'': that the priority of each element in the tree
+is smaller than its children. Maintaining this invariant is the focus
+of each operation on binary heaps, and the notion of ``bubbling''
+elements up and down through the tree, swapping children and parents,
+appears again and again, as we shall see.
 
-needs content
 
-\section{Implementing decrease key}
+\section{Binary Heaps with Arrays}
 
-needs content
+The original paper from 1964 utilizes the balanced binary tree implied
+by the order of elements in an array. If we label the elements in the
+array from 1, we see that they correspond uniquely to a position in
+the following binary tree:
 
-\section{Time-complexity for binary heap with array}
+\begin{center}
+  \begin{tikzpicture}[thick,->,auto,node distance=4cm]
+    \tikzstyle{node}=[circle, minimum size=1cm, draw]
+    
+    \node[node]    	  (1) {$1$}
+    child{node[node]      (2) {$2$}
+      child{node[node]    (4) {$4$}}
+      child{node[node]    (5) {$5$}}}
+    child{node[node]      (3) {$3$}
+      child{node[node]    (6) {$6$}}
+      child{node[node]    (7) {$7$}}};
+    
+  \end{tikzpicture}
+\end{center}
 
-\section{Binary heap with pointers}
 
-needs content
+The parent-child relationships in the tree can be seen in the array by
+observing that the numbers of node $i$s children are $2i$ and $2i +
+1$. Similarly, the parent of node $i$ is node
+$\left\lfloor\frac{i}{2}\right\rfloor$. Therefore, if the
+implementation language supports arrays, there is no need to maintain
+an explicit representation of a binary tree, likely saving space
+time.
 
-\section{Implementing decrease key}
+It is of course entirely possible to take the alternate approach,
+which we investigate in the next section.
 
-needs content
+\section{Implementation Decisions}
 
-\section{Time-complexity for binary heap with pointers}
+The algorithms used in our C implementation are faithful to the paper,
+save for slight modernizations such as removal of \texttt{goto}
+statements in favor of familiar looping control flow. This does not
+alter the asymptotic running times or space consumption of the
+algorithm.
 
-\section{Testing correctness of Binary Heaps}
+We choose to inline the \textsc{Swopheap} operation as used by
+\cite{Forsyth:1964}, as we believe it makes the intent
+clearer. \textsc{Swop} has the effect of ``bubbling'' an element down
+through the heap until the heap invariant is reestablished. This is
+used for \DeleteMin, where the root of the tree is removed and replaced
+by the last leaf of the tree, which is then bubbled downwards.
 
-needs content
+For the \DecreaseKey operation, we refer to \cite{ITA:09}, which
+demonstates an implementation of maximum priority queues supporting an
+\textsc{IncreaseKey} operation. It is easy to transfer the algorithm
+to our implementation. The basic algorithm decreases they key of an
+element, and then proceeds to bubble the element up through the heap
+until the heap invariant is reestablished, similar to how the original
+implementation achieves insertion.
+
+\section{Time-complexity for Binary Heaps with Arrays}
+
+We here present arguments for the worst-case running times of the
+following operations: \MakeHeap, \FindMin, \Insert, \DeleteMin and
+\DecreaseKey - the operations we need to implement Dijkstra's
+Algorithm in later sections.
+
+\paragraph{\MakeHeap} Runs in constant time: \BigO{1}. All we do is a
+single allocation of contiguous memory to store the elements of the
+heap.
+
+\paragraph{\FindMin} Runs in constant time: \BigO{1}. We do a single array
+indexing, as, according to our heap invariant, the element of lowest
+key is always in root position - the first element in our underlying
+array.
+
+\paragraph{\Insert} Runs linearly in the number of elements in
+the heap: \BigO{n}. We insert the incomming node into the last position
+of the tree, which we know by maintaining the current element
+count. We then bubble the element upwards, performing a comparison and
+a swap per level it moves. Thus we achieve a logarithmic running time
+as the depth of a balanced binary tree is proportional to $\log
+n$. However, due to the workings of C, we cannot dynamically alter the
+size of the underlying array, and so, worst-case, we have to
+reallocate the entire underlying array. We use the same approach as
+the standard Java ArrayList of doubling the underlying array each time
+the limit is reached. This requires copying the entire array, byte by
+byte, into a new array, an operation linear in the number of elements,
+which dominates the logarithmic cost of maintaining the heap
+invariant. While this is a worst-case analysis, it is worth noting
+that the amortized cost is \BigO{1}, where we pay for the cost of
+reallocation by paying more per insertion.
+
+\paragraph{\DeleteMin} Runs logarithmically in the number of elements
+inserted: $O(\log n)$. We Remove the minimal element according to
+\FindMin and replace it as root with the last element in the tree
+(always found at position \textsc{Size} in the array). We then bubble
+the element down through the tree, at most two comparisons and a swap
+per level in the tree. The depth of a balanced binary tree is $O(\log
+n)$. So we do a constant amount of work per level the node moves,
+resulting in the logarithmic running time.
+
+\paragraph{\DecreaseKey} Runs logarithmically in the number of
+elements inserted: \BigO{\log n}. We decrease the key of the specified
+element, and proceed to bubble it upwards until the invariant is
+reestablished, using a single comparison and a swap per level
+moved. The argument is similar to the one used for insertion and
+deletion.
+
+\section{Binary Heaps with Pointers}
+
+While the original implementation used an underlying array, it is not
+strictly necessary to achieve the benefit of a binary heap. We can
+model the balanced binary tree explicitly using pointers. 
+
+The algorithms follow the same procedures operationally as described
+above, but with slight variations since we loose the direct access to
+arbitrary positions in the tree facilitated by an underlying
+array. Instead we must ``count'' our way into the tree.
+
+The ``trick'' to achieve the same, if not better, running times as the
+original implementation, is observing that position of a node $i$ in
+the tree is given uniquely by the binary representation of $i -
+1$. Read from most significant bit, the ones and zeroes gives
+``directions'' from the root to the particular node. We defer to the
+implementation for the dreary details.
+
+\section{Time-complexity for Binary Heaps with Pointers}
+
+We here detail the worst case running times for the key operations of
+a minimum priority que: \MakeHeap, \FindMin, \Insert, \DeleteMin and
+\DecreaseKey.
+
+\paragraph{\MakeHeap} Runs in constant time: \BigO{1}. Allocation of
+the necessary varibales for keeping count of the elements inserted and
+a pointer to the root node, once inserted.
+
+\paragraph{\FindMin} Runs in constant time: \BigO{1}. By maintaining a
+pointer to the root node, we have constant time access to it.
+
+\paragraph{\Insert} Runs logarithmically in the number of elements:
+\BigO{\log n}. Ny maintaining the number of elements inserted, we
+can calculate directions to the position of the next element. This
+involves reading bits and following pointers. We follow one pointer
+per bit of ``direction''. The binary representation of $n$ uses $\log
+n$ bits, so we follow \BigO{n} pointers. Upon insertion, we then
+bubble the element up to reestablish the heap invariant, swapping
+appropriate pointers as we go. We do this a number of times
+proportional to the depth of the tree. Thus we run in time
+$\BigO{2\log n} = \BigO{log n}$.
+
+\paragraph{\DeleteMin} Runs logarithmically in the number of elements:
+\BigO{\log n}. Similarly to \Insert, we can find the last element in the
+heap by tracing a path down from the root. This is logarithmic in the
+number of elements for the same reasons. Then, we swap the root and
+the last element, and bubble the last element down until the heap
+invariant is restored. This is also logarithmic in the number of
+elements.
+
+\paragraph{\DecreaseKey} Runs logarithmically in the number of
+elements: \BigO{\log n}. We decrease the key of the specified element,
+and bubble upwards until we reestablish heap order. This is
+proportional to the depth of the tree and thus logarithmic in the
+number of elements.
+
+\section{Correctness of Binary Heaps}
+
+We opted for a visual inspection rather than unit testing. We
+implement a \texttt{to\_dot} that displays the assocatied binary
+tree. That is, it follows pointers recursively in the case of the
+pointer based implementation, while calculating the implicit binary
+tree in the case of the array based implementation.
+
+This gives us quick and easy visual feedback, which is invaluable
+particularly in the case of the pointer based implementation. Between
+two nodes, we have a total of 4 children pointers and 6 parent
+pointers that needs to be updated, which is a lot for any programmer
+to manage at a single time. Visualizing the pointers gave us
+immeadiate feedback when on a by-need basis testing proved
+discrepancies in behaviour.
 
 \chapter{Fibonacci heaps}
 
@@ -130,21 +296,21 @@ The upper bound $D(n)$ on the degree of any node of an n-node Fibonacci is $\Big
 
 By three different induction proofs and the lemma described above, it can be shown that if $k = degree(x)$ for any node in a Fibonacci heap then $size(x) \ge F_{k+2} \ge \phi^k$, where $\phi = (1+\sqrt{5}) / 2$ also known as the golden ratio. Hereafter, showing the bound of $D(n)$ is straight forward:
 \begin{gather*}
-    n \ge size(x) \ge \phi^k \\
-    \Downarrow \\
-    k \le \lfloor \log_\phi n \rfloor    
+  n \ge size(x) \ge \phi^k \\
+  \Downarrow \\
+  k \le \lfloor \log_\phi n \rfloor    
 \end{gather*}
 
 \section{The potential method}
 
 We will analyse the amortized running times of the Fibonacci heaps by using the potential function \cite[p.~215]{FT87}. A potential function maps a state of a data structure to a real number representing the potential contained in that data structure \cite[p.~459]{ITA09}. The amortized cost of an operation $c_i$ that transforms a data structure in state $D_{i-1}$ to $D_{i}$ is:
 \begin{align*}
-    \hat{c} = c_i + \Phi(D_i) - \Phi(D_{i-1})
+  \hat{c} = c_i + \Phi(D_i) - \Phi(D_{i-1})
 \end{align*}
 The amortized cost is therefore the cost of the operation $c_i$ plus the change in the potential. If the operation releases potential, the relased potential gets subtracted from the cost of the operation. For the Fibonacci heaps we define the potential function as:
 
 \begin{align*}
-    \Phi(H) = trees(H) + 2marked(H)
+  \Phi(H) = trees(H) + 2marked(H)
 \end{align*}
 
 Where trees define the number of trees/roots in the forest and marked is the number of marked nodes. The reason to why marked nodes contains two units of potential is that one unit pays for the cut and the other pays for the node to become a root and thereby form a new tree.
@@ -159,7 +325,7 @@ The article mentions that $\Delete$ takes $\BigO{1}$ if the node to remove is no
 
 \MakeHeap~constructs a new empty Fibonacci heap, which means there are not roots and no marked nodes. Therefore, the potential of the empty heap is 0 and constructing the heap can be done in constant time. \FindMin~does not alter the potential and is only a pointer lookup which clearly is also a constant time operation. \Insert~inserts a new root which increments the potential by one. Combine that with the actual cost which is $\BigO{1}$ the \Insert~operation is $\BigO{1}$. \Meld~can be carried out in $\BigO{1}$ actual time and since the change is:
 \begin{align*}
-    \Delta & = \Phi(H) - (\Phi(H_1) + \Phi(H_2)) = 0
+  \Delta & = \Phi(H) - (\Phi(H_1) + \Phi(H_2)) = 0
 \end{align*}
 the \Meld~operation has time $\BigO{1}$.
 
@@ -168,27 +334,27 @@ The linking phase work on at most $D(n) + tress(H) - 1$ trees, since we have rem
 
 The potential before the $\DeleteMin$ operation executues is $trees(H) + 2marked(H)$. After, at most $D(n) + 1$ roots will exist because all others would be removed during the linking phase and there is no change to marked nodes. Therefore, we have that:
 \begin{align*}
-    \DeleteMin & = \BigO{D(n) + trees(H)} + \left(\left(D(n) + 1\right) + 2marked(H)\right) \\
-    & - \left(trees(H) + 2marked(H)\right) \\
-    & = \BigO{D(n)} + \BigO{trees(H)} - trees(H) \\
-    & = \BigO{D(n)}
+  \DeleteMin & = \BigO{D(n) + trees(H)} + \left(\left(D(n) + 1\right) + 2marked(H)\right) \\
+  & - \left(trees(H) + 2marked(H)\right) \\
+  & = \BigO{D(n)} + \BigO{trees(H)} - trees(H) \\
+  & = \BigO{D(n)}
 \end{align*}
 Actually, a slight subtlety is happening above. We can turn up the units that we pay to cover the hidden constant in $\BigO{trees(H)}$, which allows us to cancel those two terms out, resulting in an amortized running time of $\BigO{D(n)} \le \BigO{\lg n}$.
 
 $\DecreaseKey$ takes constant time for moving the node for the item with the decreased key to the root, but then $c$ cascading deletes can occur. Therefore, the actual time is $\BigO{c}$. The change is potential is:
 \begin{align*}
-    \Delta & = \BigO{trees(H) + (c - 1) + 1} + 2(marked(H) - (c-1) + 1) \\
-    &- (trees(H) + 2marked(H) \\
-    & = \BigO{trees(H) + c} + 2(marked(H) - c + 2) - (trees(H) + 2marked(H)) \\
-    & = 4 - c
+  \Delta & = \BigO{trees(H) + (c - 1) + 1} + 2(marked(H) - (c-1) + 1) \\
+  &- (trees(H) + 2marked(H) \\
+  & = \BigO{trees(H) + c} + 2(marked(H) - c + 2) - (trees(H) + 2marked(H)) \\
+  & = 4 - c
 \end{align*}
 Therefore, the amortized running time of $\DecreaseKey$ is $\BigO{c} + 4 - c = \BigO{1}$
 
 Last, we have to cover the running time of $\Delete$. First, we cut the node and move the children to the root, which is at most $D(n)$ operations. Next, a chain of cascading deletes can occur where the length is $c$, making the actual time $\BigO{D(n) + c}$. The change in potential is as follows:
 \begin{align*}
-    \Delta & = \BigO{trees(H) + D(n) + c} + 2(marked(H) - c + 2) \\
-    &- (trees(H) + 2marked(H) \\
-    & = D(n) + 4 - c \\
+  \Delta & = \BigO{trees(H) + D(n) + c} + 2(marked(H) - c + 2) \\
+  &- (trees(H) + 2marked(H) \\
+  & = D(n) + 4 - c \\
 \end{align*}
 But as we showed for $\DecreaseKey$, the released potential pays for the cascading deletes, so we only have to pay the $D(n)$ for the actual time and $D(n)$ for the change in potential, which is $\BigO{D(n)} \le \BigO{\lg n}$.
 
@@ -203,7 +369,7 @@ As we showed in the previous section the actual time for performing $\DeleteMin$
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=1.5cm]
     \tikzstyle{state}=[circle, minimum size=1cm, draw]
-  
+    
     \node[state]          (1) {1};
     \node[state]         (2) [right of=1] {2};
     \node[state]         (3) [right of=2] {3};
@@ -251,7 +417,7 @@ If we delete a child to an arbitrary node $x$ we mark $x$ if is not marked and i
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1.5cm, draw]
     \tikzstyle{marked}=[diamond, minimum size=1.5cm, draw]
-  
+    
     \node[node]    	  (1) {1};
     \node[marked]         (2) [below of=1] {2};
     \node[marked]         (3) [below of=2] {3};
@@ -280,7 +446,7 @@ Such a configuration can be obtained by calling $\Insert$ with two very high num
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
     \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
-  
+    
     \node[node]    	  (1) {$x$};
     \node[node]           (2) [below of=1] {$y$};
     
@@ -294,13 +460,13 @@ If we insert three new items $x'$, $y'$ $z$ with keys slightly smaller where $z$
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
-  
+    
     \node[node]    	  (x) {$x$};
     \node[node]           (y) [below of=x] {$y$};
     \node[node]    	  (x') [right of=x] {$x'$};
     \node[node]    	  (y') [right of=x'] {$y'$}; 
     \node[node]    	  (z) [right of=y'] {$z$};
-   
+    
     \path (1) edge (2);
 
   \end{tikzpicture}
@@ -311,14 +477,14 @@ If we call $\DeleteMin$, call $\Delete$ on $y'$ and call insert with three new i
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
-  
+    
     \node[node]    	  (x') {$x'$}
     child{node[node]      (x) {$x$}
       child{node[node]    (y) {$y$}}};
     \node[node]    	  (x'') [right of=x'] {$x''$};
     \node[node]    	  (y'') [right of=x''] {$y''$}; 
     \node[node]    	  (z) [right of=y''] {$z$};
-   
+    
   \end{tikzpicture}
 \end{center}
 where $z$ again is the smallest key. $\DeleteMin$ gives:
@@ -326,13 +492,13 @@ where $z$ again is the smallest key. $\DeleteMin$ gives:
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
-  
+    
     \node[node]    	  (x'') {$x''$}
     child{node[node]      (y'') {$y''$}}
     child{node[node]      (x') {$x'$}
       child{node[node]    (x) {$x$}
         child{node[node]  (y) {$y$}}}};
-   
+    
   \end{tikzpicture}
 \end{center}
 where $\Delete$ with $y''$ as argument will result in a chain. By using this approach we can easily build up a single chain of height $n$.
@@ -354,8 +520,8 @@ After a call to $\FindMin$ thee heap looks like:
 
 Let us analyze the time for the $\FindMin$ operation. Let $l$ mark the number of vacant nodes. If $l=0$ then $\FindMin$ points to the node representing the item with the minimum key, and the work is constant. If $l \ge 1$ then the amortized running time is the new roots created from destroying vacant nodes and moving the non-vacant child nodes to the root plus the linking of the trees which is at most $\BigO{\lg n}$. We argued previously that a node $y$ have $degree(y_i) \ge i - 2$ for $i = 1,2,\cdots,k$ where $k$ is the degree of its parent. We use this to say that at least one of the vacant nodes will have a rank of $k-2$. We also know that the size of subtree rootet at a node with degree $k-2$ will be at least be of size $\phi^{k-2}$. If all children of the vacant nodes we destroy are nonvacant, they will increase the number of trees and thereby the potential by:
 \begin{align*}
-\sum_{i=1}^l \phi^{k_j-2} \le n
- \end{align*}
+  \sum_{i=1}^l \phi^{k_j-2} \le n
+\end{align*}
 where $k_1, k_2,\cdots,k_i$ are nonvacant nodes. The sum is maximized for $k_i$. MAYBE SOME MORE??
 
 \section{Worst case time-complexity for Fib heap v2}
