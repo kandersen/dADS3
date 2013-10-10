@@ -11,11 +11,11 @@ clean:
 	rm -f *.log
 	rm -f *.aux
 
-d1: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra.c
+d1: COMMON = src/main.c src/graph/linked_graph.c src/graph/dijkstra.c
 d1: NUM = 1
 d1: versions
 
-d2: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra_insert.c
+d2: COMMON = src/main.c src/graph/linked_graph.c src/graph/dijkstra_insert.c
 d2: NUM = 2
 d2: versions
 

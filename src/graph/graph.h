@@ -3,16 +3,29 @@
 
 #include <stdint.h>
 
-struct graph {
-  int nodes;
-  int * mat;
+typedef struct graph graph;
+typedef struct g_node g_node;
+typedef struct edge edge;
+
+struct edge {
+  int distance;
+  g_node* target;
 };
 
-typedef struct graph graph;
+struct g_node {
+  int id;
+  int edge_count;
+  edge** edges;
+  int visited;
+};
+
+struct graph {
+  int node_count;
+  struct g_node** nodes;
+};
+
 
 graph * create_graph   (int nodes, double prob);
-int get_distance       (graph * m, int i, int j);
-void set_distance      (graph * m, int i, int j, int val);
 void graph_to_dot      (graph * m, char* filename);
 void print_graph       (graph * m);
 void graph_to_file     (graph* m, char* filename);
