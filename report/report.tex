@@ -71,7 +71,21 @@
 
 \chapter{Introduction}
 
-needs content
+This report details our investigation into the performance
+characteristics of the heap data structure. The heap can be used as a
+minimum priority queue, a use applicable in a wide variety of problem
+domains: process scheduling, sorting and graph algorithms all have a
+place for heaps.
+
+This paper will explore two general approaches, and demonstrate two
+ways of implementing each, for a total of four different data
+structures. We argue for their worst case behaviour.
+
+We then put them to the emprical test, stressing them under load from
+Dijsktra's Single Source Shortest Path algorithm, which we use to
+demonstrate the performance characteristics of the data
+structures. Dijsktra's can be implemented in two different ways, which
+we also investigate.
 
 \chapter{Binary heaps}
 
@@ -86,7 +100,20 @@ the ``heap invariant'': that the priority of each element in the tree
 is smaller than its children. Maintaining this invariant is the focus
 of each operation on binary heaps, and the notion of ``bubbling''
 elements up and down through the tree, swapping children and parents,
-appears again and again, as we shall see.
+appears again and again, as we shall see. We begin with an overview of
+the running times of each of the two implementations we investigate.
+
+\begin{center}
+  \begin{tabular}{ l | c | c  }
+    Operation & Array Implementation & Pointer Based \\ \hline
+    \MakeHeap & $\BigT{1}$ & $\BigT{1}$ \\ 
+    \FindMin & $\BigT{1}$ & $\BigT{1}$\\
+    \Insert & $\BigO{n}$ & $\BigT{\log n}$ \\ 
+    \DeleteMin & $\BigT{\log n}$ & $\BigO{\log n}$ \\
+    \DecreaseKey & $\BigT{\log n}$ & $\BigO{1}$ \\
+  \end{tabular}
+\end{center}
+
 
 
 \section{Binary Heaps with Arrays}
@@ -512,7 +539,7 @@ We have to do some work at one point which happens in $\FindMin$. Now, $\FindMin
 Below is an image from our test-framwork showing how a tree looks like with vacant nodes:
 
 \mbox{} \par
-\noindent\centerimg{delete_39}
+\noindent\centerimg{delete_39.png}
 After a call to $\FindMin$ thee heap looks like:
 
 \mbox{} \par
