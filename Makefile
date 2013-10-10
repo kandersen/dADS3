@@ -11,18 +11,18 @@ clean:
 	rm -f *.log
 	rm -f *.aux
 
-d1: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra.c
+d1: COMMON = src/main.c src/graph/linked_graph.c src/graph/dijkstra.c
 d1: NUM = 1
 d1: versions
 
-d2: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra_insert.c
+d2: COMMON = src/main.c src/graph/linked_graph.c src/graph/dijkstra_insert.c
 d2: NUM = 2
 d2: versions
 
 XCOMMON = src2/graph/linked_graph.c src2/heaps/heap.c src2/heaps/binary_heap_array.c src2/heaps/binary_heap_pointer.c src2/heaps/fibonacci_v1.c src2/heaps/fibonacci_v2.c
 
 tester: COMMON = src/tester.c
-tester: fh1 fh2 bhp
+tester: fh1 fh2 bhp bha
 
 versions: fh1 fh2 bhp bha
 

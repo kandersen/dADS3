@@ -10,8 +10,11 @@ void test_2(int);
 void test_3(int);
 void test_4(int);
 void test_5(int);
-void test_6(int);
-void test_7(int);
+void test_14(int);
+void test_15(int);
+void test_16(int);
+void test_17(int);
+void test_18(int);
 
 
 int main(int argc, char* argv[]) {
@@ -41,11 +44,20 @@ int main(int argc, char* argv[]) {
   case 5:
     test_5(atoi(argv[2]));
     break;
-  case 6:
-    test_6(atoi(argv[2]));
+  case 14:
+    test_14(atoi(argv[2]));
     break;
-  case 7:
-    test_7(atoi(argv[2]));
+  case 15:
+    test_15(atoi(argv[2]));
+    break;
+  case 16:
+    test_16(atoi(argv[2]));
+    break;
+  case 17:
+    test_17(atoi(argv[2]));
+    break;
+  case 18:
+    test_18(atoi(argv[2]));
     break;
   default:
     break;
@@ -81,9 +93,22 @@ test_1 (int size) {
   delete_min(h);
 }
 
+// pure inserts 1 reverse 1 del
+void
+test_2 (int size) {
+  heap* h = make_heap();
+  for (int k = size; k >= 0; k--) {
+    item* i = (item*)malloc(sizeof(item));
+    i->key = k;
+    i->value = NULL;
+    insert_item(i, h);
+  }
+  delete_min(h);
+}
+
 //pure inserts delmin all
 void
-test_2(int size) {
+test_3(int size) {
   heap* h = make_heap();
   for (int k = 0; k < size; k++) {
     item* i = (item*)malloc(sizeof(item));
@@ -99,7 +124,7 @@ test_2(int size) {
 
 //mixed del inserts
 void
-test_3(int size) {
+test_4(int size) {
   heap* h = make_heap();
   for (int k = 0; k < 4*(size/10); k++) {
     item* i = (item*)malloc(sizeof(item));
@@ -143,9 +168,28 @@ test_3(int size) {
   }
 }
 
+// decrease key
+void
+test_5(int size) {
+  heap* h = make_heap();
+  item* items[size];
+  for (int k = 0; k < size; k++) {
+    item* i = (item*)malloc(sizeof(item));
+    i->key = size+k;
+    i->value = NULL;
+    insert_item(i, h);
+    items[k] = i;
+  }
+  for (int k = size-1; k >= 0; k--) {
+    item* itm = items[k];
+    decrease_key(size + 1, itm, h);
+  }
+}
+
+
 //inserts remove all (decreasing) no delmin
 void
-test_4(int size) {
+test_14(int size) {
   heap* h = make_heap();
   item* items[size];
 
@@ -163,7 +207,7 @@ test_4(int size) {
 
 //inserts remove all (increasing) 1 delmin
 void
-test_5 (int size) {
+test_15 (int size) {
   heap* h = make_heap();
   item* items[size];
 
@@ -184,7 +228,7 @@ test_5 (int size) {
 
 //inserts remove all (decreasing) 1 delmin
 void
-test_6 (int size) {
+test_16 (int size) {
   heap* h = make_heap();
   item* items[size];
 
@@ -205,7 +249,7 @@ test_6 (int size) {
 
 //inserts remove all (middle out) 1 delmin
 void
-test_7 (int size) {
+test_17 (int size) {
   heap* h = make_heap();
   item* items[size];
 
@@ -229,80 +273,77 @@ test_7 (int size) {
   }  
 }
 
-/*
-int random_in_range (unsigned int min, unsigned int max)
-{
-  int base_random = rand(); // in [0, RAND_MAX] 
-  if (RAND_MAX == base_random) return random_in_range(min, max);
-  //now guaranteed to be in [0, RAND_MAX) 
-  int range       = max - min,
-    remainder   = RAND_MAX % range,
-    bucket      = RAND_MAX / range;
-  // There are range buckets, plus one smaller interval
-  //  within remainder of RAND_MAX 
-  if (base_random < RAND_MAX - remainder) {
-    return min + base_random/bucket;
-  } else {
-    return random_in_range (min, max);
-  }
+// makes a chain of nodes that are marked, performing a cascading delete
+item* create_item(int key) {
+
+  item* itm = (item*)malloc(sizeof(item));
+  itm->key = key;
+  itm->value = NULL;
+  return itm;
 }
 
-// CHECK consistency for X operations
-void consistency(int operations) {
-  
-  srand(time(NULL));
+void test_18(int size) {
+
+  int counter = 0;
+  // char fname[50];
+  item* del_item;
+  item* old_del_item;
+  item* bottom;
 
   heap* h = make_heap();
+  insert_item(create_item(size), h);
+  bottom = create_item(size+1);
+  insert_item(bottom, h);
+  del_item = create_item(size+2);
+  insert_item(del_item, h);
+  old_del_item = create_item(size+3);
+  insert_item(old_del_item, h);
+  insert_item(create_item(-1), h);
+  delete_min(h);
 
-  item* items[operations];
+  //  sprintf(fname, "%i_1.dot", counter);
+  //  to_dot(h, fname);
 
-  for (int i = 0; i < operations; i++) {
-    items[i] = NULL;
-  }
+  remove_item(del_item, h);
 
-  int elements_in_list = 0;
-  for (int k = 0; k < operations; k++) {
+  //  sprintf(fname, "%i_2.dot", counter);
+  //to_dot(h, fname);
 
-    double r = ((double) rand() / (RAND_MAX));
+  counter += 1;
+
+  while (counter < size) {
     
-    if (r > 0.3) { // INSERT
-      item* i = (item*)malloc(sizeof(item));
-      items[k] = i;
-      i->key = random_in_range(0,100);
-      int* val = (int*)malloc(sizeof(int));
-      *(val) = k;
-      i->value = val;
-      insert(i, h);
-      elements_in_list = elements_in_list + 1;
-    } else {
-      
-      double r2 = ((double) rand() / (RAND_MAX));
-      
-      if (r2 > 0.5) {
-        item* it = delete_min(h);
-        int index = *((int*)(it->value));
-        items[index] = NULL;
-        free(it);
-      } else  {
-        int r3 = random_in_range(0, elements_in_list -1);
-        item* selected_item = items[r3];
-        if (selected_item == NULL) {
-          item* it = delete_min(h);
-          int index = *((int*)(it->value));
-          items[index] = NULL;
-          free(it);
-        } else {
-          if (r2 > 0.2) {
-            decrease_key(selected_item->key / 2, selected_item, h);
-          } else {
-            remove_item(selected_item, h);
-            int index = *((int*)(selected_item->value));
-            items[index] = NULL;
-            free(selected_item);
-          }
-        } 
-      }
-    }
+    int newroot = size - counter;
+
+    item* itm1 = create_item(newroot);
+    item* itm2 = create_item(newroot + 1);
+    item* itm3 = create_item(newroot + 2);
+    item* itm4  = create_item(newroot + 3);
+    insert_item(itm1, h);
+    insert_item(itm2, h);
+    insert_item(itm3, h);
+    insert_item(itm4, h);
+    insert_item(create_item(-1), h);
+    delete_min(h);
+
+    //    sprintf(fname, "%i_1.dot", counter);
+    //to_dot(h, fname);
+
+    remove_item(itm2, h);
+    remove_item(itm3, h);
+    remove_item(old_del_item, h);
+
+    old_del_item = itm4;
+    
+    //    sprintf(fname, "%i_2.dot", counter);
+    //to_dot(h, fname);
+    
+    counter += 1;
   }
+
+  remove_item(bottom, h);
+
+  //  sprintf(fname, "%i.dot", counter);
+  //  to_dot(h, fname);
 }
-*/
+

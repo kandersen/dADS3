@@ -240,7 +240,8 @@ int is_empty(heap* h) {
   }
 }
 
-void update_marked(node* n, heap* h) {
+void update_marked(node* n, heap* h) {  
+  puts("update_marked");
   if (n->parent == NULL) {
     return;
   } else {
@@ -256,6 +257,7 @@ void update_marked(node* n, heap* h) {
       concat_list(h->min_node, n);       
     } else {
       n->marked = 1;
+      printf("MARKING: %i\n", n->key);
     }
   }
 }

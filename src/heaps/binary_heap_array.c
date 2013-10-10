@@ -54,7 +54,7 @@ void insert_item(item* k, heap* h) {
     i = j;
   }
   h->array[INDEX_OF_ITEM(i)] = k;
-  k->n = new_node(INDEX_OF_ITEM(i));
+  k->n = new_node(i);
 }
     
 item* find_min(heap* h) {
@@ -77,11 +77,21 @@ item* delete_min(heap* h) {
   int i = 1;  
   int j;
   while ((j = 2 * i) <= h->count) {
-    item* temp = h->array[INDEX_OF_ITEM(j)];
+    int right_sibling = j + 1;
+    if (right_sibling > h->count) {
+      right_sibling = j;
+    }
+    int dest;
+    if (LE(h->array[INDEX_OF_ITEM(j)]->key, h->array[INDEX_OF_ITEM(right_sibling)]->key)) {
+      dest = j;
+    } else {
+      dest = right_sibling;
+    }
+    item* temp = h->array[INDEX_OF_ITEM(dest)];
     if (LT(temp->key, in->key)) {
       h->array[INDEX_OF_ITEM(i)] = temp;
       temp->n->index = i;
-      i = j;
+      i = dest;
     } else {
       break;
     }
@@ -94,7 +104,7 @@ item* delete_min(heap* h) {
 
 void decrease_key(int delta, item* k, heap* h) {
   k->key -= delta;  
-  int i = ITEM_OF_INDEX(k->n->index);
+  int i = k->n->index;
   while (i > 1) {
     int j = i / 2;
     if (GE(k->key, h->array[INDEX_OF_ITEM(j)]->key)) {
@@ -114,6 +124,10 @@ int is_empty(heap* h) {
 
 int count(heap* h) {
   return h->count;
+}
+
+void remove_item(item* i, heap* h) {
+  
 }
 
 // DOTTING
@@ -147,7 +161,7 @@ void dot_items (heap* h, FILE* out) {
   }
 }
     
-void  to_dotarr (heap* h, char* filename) {
+void  to_dot (heap* h, char* filename) {
   FILE * out_file = fopen(filename, "w");
 
   if (out_file == NULL) {

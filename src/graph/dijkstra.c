@@ -5,9 +5,9 @@
 #include "graph.h"
 
 void dijkstra(graph* g, int source, item** ph) {
-  
+
   int infinity = 100000000;
-  int vertices = g->nodes;
+  int vertices = g->node_count;
 
   heap* h = make_heap();
 
@@ -37,18 +37,20 @@ void dijkstra(graph* g, int source, item** ph) {
 
     int u_index = *((int*)(val->value));
 
-    for (int v_index = 0; v_index < vertices; v_index++) {
-      int dist_between = get_distance(g, u_index, v_index);
-      if (dist_between > 0) { // it is a neighbor
-        item* v = ph[v_index];
-        int alt = val->key + dist_between;
-        if (alt < v->key) {
-          int delta = v->key - alt;
-          decrease_key(delta, v, h);
-        }
+    g_node* n = g->nodes[u_index];
+    
+    for (int v_index = 0; v_index < n->edge_count; v_index++) {
+
+      edge* e = n->edges[v_index];
+      int dist_between = e->distance;
+      item* v = ph[e->target->id];
+      int alt = val->key + dist_between;
+      if (alt < v->key) {
+        int delta = v->key - alt;
+        decrease_key(delta, v, h);
       }
     }
-
+    
     val = find_min(h);
     delete_min(h);
   }

@@ -4,7 +4,7 @@ for (( i = 100; i <= 8000; i = i + 100 ))
 do
     for p in 0 1 2 3 4 5 6 7 8 9
     do
-        for (( t = 0; t <= 3; t++))
+        for (( t = 1; t <= 3; t++))
         do
             for (( k = 1; k <= 3; k++ ))
             do

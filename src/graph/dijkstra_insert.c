@@ -8,7 +8,7 @@
 void dijkstra(graph* g, int source, item** ph) {
   
   int infinity = 100000000;
-  int vertices = g->nodes;
+  int vertices = g->node_count;
 
   heap* h = make_heap();
 
@@ -32,30 +32,31 @@ void dijkstra(graph* g, int source, item** ph) {
   
   while (val != NULL) {
 
-    if (val->visited == 1) {
+    int u_index = *((int*)(val->value));
+    g_node* n = g->nodes[u_index];
+
+    if (n->visited == 1) {
       break;
     } else {
-      val->visited = 1;
+      n->visited = 1;
     }
 
-    int u_index = *((int*)(val->value));    
+    for (int v_index = 0; v_index < n->edge_count; v_index++) {
 
-    for (int v_index = 0; v_index < vertices; v_index++) {
-      int dist_between = get_distance(g, u_index, v_index);
-      if (dist_between > 0) { // it is a neighbor
-        item* v = ph[v_index];
-        int alt = val->key + dist_between;
+      edge* e = n->edges[v_index];
+      int dist_between = e->distance;
+      int target_id = e->target->id;
+      item* v = ph[target_id];
+      int alt = val->key + dist_between;
+      if (alt < v->key) {
         item* newitem = (item*)malloc(sizeof(item));
-        if (v->key > alt) {
-          newitem->key = alt;
-          newitem->visited = v->visited;
-          newitem->value = v->value;
-          insert_item(newitem, h);
-          ph[v_index] = newitem;
-        }
+        newitem->key = alt;
+        newitem->value = v->value;
+        insert_item(newitem, h);
+        ph[target_id] = newitem;
       }
     }
-
+    
     val = find_min(h);
     delete_min(h);
   }

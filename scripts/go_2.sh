@@ -7,7 +7,7 @@ do
         for (( k = 1; k <= 3; k++ ))
         do
             seed=$((($p+1) * 10000000 + $i * 100 + 10 * $k))
-            for ex in fh11 fh21 bhp1 bha1
+            for ex in fh12 fh22 bhp2 bha2
             do
                 for (( r = 1; r <= 3; r++ ))
                 do
@@ -27,7 +27,7 @@ do
         for (( k = 1; k <= 3; k++ ))
         do
             seed=$((($p+1) * 10000000 + $i * 100 + 10 * $k))
-            for ex in fh11 fh21 bhp1 bha1
+            for ex in fh12 fh22 bhp2 bha2
             do
                 for (( r = 1; r <= 3; r++ ))
                 do
@@ -39,5 +39,4 @@ do
     done
     echo "size: $i"
 done
-
 
