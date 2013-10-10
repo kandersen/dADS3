@@ -41,8 +41,9 @@ void dijkstra(graph* g, int source, item** ph) {
     
     for (int v_index = 0; v_index < n->edge_count; v_index++) {
 
-      int dist_between = n->edges[v_index]->distance;
-      item* v = ph[v_index];
+      edge* e = n->edges[v_index];
+      int dist_between = e->distance;
+      item* v = ph[e->target->id];
       int alt = val->key + dist_between;
       if (alt < v->key) {
         int delta = v->key - alt;

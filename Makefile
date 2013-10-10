@@ -19,7 +19,7 @@ d2: COMMON = src/main.c src/graph/graph.c src/graph/dijkstra_insert.c
 d2: NUM = 2
 d2: versions
 
-XCOMMON = src2/graph/linked_graph.c src2/heaps/heap.c src2/heaps/binary_heap_array.c src2/heaps/binary_heap_pointer.c src2/heaps/fibonacci_v1.c src2/heaps/fibonacci_v2.c src2/main.c 
+XCOMMON = src2/graph/linked_graph.c src2/heaps/heap.c src2/heaps/binary_heap_array.c src2/heaps/binary_heap_pointer.c src2/heaps/fibonacci_v1.c src2/heaps/fibonacci_v2.c
 
 tester: COMMON = src/tester.c
 tester: fh1 fh2 bhp
@@ -39,10 +39,10 @@ fh2:
 	$(COMPILER) $(FLAGS) -o bin/fh2$(NUM).out src/heaps/fibonacci_v2.c $(COMMON)
 
 xdjk1:
-	$(COMPILER) $(FLAGS2) -o bin/xdjk1.out src2/graph/dijkstra.c $(XCOMMON)
+	$(COMPILER) $(FLAGS2) -o bin/xdjk1.out src2/graph/dijkstra.c src2/main.c  $(XCOMMON)
 
 xdjk2:
-	$(COMPILER) $(FLAGS2) -o bin/xdjk2.out src2/graph/dijkstra_insert.c $(XCOMMON)
+	$(COMPILER) $(FLAGS2) -o bin/xdjk2.out src2/graph/dijkstra_insert.c src2/main_insert.c $(XCOMMON)
 
 
 creator: 

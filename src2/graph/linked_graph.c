@@ -9,15 +9,15 @@ graph* create_graph (int nodes, double prob) {
   graph* g = (graph*)malloc(sizeof(graph));
   
   g->node_count = nodes;
-  g_node* items[nodes];
+  g_node** items = (g_node**)malloc(nodes * sizeof(g_node*));
   g->nodes = items;
 
   for (int i = 0; i < nodes; i++) {
     g_node* n = (g_node*)malloc(sizeof(g_node));
     n->id = i;
     n->edge_count = 0;
-    edge* edges[nodes];
-    n->edges = edges;
+    edge** es = (edge**)malloc(nodes * sizeof(edge*));
+    n->edges = es;
     n->visited = 0;
     items[i] = n;
   }
@@ -33,12 +33,11 @@ graph* create_graph (int nodes, double prob) {
         e->target = items[j];
         n->edges[n->edge_count] = e;
         n->edge_count += 1;
-        puts("2");
 
         g_node* n2 = items[j];
         edge* e2 = (edge*)malloc(sizeof(edge));
-        e->distance = dist;
-        e->target = items[i];
+        e2->distance = dist;
+        e2->target = items[i];
         n2->edges[n2->edge_count] = e2;
         n2->edge_count += 1;
       } 

@@ -14,7 +14,6 @@ void print(item** items, int size) {
      printf("%i\n", items[i]->key);
     }
   }
-
 }
 
 int main(int argc, char* argv[]) {
@@ -40,7 +39,7 @@ int main(int argc, char* argv[]) {
  clock_t start;
  long elapsed;
 
- for (int k = 0; k < 0; k++) {
+ for (int k = 1; k < 4; k++) {
    
    for (i = 0; i <= 3; i++) {
 
@@ -58,7 +57,7 @@ int main(int argc, char* argv[]) {
        printf("%i %i %i %i %ld\n", size, (int)(prob * 10), i, k, elapsed);
      }
      
-     //       print(items, size);
+     //print(items, size);
      
      if (djkstr == 1) {
        

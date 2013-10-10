@@ -14,6 +14,7 @@ namespace CreateAverage
             string outputFile = args[1];
             int prob = int.Parse(args[2]);
 
+
             using (StreamWriter writer = new StreamWriter(File.OpenWrite(outputFile)))
             {
                 int lastPoint = 0;
