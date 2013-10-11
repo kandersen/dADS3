@@ -593,15 +593,16 @@ After a call to $\FindMin$ the heap looks like:
 \mbox{} \par
 \noindent\centerimg{find_min}
 
-Let us analyze the time for the $\FindMin$ operation. Let $l$ mark the number of vacant nodes. If $l=0$ then $\FindMin$ points to the node representing the item with the minimum key, and the work is constant. If $l \ge 1$ then the amortized running time is the new roots created from destroying vacant nodes and moving the non-vacant child nodes to the root plus the linking of the trees which is at most $\BigO{\log n}$. We argued previously that a node $y$ have $degree(y_i) \ge i - 2$ for $i = 1,2,\cdots,k$ where $k$ is the degree of its parent. We use this to say that at least one of the vacant nodes will have a rank of $k-2$. We also know that the size of subtree rooted at a node with degree $k-2$ will be at least be of size $\phi^{k-2}$. If all children of the vacant nodes we destroy are non-vacant, they will increase the number of trees and thereby the potential by:
-\begin{align*}
-  \sum_{i=1}^l \phi^{k_j-2} \le n
-\end{align*}
-where $k_1, k_2,\cdots,k_i$ are non-vacant nodes. The sum is maximized for $k_i$. MAYBE SOME MORE??
+We defer the analysis of the time complexcity of the \FindMin
+operation to \cite{FT87}, Lemma 2, but mention the final result of
+$\BigO{l \cdot (\log \frac{n}{l} + 1)}, where l is the number of
+vancant nodes in the heap.
 
 \section{Worst case time-complexity for Fib heap v2}
 
-The worst case example is extremely easy. Since $l$ and $n$ are disjoint, the can be filled with vacant nodes. The worst-case would then be calling $\FindMin$, just to find out that no such node exist. 
+The worst case example is extremely easy. Since $l$ and $n$ are
+disjoint, the can be filled with vacant nodes. The worst-case would
+then be calling $\FindMin$, just to find out that no such node exist.
 
 \section{Testing correctness of Fibonacci Heaps}
 
@@ -696,13 +697,19 @@ generator in C but we will use the resulting graphs as if they were
 completely randomly generated graphs with an expected probability on the
 number of edges in the graph.
 
-\section{Special cases for graphs }
+\section{Pathological Cases }
 
-Overall, the previous section provides a generel desription of when $\Dijkstra$ will perform a lot of operations, but one could be interested in graphs that has a many or few $\Insert$- or $\DecreaseKey$ operations.
+Overall, the previous section provides a general description of when
+$\Dijkstra$ will perform a lot of operations, but one could be
+interested in graphs that has many or few $\Insert$- or
+$\DecreaseKey$ operations.
 
-If the first path that $\Dijkstra$ computes to each node is the optimal path only $n$ $\DecreaseKey$ operations will be called. A trivial case is when the graph is a tree.
+If the first path that $\Dijkstra$ computes to each node is the
+optimal path only $n$ $\DecreaseKey$ operations will be called. A
+trivial case is when the graph is a tree.
 
-A more interesting case that can result in many or few calls to $\DecreaseKey$ has the following structure:
+A more interesting case that can result in many or few calls to
+$\DecreaseKey$ has the following structure:
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
@@ -738,7 +745,10 @@ A more interesting case that can result in many or few calls to $\DecreaseKey$ h
   \end{tikzpicture}
 \end{center}
 
-For suitable $k_i$s and $c_j$ we can make $\Dijkstra$ call $\DecreaseKey$ for every node $n+1$ to $m$, for each of the nodes in the vertical list $2$ to $n$. If $n=m=|V|$ we will $\BigOh{n^2}$ calls to $\DecreaseKey$.
+For suitable $k_i$s and $c_j$ we can make $\Dijkstra$ call
+$\DecreaseKey$ for every node $n+1$ to $m$, for each of the nodes in
+the vertical list $2$ to $n$. If $n=m=|V|$ we will use $\BigO{n^2}$ calls
+to $\DecreaseKey$.
 
 \chapter{Empirical Testing}
 
@@ -755,9 +765,11 @@ Dijkstra's Algorithm found above.
 
 \section{Stress-Testing}
 
-We have devised a series of 9 tests in order to exhibit the various
+We have devised a series of 11 tests in order to exhibit the various
 time complexities of each operation facilitated by our
-implementations. The first five tests listed below are run with on the
+implementations under different special cases. 
+These tests were also used to control correctness of the implementations.
+The first six tests listed below are run on the
 order of 600.000 elements, for all 4 implementations.
 
 \begin{itemize}
@@ -769,22 +781,26 @@ order of 600.000 elements, for all 4 implementations.
 \item As the previous test, but with elements inserted in decreasing
   key order, in order to force bubbling and tree traversals on each
   insert.
-\item As the first test, followed by as many \DeleteMin operations.
-\item Mixed insertions and deletions.
-\item As the first, followed by as many \DecreaseKey operations.
+\item As the first test, followed by as many $\DeleteMin$ operations, testing correctness of repeated bubbling actions.
+\item Mixed insertions and deletions, to simulate some degree of normal use, i.e. inserts may or may not introduce new minimums.
+\item As the first, followed by as many $\DecreaseKey$ operations; each making the currenty largest element the smallest. 
+Showcasing the worst case for the binary heaps, as each $\DecreaseKey$ operation bubbles the element from a leaf to the root.
 \end{itemize}
 
-The following 4 test cases are run only for the Fibonacci heaps, as
-they are designed to force worst-case behavior as opposed to the
-amortized bounds, which should be exhibited by the preceding 5 tests.
+The following five test cases are run only for the Fibonacci heaps,
+as a they use the $\Delete$ operation, which we have only defined for these.
+The last test is especially interesting as it is designed to force 
+worst-case behavior as opposed to the amortized bounds of remove.
+These tests were also run on an order of 600.000 elements.
 
 \begin{itemize}
-\item A series of inserts, followed by a single \DeleteMin, followed
-  by as many \Delete operations. The point is that \Insert and \Delete
-  are both amortized constant operations, but the \DeleteMin forces
-  the logarithmic worst-case behavior expected.
-\item Same as the first, but removing in reverse order.
-\item Same as the first, but removing from the middle of the range of
+\item A series of inserts, followed by as many $\Delete$ operations. 
+  Removing the elements in decreasing order.
+\item Same as the first, but with a $\DeleteMin$ operation before
+the $\Delete$ (one less now) operations. The point being that
+the $\DeleteMin$ operation will force the Fibonacci heap to make a linking step.
+\item Same as above, but removing in reverse(increasing) order.
+\item Same as above, but removing from the middle of the range of
   keys, in alternatingly decreasing and increasing order.
 \item A series of deletions and insertions to force the phenomenon of
   cascading deletions.
@@ -814,13 +830,6 @@ connectivity in steps of 10\%.
 Finally, we run the algorithm-data structure-input size-connectivity
 configuration 3 times to account for effects out of our hands such as
 the operating system of the test machine.
-
-We thus have a grand total of 144.000 test runs, witnessed by the
-following formula.
-
-\begin{align*}
-    \text{\# of tests} = 200 * 10 * 3 * 8 * 3 = 144.000 
- \end{align*}
 
 We measure running times through the use of the GNU \texttt{time}
 command, from which we gather the actual CPU time spent on running the
