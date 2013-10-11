@@ -593,15 +593,16 @@ After a call to $\FindMin$ the heap looks like:
 \mbox{} \par
 \noindent\centerimg{find_min}
 
-Let us analyze the time for the $\FindMin$ operation. Let $l$ mark the number of vacant nodes. If $l=0$ then $\FindMin$ points to the node representing the item with the minimum key, and the work is constant. If $l \ge 1$ then the amortized running time is the new roots created from destroying vacant nodes and moving the non-vacant child nodes to the root plus the linking of the trees which is at most $\BigO{\log n}$. We argued previously that a node $y$ have $degree(y_i) \ge i - 2$ for $i = 1,2,\cdots,k$ where $k$ is the degree of its parent. We use this to say that at least one of the vacant nodes will have a rank of $k-2$. We also know that the size of subtree rooted at a node with degree $k-2$ will be at least be of size $\phi^{k-2}$. If all children of the vacant nodes we destroy are non-vacant, they will increase the number of trees and thereby the potential by:
-\begin{align*}
-  \sum_{i=1}^l \phi^{k_j-2} \le n
-\end{align*}
-where $k_1, k_2,\cdots,k_i$ are non-vacant nodes. The sum is maximized for $k_i$. MAYBE SOME MORE??
+We defer the analysis of the time complexcity of the \FindMin
+operation to \cite{FT87}, Lemma 2, but mention the final result of
+$\BigO{l \cdot (\log \frac{n}{l} + 1)}, where l is the number of
+vancant nodes in the heap.
 
 \section{Worst case time-complexity for Fib heap v2}
 
-The worst case example is extremely easy. Since $l$ and $n$ are disjoint, the can be filled with vacant nodes. The worst-case would then be calling $\FindMin$, just to find out that no such node exist. 
+The worst case example is extremely easy. Since $l$ and $n$ are
+disjoint, the can be filled with vacant nodes. The worst-case would
+then be calling $\FindMin$, just to find out that no such node exist.
 
 \section{Testing correctness of Fibonacci Heaps}
 
@@ -823,13 +824,6 @@ connectivity in steps of 10\%.
 Finally, we run the algorithm-data structure-input size-connectivity
 configuration 3 times to account for effects out of our hands such as
 the operating system of the test machine.
-
-We thus have a grand total of 144.000 test runs, witnessed by the
-following formula.
-
-\begin{align*}
-    \text{\# of tests} = 200 * 10 * 3 * 8 * 3 = 144.000 
- \end{align*}
 
 We measure running times through the use of the GNU \texttt{time}
 command, from which we gather the actual CPU time spent on running the
