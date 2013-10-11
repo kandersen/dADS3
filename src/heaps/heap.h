@@ -1,6 +1,7 @@
 #ifndef DADS3_HEAP_H
 #define DADS3_HEAP_H
 
+
 #ifndef INSTRUMENT
 #define LE(X, Y) ((X) <= (Y))
 #define LT(X, Y) ((X) <  (Y))
@@ -8,7 +9,6 @@
 #define GT(X, Y) ((X) >  (Y))
 #define EQ(X, Y) ((X) == (Y))
 #else
-long long cmp_counter = 0;
 #define LE(X, Y) ((cmp_counter++, (X) <= (Y)))
 #define LT(X, Y) ((cmp_counter++, (X) <  (Y)))
 #define GE(X, Y) ((cmp_counter++, (X) >= (Y)))

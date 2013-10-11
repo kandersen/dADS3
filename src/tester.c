@@ -3,6 +3,7 @@
 #include <time.h>
 #include "heap.h"
 
+long long cmp_counter;
 
 void test_0(int);
 void test_1(int);
@@ -15,7 +16,6 @@ void test_15(int);
 void test_16(int);
 void test_17(int);
 void test_18(int);
-
 
 int main(int argc, char* argv[]) {
   clock_t start = clock(), elapsed = 0;
@@ -64,9 +64,14 @@ int main(int argc, char* argv[]) {
   }
 
   elapsed = clock() - start;
+#ifndef INSTRUMENT
   printf("%ld\n", elapsed);
+#else
+  printf("%lld\n", cmp_counter);
+#endif
   return 0;
 }
+
 
 // pure inserts
 void 

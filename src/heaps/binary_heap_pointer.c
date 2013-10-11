@@ -4,6 +4,8 @@
 #include <string.h>
 #include "heap.h"
 
+long long cmp_counter = 0;
+
 //TYPES
 
 struct node { 

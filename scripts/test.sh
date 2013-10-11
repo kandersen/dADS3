@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for (( i = 100; i <= 200000; i = i + 100 ))
+for (( i = 1000; i <= 600000; i = i + 1000 ))
 do
     for ex in fh1 fh2 bhp bha
     do
@@ -13,9 +13,10 @@ do
             done
         done
     done
+    echo "all size: $i"
 done
 
-for (( i = 100; i <= 200000; i = i + 100 ))
+for (( i = 1000; i <= 600000; i = i + 1000 ))
 do
     for ex in fh1 fh2
     do
@@ -28,6 +29,7 @@ do
             done
         done
     done
+    echo "fib size: $i"
 done
 
 

@@ -15,7 +15,7 @@
 \usepackage{epstopdf} 
 \usepackage{graphicx}
 \usepackage{pgfplots}
-\usepackage{caption}
+\usepackage[format=hang]{caption}
 
 \usepackage{pgf,tikz}
 \usepackage{comment}
@@ -276,68 +276,71 @@ where a diamond is modelling a marked node. If either $\DecreaseKey$ or $\Delete
 \end{align*}
 which is $\BigT{n}$.
 
-Such a configuration can be obtained by calling $\Insert$ with two very high numbers $x$ and $y$ and one smaller and call $\DeleteMin$:
+Such a configuration can be obtained by constructring triangles, chaining and deleting (as a side note, this is exercise 19.4-1 in \cite{ITA09}). In order for us to create the first triangle, we insert five nodes, call $\DeleteMin$ and then remove the bottom most:
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
     \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
   
-    \node[node]    	  (1) {$x$};
-    \node[node]           (2) [below of=1] {$y$};
-    
-    \path (1) edge (2);
+    \node[node]          (x) {$x$}
+    child{node[node]      (y) {$y$}}
+    child{node[marked]      (z) {$z$}};
 
   \end{tikzpicture}
 \end{center}
 
-If we insert three new items $x'$, $y'$ $z$ with keys slightly smaller where $z$ is the smallest key we will have the following forest:
+We can then create another triangle, having $x'$ being a lesser key than $x$. The picture below is just before joining the two rank two trees.
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
+    \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
   
-    \node[node]    	  (x) {$x$};
-    \node[node]           (y) [below of=x] {$y$};
-    \node[node]    	  (x') [right of=x] {$x'$};
-    \node[node]    	  (y') [right of=x'] {$y'$}; 
-    \node[node]    	  (z) [right of=y'] {$z$};
-   
-    \path (1) edge (2);
+    \node[node]          (x) {$x$}
+    child{node[node]      (y) {$y$}}
+    child{node[marked]      (z) {$z$}};
+
+    \node[node]          (x') [right=4cm of x] {$x'$}
+    child{node[node]      (y') {$y'$}}
+    child{node[marked]      (z') {$z'$}};
 
   \end{tikzpicture}
 \end{center}
 
-If we call $\DeleteMin$, call $\Delete$ on $y'$ and call insert with three new items as above, we can get the following configuration:
+The result is then: 
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
-  
-    \node[node]    	  (x') {$x'$}
-    child{node[node]      (x) {$x$}
-      child{node[node]    (y) {$y$}}};
-    \node[node]    	  (x'') [right of=x'] {$x''$};
-    \node[node]    	  (y'') [right of=x''] {$y''$}; 
-    \node[node]    	  (z) [right of=y''] {$z$};
+    \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
+
+    \node[node]          (x') {$x'$}
+    child{node[node]      (y') {$y'$}}
+    child{node[marked]      (z') {$z'$}}
+    child{node[node]          (x) {$x$}
+        child{node[node]      (y) {$y$}}
+        child{node[marked]      (z) {$z$}}};
    
   \end{tikzpicture}
 \end{center}
-where $z$ again is the smallest key. $\DeleteMin$ gives:
+
+Now, we can delete $y$ and $z'$ and we will have the wanted structure. 
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
-  
-    \node[node]    	  (x'') {$x''$}
-    child{node[node]      (y'') {$y''$}}
-    child{node[node]      (x') {$x'$}
-      child{node[node]    (x) {$x$}
-        child{node[node]  (y) {$y$}}}};
+    \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
+
+    \node[node]          (x') {$x'$}
+    child{node[node]      (y') {$y'$}}
+    child{node[marked]          (x) {$x$}
+        child{node[marked]      (z) {$z$}}};
    
   \end{tikzpicture}
 \end{center}
-where $\Delete$ with $y''$ as argument will result in a chain. By using this approach we can easily build up a single chain of height $n$.
+
+To create a chain of height $n$, we have to create $n$ triangles.
 
 \section{Fibonacci heap version 2}
 
@@ -428,8 +431,6 @@ For each level in our node-size interval we have 10 different graph connectivity
 \begin{align*}
     \text{\# of tests} = 200 * 10 * 3 * 8 * 3 = 144.000 
  \end{align*}
-
-
 
 \chapter{Binary heap vs Fibonacci heap}
 

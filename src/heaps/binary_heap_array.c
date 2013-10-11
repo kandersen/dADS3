@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+long long cmp_counter = 0;
+
 #define INITIAL_HEAP_SIZE 1024
 #define INDEX_OF_ITEM(I) (I - 1)
 #define ITEM_OF_INDEX(I) (I)

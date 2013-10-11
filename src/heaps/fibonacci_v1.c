@@ -3,6 +3,8 @@
 #include <string.h>
 #include "heap.h"
 
+long long cmp_counter = 0;
+
 void concat_list(node*, node*);
 void remove_node_in_list(node*);
 node* join_trees(node*,node*);
@@ -241,7 +243,6 @@ int is_empty(heap* h) {
 }
 
 void update_marked(node* n, heap* h) {  
-  puts("update_marked");
   if (n->parent == NULL) {
     return;
   } else {
@@ -257,7 +258,6 @@ void update_marked(node* n, heap* h) {
       concat_list(h->min_node, n);       
     } else {
       n->marked = 1;
-      printf("MARKING: %i\n", n->key);
     }
   }
 }

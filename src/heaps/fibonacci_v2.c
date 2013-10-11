@@ -3,6 +3,8 @@
 #include <string.h>
 #include "heap.h"
 
+long long cmp_counter = 0;
+
 void concat_list(node*, node*);
 void remove_node_in_list(node*);
 node* join_trees(node*,node*);
