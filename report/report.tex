@@ -908,41 +908,41 @@ order of 600.000 elements, for all 4 implementations.
 
 \begin{itemize}
 \item A series of \Insert s, elements inserted in increasing key
-  order. We expect linear behavior, as the keys are inserted
-  immediately in the right location.
+  order. We expect linear behaviour, as the keys are inserted
+  immediately in the right location. Our results prove us correct in \ref{time_0} and \ref{comp_0}. 
 \item As before, followed by a single \DeleteMin. This forces re-balancing
-  of Fibonacci heaps.
+  of Fibonacci heaps. We point to \ref{time_1} and \ref{comp_1}. 
 \item As the previous test, but with elements inserted in decreasing
   key order, in order to force bubbling and tree traversals on each
-  insert.
-\item As the first test, followed by as many $\DeleteMin$ operations, testing correctness of repeated bubbling actions.
-\item Mixed insertions and deletions, to simulate some degree of normal use, i.e. inserts may or may not introduce new minimums.
-\item As the first, followed by as many $\DecreaseKey$ operations; each making the currenty largest element the smallest. 
-Showcasing the worst case for the binary heaps, as each $\DecreaseKey$ operation bubbles the element from a leaf to the root.
+  insert. This behaves as expected as \ref{time_2} and \ref{comp_2} show. 
+\item As the first test, followed by as many $\DeleteMin$ operations, testing correctness of repeated bubbling actions. This is surely something that is expected to be $n\logn$ operations as we also show in \ref{time_3} and \ref{comp_3}. 
+\item Mixed insertions and deletions, to simulate some degree of normal use, i.e. inserts may or may not introduce new minimums. Any chain of operations will be $\BigO{\log n}$ per operation for Binary heaps and for Fibonacci heap we can establish the same upper bound due to Theorem 1~\cite[p.604]{FT87}. Please see \ref{time_4} and \ref{comp_4} for running time and comparison measurements. 
+\item As the first, followed by as many $\DecreaseKey$ operations; each making the currently largest element the smallest. 
+Showcasing the worst case for the binary heaps, as each $\DecreaseKey$ operation bubbles the element from a leaf to the root. Again, this is expected to be $n\logn$ and can bee seen in \ref{time_5} and \ref{comp_5}.
 \end{itemize}
 
 The following five test cases are run only for the Fibonacci heaps,
 as a they use the $\Delete$ operation, which we have only defined for these.
 The last test is especially interesting as it is designed to force 
-worst-case behavior as opposed to the amortized bounds of remove.
+worst-case behaviour as opposed to the amortized bounds of remove.
 These tests were also run on an order of 600.000 elements.
 
 \begin{itemize}
 \item A series of inserts, followed by as many $\Delete$ operations. 
-  Removing the elements in decreasing order.
+  Removing the elements in decreasing order. \ref{time_14} and \ref{comp_14}.
 \item Same as the first, but with a $\DeleteMin$ operation before
 the $\Delete$ (one less now) operations. The point being that
-the $\DeleteMin$ operation will force the Fibonacci heap to make a linking step.
-\item Same as above, but removing in reverse(increasing) order.
+the $\DeleteMin$ operation will force the Fibonacci heap to make a linking step. \ref{time_15} and \ref{comp_15}
+\item Same as above, but removing in reverse(increasing) order. \ref{time_16} and \ref{comp_16}
 \item Same as above, but removing from the middle of the range of
-  keys, in alternatingly decreasing and increasing order.
+  keys, in alternatingly decreasing and increasing order. \ref{time_17} and \ref{comp_17}
 \item A series of deletions and insertions to force the phenomenon of
-  cascading deletions.
+  cascading deletions. \ref{time_18} and \ref{comp_18}
 \end{itemize}
 
 We mention them here for completeness as they were part of our
 verification/testing approach, but not strictly asked of the
-report. We refer to Appendix A.2 for plots of the running times.
+report. We refer to Appendix A.3 for plots of the running times.
 
 \section{Dijkstra's Algorithm Tests}
 
@@ -1014,7 +1014,7 @@ data structure.
 \chapter{Conclusion}
 
 The conclusion of the paper is one we draw with mixed feelings. From
-the bounds analyzed in the first few chapters we expected to
+the bounds analysed in the first few chapters we expected to
 empirically observe a clear advantage of the Fibonacci family of heaps
 over the classical binary heaps (there are after all almost 3 decades
 of research between them), at the least on sparse graphs.
