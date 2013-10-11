@@ -709,9 +709,11 @@ Dijkstra's Algorithm found above.
 
 \section{Stress-Testing}
 
-We have devised a series of 9 tests in order to exhibit the various
+We have devised a series of 11 tests in order to exhibit the various
 time complexities of each operation facilitated by our
-implementations. The first five tests listed below are run with on the
+implementations under different special cases. 
+These tests were also used to control correctness of the implementations.
+The first six tests listed below are run on the
 order of 600.000 elements, for all 4 implementations.
 
 \begin{itemize}
@@ -723,22 +725,26 @@ order of 600.000 elements, for all 4 implementations.
 \item As the previous test, but with elements inserted in decreasing
   key order, in order to force bubbling and tree traversals on each
   insert.
-\item As the first test, followed by as many \DeleteMin operations.
-\item Mixed insertions and deletions.
-\item As the first, followed by as many \DecreaseKey operations.
+\item As the first test, followed by as many $\DeleteMin$ operations, testing correctness of repeated bubbling actions.
+\item Mixed insertions and deletions, to simulate some degree of normal use, i.e. inserts may or may not introduce new minimums.
+\item As the first, followed by as many $\DecreaseKey$ operations; each making the currenty largest element the smallest. 
+Showcasing the worst case for the binary heaps, as each $\DecreaseKey$ operation bubbles the element from a leaf to the root.
 \end{itemize}
 
-The following 4 test cases are run only for the Fibonacci heaps, as
-they are designed to force worst-case behavior as opposed to the
-amortized bounds, which should be exhibited by the preceding 5 tests.
+The following five test cases are run only for the Fibonacci heaps,
+as a they use the $\Delete$ operation, which we have only defined for these.
+The last test is especially interesting as it is designed to force 
+worst-case behavior as opposed to the amortized bounds of remove.
+These tests were also run on an order of 600.000 elements.
 
 \begin{itemize}
-\item A series of inserts, followed by a single \DeleteMin, followed
-  by as many \Delete operations. The point is that \Insert and \Delete
-  are both amortized constant operations, but the \DeleteMin forces
-  the logarithmic worst-case behavior expected.
-\item Same as the first, but removing in reverse order.
-\item Same as the first, but removing from the middle of the range of
+\item A series of inserts, followed by as many $\Delete$ operations. 
+  Removing the elements in decreasing order.
+\item Same as the first, but with a $\DeleteMin$ operation before
+the $\Delete$ (one less now) operations. The point being that
+the $\DeleteMin$ operation will force the Fibonacci heap to make a linking step.
+\item Same as above, but removing in reverse(increasing) order.
+\item Same as above, but removing from the middle of the range of
   keys, in alternatingly decreasing and increasing order.
 \item A series of deletions and insertions to force the phenomenon of
   cascading deletions.
