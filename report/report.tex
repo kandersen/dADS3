@@ -129,7 +129,10 @@ array from 1, we see that they correspond uniquely to a position in
 the following binary tree:
 
 \begin{center}
-  \begin{tikzpicture}[thick,->,auto,node distance=4cm]
+  \begin{tikzpicture}[level distance=1.5cm,
+  level 1/.style={sibling distance=3cm},
+  level 2/.style={sibling distance=1.5cm},
+  thick,->,auto]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
     
     \node[node]    	  (1) {$1$}
@@ -590,15 +593,16 @@ After a call to $\FindMin$ the heap looks like:
 \mbox{} \par
 \noindent\centerimg{find_min}
 
-Let us analyze the time for the $\FindMin$ operation. Let $l$ mark the number of vacant nodes. If $l=0$ then $\FindMin$ points to the node representing the item with the minimum key, and the work is constant. If $l \ge 1$ then the amortized running time is the new roots created from destroying vacant nodes and moving the non-vacant child nodes to the root plus the linking of the trees which is at most $\BigO{\log n}$. We argued previously that a node $y$ have $degree(y_i) \ge i - 2$ for $i = 1,2,\cdots,k$ where $k$ is the degree of its parent. We use this to say that at least one of the vacant nodes will have a rank of $k-2$. We also know that the size of subtree rooted at a node with degree $k-2$ will be at least be of size $\phi^{k-2}$. If all children of the vacant nodes we destroy are non-vacant, they will increase the number of trees and thereby the potential by:
-\begin{align*}
-  \sum_{i=1}^l \phi^{k_j-2} \le n
-\end{align*}
-where $k_1, k_2,\cdots,k_i$ are non-vacant nodes. The sum is maximized for $k_i$. MAYBE SOME MORE??
+We defer the analysis of the time complexcity of the \FindMin
+operation to \cite{FT87}, Lemma 2, but mention the final result of
+$\BigO{l \cdot (\log \frac{n}{l} + 1)}, where l is the number of
+vancant nodes in the heap.
 
 \section{Worst case time-complexity for Fib heap v2}
 
-The worst case example is extremely easy. Since $l$ and $n$ are disjoint, the can be filled with vacant nodes. The worst-case would then be calling $\FindMin$, just to find out that no such node exist. 
+The worst case example is extremely easy. Since $l$ and $n$ are
+disjoint, the can be filled with vacant nodes. The worst-case would
+then be calling $\FindMin$, just to find out that no such node exist.
 
 \section{Testing correctness of Fibonacci Heaps}
 
@@ -693,6 +697,58 @@ generator in C but we will use the resulting graphs as if they were
 completely randomly generated graphs with an expected probability on the
 number of edges in the graph.
 
+\section{Pathological Cases }
+
+Overall, the previous section provides a general description of when
+$\Dijkstra$ will perform a lot of operations, but one could be
+interested in graphs that has many or few $\Insert$- or
+$\DecreaseKey$ operations.
+
+If the first path that $\Dijkstra$ computes to each node is the
+optimal path only $n$ $\DecreaseKey$ operations will be called. A
+trivial case is when the graph is a tree.
+
+A more interesting case that can result in many or few calls to
+$\DecreaseKey$ has the following structure:
+
+\begin{center}
+  \begin{tikzpicture}[thick,->,auto,node distance=2cm]
+    \tikzstyle{node}=[circle, minimum size=1.5cm, draw]
+    \tikzstyle{marked}=[diamond, minimum size=1.5cm, draw]
+  
+    \node[node]          (2) {2};
+    \node[node]         (3) [below of=2] {3};
+    \node          (dots) [below of=3] {$\vdots$};
+    \node[node]         (nminusone) [below of=dots] {$n-1$};
+    \node[node]         (n) [below of=nminusone] {$n$};
+    
+    \node[node]    (1) [left=3cm of dots] {1};
+    
+    \node[node]    (nplusone) [right=3cm of dots] {$n+1$};
+    \node          (dotstwo) [right of=nplusone] {$\cdots$};
+    \node[node]    (m) [right of=dotstwo] {$m$};
+
+    \path (1) edge node {$k$} (2);
+    \path (1) edge node {$k_1$} (3);
+    \path (1) edge node {$k_{n-1}$} (nminusone);
+    \path (1) edge node {$k_n$} (n);
+
+    \path (2) edge node {$c_1$} (nplusone);
+    \path (2) edge node {$c_1$} (m);
+    \path (3) edge node {$c_2$} (nplusone);
+    \path (3) edge node {$c_2$} (m);
+    \path (nminusone) edge node {$c_{n-1}$} (nplusone);
+    \path (nminusone) edge node {$c_{n-1}$} (m);
+    \path (n) edge node {$c_n$} (nplusone);
+    \path (n) edge node {$c_n$} (m);
+
+  \end{tikzpicture}
+\end{center}
+
+For suitable $k_i$s and $c_j$ we can make $\Dijkstra$ call
+$\DecreaseKey$ for every node $n+1$ to $m$, for each of the nodes in
+the vertical list $2$ to $n$. If $n=m=|V|$ we will use $\BigO{n^2}$ calls
+to $\DecreaseKey$.
 
 \chapter{Empirical Testing}
 
@@ -774,13 +830,6 @@ connectivity in steps of 10\%.
 Finally, we run the algorithm-data structure-input size-connectivity
 configuration 3 times to account for effects out of our hands such as
 the operating system of the test machine.
-
-We thus have a grand total of 144.000 test runs, witnessed by the
-following formula.
-
-\begin{align*}
-    \text{\# of tests} = 200 * 10 * 3 * 8 * 3 = 144.000 
- \end{align*}
 
 We measure running times through the use of the GNU \texttt{time}
 command, from which we gather the actual CPU time spent on running the
