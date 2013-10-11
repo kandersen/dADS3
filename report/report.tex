@@ -114,7 +114,7 @@ the running times of each of the two implementations we investigate.
     Operation & Array Implementation & Pointer Based \\ \hline
     \MakeHeap & $\BigT{1}$ & $\BigT{1}$ \\ 
     \FindMin & $\BigT{1}$ & $\BigT{1}$\\
-    \Insert & $\BigO{n}$ & $\BigT{\log n}$ \\ 
+    \Insert & $\BigO{\log n}$ & $\BigT{\log n}$ \\ 
     \DeleteMin & $\BigT{\log n}$ & $\BigT{\log n}$ \\
     \DecreaseKey & $\BigT{\log n}$ & $\BigT{\log n}$ \\
   \end{tabular}
@@ -366,7 +366,11 @@ must have had the same degree which results in $degree(y_i) \le k -
 1$. $y$ could have lost at most one child before it would be cut from
 $x$ resulting in $degree(y_i) \ge i - 2$ where $i = 1,2,\cdots,k$.
 
-By three different induction proofs and the lemma described above, it can be shown that if $k = degree(x)$ for any node in a Fibonacci heap then $size(x) \ge F_{k+2} \ge \phi^k$, where $\phi = (1+\sqrt{5}) / 2$ also known as the golden ratio. Hereafter, showing the bound of $D(n)$ is straight forward:
+By three different induction proofs and the lemma described above, it
+can be shown that if $k = degree(x)$ for any node in a Fibonacci heap
+then $size(x) \ge F_{k+2} \ge \phi^k$, where $\phi = (1+\sqrt{5}) / 2$
+also known as the golden ratio. Hereafter, showing the bound of $D(n)$
+is straight forward:
 \begin{gather*}
   n \ge size(x) \ge \phi^k \\
   \Downarrow \\
@@ -375,68 +379,137 @@ By three different induction proofs and the lemma described above, it can be sho
 
 \section{The potential method}
 
-We will analyze the amortized running times of the Fibonacci heaps by using the potential function \cite[p.~215]{FT87}. A potential function maps a state of a data structure to a real number representing the potential contained in that data structure \cite[p.~459]{ITA09}. The amortized cost of an operation $c_i$ that transforms a data structure in state $D_{i-1}$ to $D_{i}$ is:
+We will analyze the amortized running times of the Fibonacci heaps by
+using the potential function \cite[p.~215]{FT87}. A potential function
+maps a state of a data structure to a real number representing the
+potential contained in that data structure \cite[p.~459]{ITA09}. The
+amortized cost of an operation $c_i$ that transforms a data structure
+in state $D_{i-1}$ to $D_{i}$ is:
 \begin{align*}
   \hat{c} = c_i + \Phi(D_i) - \Phi(D_{i-1})
 \end{align*}
-The amortized cost is therefore the cost of the operation $c_i$ plus the change in the potential. If the operation releases potential, the released potential gets subtracted from the cost of the operation. For the Fibonacci heaps we define the potential function as:
+The amortized cost is therefore the cost of the operation $c_i$ plus
+the change in the potential. If the operation releases potential, the
+released potential gets subtracted from the cost of the operation. For
+the Fibonacci heaps we define the potential function as:
 
 \begin{align*}
   \Phi(H) = trees(H) + 2marked(H)
 \end{align*}
 
-Where trees define the number of trees/roots in the forest and marked is the number of marked nodes. The reason to why marked nodes contains two units of potential is that one unit pays for the cut and the other pays for the node to become a root and thereby form a new tree.
+Where trees define the number of trees/roots in the forest and marked
+is the number of marked nodes. The reason to why marked nodes contains
+two units of potential is that one unit pays for the cut and the other
+pays for the node to become a root and thereby form a new tree.
 
 \section{Fibonacci heap version 1}
 
-The first Fibonacci heap variant we present is the original version proposed in FT87. A potential function is used to analyze the performance, thus the above stated time-complexities are amortized.
+The first Fibonacci heap variant we present is the original version
+proposed in FT87. A potential function is used to analyze the
+performance, thus the above stated time-complexities are amortized.
 
-Our implementation pretty much follows from the article, with few minor exceptions. The article do not specify exactly how a node is found from an item in constant time, so we decided to place a pointer on the item. Also, melding is not totally destructable since we join the heap in of the two existing heaps and return an arbitrary one. 
+Our implementation pretty much follows from the article, with few
+minor exceptions. The article do not specify exactly how a node is
+found from an item in constant time, so we decided to place a pointer
+on the item. Also, melding is not totally destructable since we join
+the heap in of the two existing heaps and return an arbitrary one.
 
-The article mentions that $\Delete$ takes $\BigO{1}$ if the node to remove is not the min-node and without cascading deletes. The children of the node to delete must be moved up onto the root which can only be done in constant time if every children has a pointer to a parent pointer. In this way, we only have to change one pointer to update all parent pointers for the children of the aforementioned node. Since the running time of the \Delete~operation is amortized $\BigO{\log n}$ we chose a simpler version where we just update all parent pointers one by one. As stated above $size(node) \le \BigO{\log n}$ so this only takes $\BigT{\log n}$ time.
+The article mentions that $\Delete$ takes $\BigO{1}$ if the node to
+remove is not the min-node and without cascading deletes. The children
+of the node to delete must be moved up onto the root which can only be
+done in constant time if every children has a pointer to a parent
+pointer. In this way, we only have to change one pointer to update all
+parent pointers for the children of the aforementioned node. Since the
+running time of the \Delete~operation is amortized $\BigO{\log n}$ we
+chose a simpler version where we just update all parent pointers one
+by one. As stated above $size(node) \le \BigO{\log n}$ so this only
+takes $\BigT{\log n}$ time.
 
-\MakeHeap~constructs a new empty Fibonacci heap, which means there are not roots and no marked nodes. Therefore, the potential of the empty heap is 0 and constructing the heap can be done in constant time. \FindMin~does not alter the potential and is only a pointer lookup which clearly is also a constant time operation. \Insert~inserts a new root which increments the potential by one. Combine that with the actual cost which is $\BigO{1}$ the \Insert~operation is $\BigO{1}$. \Meld~can be carried out in $\BigO{1}$ actual time and since the change is:
+\MakeHeap~constructs a new empty Fibonacci heap, which means there are
+not roots and no marked nodes. Therefore, the potential of the empty
+heap is 0 and constructing the heap can be done in constant
+time. \FindMin~does not alter the potential and is only a pointer
+lookup which clearly is also a constant time
+operation. \Insert~inserts a new root which increments the potential
+by one. Combine that with the actual cost which is $\BigO{1}$ the
+\Insert~operation is $\BigO{1}$. \Meld~can be carried out in
+$\BigO{1}$ actual time and since the change is:
 \begin{align*}
   \Delta & = \Phi(H) - (\Phi(H_1) + \Phi(H_2)) = 0
 \end{align*}
 the \Meld~operation has time $\BigO{1}$.
 
-When analyzing the amortized cost of $\DeleteMin$, let us say that the minimum node to delete is actually the node with degree $D(n)$ which is the upper bound on the maximum degree for any node. Setting the parent pointer to \NULL and concatenating each node with the root list takes constant time for each of the $D(n)$ children. 
-The linking phase work on at most $D(n) + tress(H) - 1$ trees, since we have removed the minimum node from the root list and at most will be adding $D(n)$. We also join trees of same degree, but when two trees are joined only one will remain in the root list, so this can happen at most the number of roots in the root list. Therefore, the actual working time is $\BigO{D(n) + trees(H)}$.
+When analyzing the amortized cost of $\DeleteMin$, let us say that the
+minimum node to delete is actually the node with degree $D(n)$ which
+is the upper bound on the maximum degree for any node. Setting the
+parent pointer to \NULL and concatenating each node with the root list
+takes constant time for each of the $D(n)$ children.  The linking
+phase work on at most $D(n) + tress(H) - 1$ trees, since we have
+removed the minimum node from the root list and at most will be adding
+$D(n)$. We also join trees of same degree, but when two trees are
+joined only one will remain in the root list, so this can happen at
+most the number of roots in the root list. Therefore, the actual
+working time is $\BigO{D(n) + trees(H)}$.
 
-The potential before the $\DeleteMin$ operation executes is $trees(H) + 2marked(H)$. After, at most $D(n) + 1$ roots will exist because all others would be removed during the linking phase and there is no change to marked nodes. Therefore, we have that:
+The potential before the $\DeleteMin$ operation executes is $trees(H)
++ 2marked(H)$. After, at most $D(n) + 1$ roots will exist because all
+others would be removed during the linking phase and there is no
+change to marked nodes. Therefore, we have that:
 \begin{align*}
   \DeleteMin & = \BigO{D(n) + trees(H)} + \left(\left(D(n) + 1\right) + 2marked(H)\right) \\
   & - \left(trees(H) + 2marked(H)\right) \\
   & = \BigO{D(n)} + \BigO{trees(H)} - trees(H) \\
   & = \BigO{D(n)}
 \end{align*}
-Actually, a slight subtlety is happening above. We can turn up the units that we pay to cover the hidden constant in $\BigO{trees(H)}$, which allows us to cancel those two terms out, resulting in an amortized running time of $\BigO{D(n)} \le \BigO{\log n}$.
+Actually, a slight subtlety is happening above. We can turn up the
+units that we pay to cover the hidden constant in $\BigO{trees(H)}$,
+which allows us to cancel those two terms out, resulting in an
+amortized running time of $\BigO{D(n)} \le \BigO{\log n}$.
 
-$\DecreaseKey$ takes constant time for moving the node for the item with the decreased key to the root, but then $c$ cascading deletes can occur. Therefore, the actual time is $\BigO{c}$. The change is potential is:
+$\DecreaseKey$ takes constant time for moving the node for the item
+with the decreased key to the root, but then $c$ cascading deletes can
+occur. Therefore, the actual time is $\BigO{c}$. The change is
+potential is:
 \begin{align*}
   \Delta & = \BigO{trees(H) + (c - 1) + 1} + 2(marked(H) - (c-1) + 1) \\
   &- (trees(H) + 2marked(H) \\
   & = \BigO{trees(H) + c} + 2(marked(H) - c + 2) - (trees(H) + 2marked(H)) \\
   & = 4 - c
 \end{align*}
-Therefore, the amortized running time of $\DecreaseKey$ is $\BigO{c} + 4 - c = \BigO{1}$
+Therefore, the amortized running time of $\DecreaseKey$ is $\BigO{c} +
+4 - c = \BigO{1}$
 
-Last, we have to cover the running time of $\Delete$. First, we cut the node and move the children to the root, which is at most $D(n)$ operations. Next, a chain of cascading deletes can occur where the length is $c$, making the actual time $\BigO{D(n) + c}$. The change in potential is as follows:
+Last, we have to cover the running time of $\Delete$. First, we cut
+the node and move the children to the root, which is at most $D(n)$
+operations. Next, a chain of cascading deletes can occur where the
+length is $c$, making the actual time $\BigO{D(n) + c}$. The change in
+potential is as follows:
 \begin{align*}
   \Delta & = \BigO{trees(H) + D(n) + c} + 2(marked(H) - c + 2) \\
   &- (trees(H) + 2marked(H) \\
   & = D(n) + 4 - c \\
 \end{align*}
-But as we showed for $\DecreaseKey$, the released potential pays for the cascading deletes, so we only have to pay the $D(n)$ for the actual time and $D(n)$ for the change in potential, which is $\BigO{D(n)} \le \BigO{\log n}$.
+But as we showed for $\DecreaseKey$, the released potential pays for
+the cascading deletes, so we only have to pay the $D(n)$ for the
+actual time and $D(n)$ for the change in potential, which is
+$\BigO{D(n)} \le \BigO{\log n}$.
 
 \section{Worst case time-complexity for Fib heap v1}
 
-There are three operations where changes to the potential occurs, and thus, the stated times are amortized for $\DeleteMin$, $\DecreaseKey$ and $\Delete$. Below we illustrate the worst-case for each of these operations by showing a configuration and how that configuration can be obtained from a sequence of operations :
+There are three operations where changes to the potential occurs, and
+thus, the stated times are amortized for $\DeleteMin$, $\DecreaseKey$
+and $\Delete$. Below we illustrate the worst-case for each of these
+operations by showing a configuration and how that configuration can
+be obtained from a sequence of operations :
 
 \subsection{Worst case time-complexity for $\DeleteMin$}
 
-As we showed in the previous section the actual time for performing $\DeleteMin$ is $\BigO{D(n) + trees(H)}$. When linking trees the change in potential pays for $trees(H)$, therefore, it is in the amount of trees the worst case configuration for $\DeleteMin$ can be found. It is easy to see that the worst case is when all the nodes in the heap is at the root in a linked list:
+As we showed in the previous section the actual time for performing
+$\DeleteMin$ is $\BigO{D(n) + trees(H)}$. When linking trees the
+change in potential pays for $trees(H)$, therefore, it is in the
+amount of trees the worst case configuration for $\DeleteMin$ can be
+found. It is easy to see that the worst case is when all the nodes in
+the heap is at the root in a linked list:
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=1.5cm]
@@ -472,7 +545,12 @@ As we showed in the previous section the actual time for performing $\DeleteMin$
   \end{tikzpicture}
 \end{center}
 
-This configuration can be achieved by just calling insert $n$ times. For simplicity, let us assume that $n$ is odd, and a call to $\DeleteMin$ happens. In the above example 1 will be removed and we are left with $n-1$ root nodes to link. This results in $n-1$ key comparisons, but all the trees of rank 1 will be joined too and this will continue until no trees of duplicate size is found.
+This configuration can be achieved by just calling insert $n$
+times. For simplicity, let us assume that $n$ is odd, and a call to
+$\DeleteMin$ happens. In the above example 1 will be removed and we
+are left with $n-1$ root nodes to link. This results in $n-1$ key
+comparisons, but all the trees of rank 1 will be joined too and this
+will continue until no trees of duplicate size is found.
 \begin{align*}
   \text{\# of operations} = \BigO{n-1} + \BigO{\frac{n-1}{2}} + \BigO{\frac{n-1}{2^2}} + \cdots + \BigO{\frac{n-1}{2^{\log (n-1)-1}}}
 \end{align*}
@@ -480,11 +558,22 @@ which is $\BigT{n}$.
 
 \subsection{Worst case time-complexity for $\Delete$ and $\DecreaseKey$}
 
-As we shoved in the previous section, the release in potential for cascading deletes pays for most of the work, therefore, we can find a worst-case configuration that will perform considerably worse in actual time.
+As we shoved in the previous section, the release in potential for
+cascading deletes pays for most of the work, therefore, we can find a
+worst-case configuration that will perform considerably worse in
+actual time.
 
-If $\Delete$ is invoked with the min-node as argument then $\Delete$ calls $\DeleteMin$, therefore, the worst case for $\Delete$ is $\BigT{n}$, but we will show that without the min-node as argument, we still end up with $\BigT{n}$. The following observation holds true for $\DecreaseKey$ as well.
+If $\Delete$ is invoked with the min-node as argument then $\Delete$
+calls $\DeleteMin$, therefore, the worst case for $\Delete$ is
+$\BigT{n}$, but we will show that without the min-node as argument, we
+still end up with $\BigT{n}$. The following observation holds true for
+$\DecreaseKey$ as well.
 
-If we delete a child to an arbitrary node $x$ we mark $x$ if is not marked and if it is marked, we cut $x$ from its parent, move the subtree formed by $x$ to the root and try to mark the previous parent of $x$. This could result in cascading deletes. Therefore, the worst situation would be the following configuration:
+If we delete a child to an arbitrary node $x$ we mark $x$ if is not
+marked and if it is marked, we cut $x$ from its parent, move the
+subtree formed by $x$ to the root and try to mark the previous parent
+of $x$. This could result in cascading deletes. Therefore, the worst
+situation would be the following configuration:
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1.5cm, draw]
@@ -505,14 +594,19 @@ If we delete a child to an arbitrary node $x$ we mark $x$ if is not marked and i
 
   \end{tikzpicture}
 \end{center}
-
-where a diamond is modeling a marked node. If either $\DecreaseKey$ or $\Delete$ is called with an item corresponding to node $n$ a cascading delete will begin and will not stop until it reaches $2$ in this example. The amount of operations is therefore the entire chain:
+where a diamond is modeling a marked node. If either $\DecreaseKey$ or
+$\Delete$ is called with an item corresponding to node $n$ a cascading
+delete will begin and will not stop until it reaches $2$ in this
+example. The amount of operations is therefore the entire chain:
 \begin{align*}
   \text{length of chain} = n - 1
 \end{align*}
 which is $\BigT{n}$.
 
-Such a configuration can be obtained by constructing triangles, chaining and deleting (as a side note, this is exercise 19.4-1 in \cite{ITA09}). In order for us to create the first triangle, we insert five nodes, call $\DeleteMin$ and then remove the bottom most:
+Such a configuration can be obtained by constructing triangles,
+chaining and deleting (as a side note, this is exercise 19.4-1 in
+\cite{ITA09}). In order for us to create the first triangle, we insert
+five nodes, call $\DeleteMin$ and then remove the bottom most:
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
@@ -526,7 +620,9 @@ Such a configuration can be obtained by constructing triangles, chaining and del
   \end{tikzpicture}
 \end{center}
 
-We can then create another triangle, having $x'$ being a lesser key than $x$. The picture below is just before joining the two rank two trees.
+We can then create another triangle, having $x'$ being a lesser key
+than $x$. The picture below is just before joining the two rank two
+trees.
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
@@ -580,11 +676,21 @@ To create a chain of height $n$, we have to create $n$ triangles.
 
 \section{Fibonacci heap version 2}
 
-In this second version of a Fibonacci heap we try to be more lazy, by doing as little work as possible for $\Delete$ and $\DeleteMin$. When a call to either one of the operations is called, we mark the node as vacant but then halt to do any additional work. This makes $\Delete$ and $\DeleteMin$ run in $\BigO{1}$.
+In this second version of a Fibonacci heap we try to be more lazy, by
+doing as little work as possible for $\Delete$ and $\DeleteMin$. When
+a call to either one of the operations is called, we mark the node as
+vacant but then halt to do any additional work. This makes $\Delete$
+and $\DeleteMin$ run in $\BigO{1}$.
 
-We have to do some work at one point which happens in $\FindMin$. Now, $\FindMin$ works like $\DeleteMin$ in version 1, but also has to delete every vacant node it meets on the path. $\Meld$ also requires little work, such that when melding two heaps, if a root is marked as vacant it should be the new root of the resulting heap. There is no change in actual time for $\Meld$.
+We have to do some work at one point which happens in $\FindMin$. Now,
+$\FindMin$ works like $\DeleteMin$ in version 1, but also has to
+delete every vacant node it meets on the path. $\Meld$ also requires
+little work, such that when melding two heaps, if a root is marked as
+vacant it should be the new root of the resulting heap. There is no
+change in actual time for $\Meld$.
 
-Below is an image from our test-framework showing how a tree looks like with vacant nodes:
+Below is an image from our test-framework showing how a tree looks
+like with vacant nodes:
 
 \mbox{} \par
 \noindent\centerimg{delete_39.png}
@@ -606,30 +712,58 @@ then be calling $\FindMin$, just to find out that no such node exist.
 
 \section{Testing correctness of Fibonacci Heaps}
 
-Implementing the Fibonacci heaps in C required a lot of work and since we are working with that many pointers, we decided very early in the process that we needed some kind of test-framework to assist us. 
+Implementing the Fibonacci heaps in C required a lot of work and since
+we are working with that many pointers, we decided very early in the
+process that we needed some kind of test-framework to assist us.
 
-First, we implemented a consistency checker, that checks the following properties for each node $x$: That the nodes the sibling pointers of $x$ points to points to $x$ with the corresponding sibling pointer. That the parent pointer is correct if the node $x$ is a child of any node and that the key is larger than its parent. Still, this tests the implementation more than the properties of the Fibonacci heaps, so we needed one more tool.
+First, we implemented a consistency checker, that checks the following
+properties for each node $x$: That the nodes the sibling pointers of
+$x$ points to points to $x$ with the corresponding sibling
+pointer. That the parent pointer is correct if the node $x$ is a child
+of any node and that the key is larger than its parent. Still, this
+tests the implementation more than the properties of the Fibonacci
+heaps, so we needed one more tool.
 
-We build a pretty printer that could convert any subtree (or heap) to a graphical representation, such that we could see how the heap looked like. We then made test-cases, that for each operation printed the output, and then we could manually check if $\DeleteMin$, $\Delete$ and $\DecreaseKey$ behaved as it should. We manually checked test-instances of size less than or equal to 100 operations.
+We build a pretty printer that could convert any subtree (or heap) to
+a graphical representation, such that we could see how the heap looked
+like. We then made test-cases, that for each operation printed the
+output, and then we could manually check if $\DeleteMin$, $\Delete$
+and $\DecreaseKey$ behaved as it should. We manually checked
+test-instances of size less than or equal to 100 operations.
 
-Attached in the zipped-file accompanying the report are generated images we have used to check correctness.
+Attached in the zipped-file accompanying the report are generated
+images we have used to check correctness.
 
-Lastly, since we now have four data structures, we could check the output for each and compare it with the others, to make sure, that all our heaps answer correctly (or all could answer wrong the same way, which is highly unlikely).
+Lastly, since we now have four data structures, we could check the
+output for each and compare it with the others, to make sure, that all
+our heaps answer correctly (or all could answer wrong the same way,
+which is highly unlikely).
 
 \chapter{\Dijkstra's algorithm}
 
-\Dijkstra's~algorithm is an graph search algorithm that solves the single-source shortest path problem. Without a min-priority queue the algorithm runs in $\BigO{V^2} \ge \BigO{E}$ for a graph $G=(V, E)$[3]. But we have two heaps that can actually be used as priority queues, so this will give us better asymptotic running times depending on the connectivity of the graph.
-Normally, $\Dijkstra$ is implemented by using the $\DecreaseKey$ operation, but if we disregard space, we can actually implement $\Dijkstra$ without $\DecreaseKey$ and just insert new nodes every time we find a shorter path. Below is a summary of the running time and space complexities:
+\Dijkstra's~algorithm is an graph search algorithm that solves the
+single-source shortest path problem. Without a min-priority queue the
+algorithm runs in $\BigO{V^2} \ge \BigO{E}$ for a graph $G=(V,
+E)$[3]. But we have two heaps that can actually be used as priority
+queues, so this will give us better asymptotic running times depending
+on the connectivity of the graph.  Normally, $\Dijkstra$ is
+implemented by using the $\DecreaseKey$ operation, but if we disregard
+space, we can actually implement $\Dijkstra$ without $\DecreaseKey$
+and just insert new nodes every time we find a shorter path. Below is
+a summary of the running time and space complexities:
 
 \begin{center}
   \begin{tabular}{ l | c | c | c}
     $\Dijkstra$ & Binary heaps & Fibonacci heap v1 & Fibonacci heap v2 \\ \hline
-    with & $\BigO{(n+m)\lg n}$ & $\BigO{n\lg n + m}$ & $\BigO{n\lg n + m}$ \\
-    without & $\BigO{(n+m)\lg n}$ & $\BigO{n\lg n + m}$ & $\BigO{n\lg n + m}$ \\     
+    with & $\BigO{(n+m)\log n n}$ & $\BigO{n\log n n + m}$ & $\BigO{n\log n n + m}$ \\
+    without & $\BigO{(n+m)\log n n}$ & $\BigO{n\log n n + m}$ & $\BigO{n\log n n + m}$ \\     
   \end{tabular}
 \end{center}
 
-We represent graphs by a linked list so running $\Dijkstra$ with inserts will make a drastic increase in memory consumption for sparsely connected graphs, but only be a constant factor larger for a fully connected graph.
+We represent graphs by a linked list so running $\Dijkstra$ with
+inserts will make a drastic increase in memory consumption for
+sparsely connected graphs, but only be a constant factor larger for a
+fully connected graph.
 
 \section{Running times for $\Dijkstra$ with heaps}
 
@@ -645,14 +779,14 @@ been deleted by $\DeleteMin$, therefore there can only be $n$ $dm$
 operations. For each node, there can be up to $m$ $dk$ operations, one
 for each adjacent node in the graph. Since $\Insert$, $\DeleteMin$ and
 $\DecreaseKey$ all take logarithmic time, the total time is
-$\BigO{(n+m)\lg n}$. For the $\Dijkstra$ version with $\Insert$s only,
+$\BigO{(n+m)\log n n}$. For the $\Dijkstra$ version with $\Insert$s only,
 the $m$ previous calls to $\DecreaseKey$ will now call $\Insert$
 instead but the time will remain the same.
 
 We are able to reduce the time complexity asymptotically when we use a
 Fibonacci heap. For Fibonacci heaps, $\DecreaseKey $ takes amortized
-time $\BigO{1}$ and $\DeleteMin$ takes amortized time $\BigO{\lg n}$
-resulting in the time-complexity $\BigO{m+n\lg n}$ for $\Dijkstra$
+time $\BigO{1}$ and $\DeleteMin$ takes amortized time $\BigO{\log n n}$
+resulting in the time-complexity $\BigO{m+n\log n n}$ for $\Dijkstra$
 with Fibonacci heap version 1. Because the time-complexity for
 $\Insert$ is also $\BigO{1}$, using $\Dijkstra$ without $\DecreaseKey$
 has the same total time complexity.
@@ -661,7 +795,7 @@ So what happens when we are lazy with deletions, and for $\DeleteMin$
 mark a node as vacant in Fibonacci version 2? There are no random
 deletions in the Fibonacci heap when running $\Dijkstra$, therefore
 $l$, which denotes the number of vacant nodes, has an upper bound of
-$1$. Therefore, the amortized time for $\FindMin$ is $\BigO{\lg n +
+$1$. Therefore, the amortized time for $\FindMin$ is $\BigO{\log n n +
   1}$ which results in the same running times for $\Dijkstra$ as
 Fibonacci heap version 1.
 
@@ -674,15 +808,15 @@ run quicker than highly connected graphs.
 
 If the graph is sufficiently sparse it is an effective speed-up to
 implement $\Dijkstra$ using a min-priority queue of some sort. For
-Binary heaps, the threshold is when $m = o(n^2 / \lg n)$:
+Binary heaps, the threshold is when $m = o(n^2 / \log n n)$:
 \begin{align*}
-    \BigO{(n+m)\lg n} = \BigO{(n^2/\lg n)\lg n} = \BigO{n^2}
+    \BigO{(n+m)\log n n} = \BigO{(n^2/\log n n)\log n n} = \BigO{n^2}
 \sum_{i=1}^l \phi^{k_j-2} \le n
  \end{align*}
  which is the same running time as without a min-priority queue.
  
-For Fibonacci heaps the time $\BigO{n\lg n + m}$ suggest, since $m$
-dominates $n \lg n$, that if the graphs is not totally connected the
+For Fibonacci heaps the time $\BigO{n\log n n + m}$ suggest, since $m$
+dominates $n \log n n$, that if the graphs is not totally connected the
 Fibonacci heap will run quicker or in the same time as $\Dijkstra$
 without min-priority queues. We are very confident, that the graph
 should be strictly sparser since the running time in
@@ -697,7 +831,7 @@ generator in C but we will use the resulting graphs as if they were
 completely randomly generated graphs with an expected probability on the
 number of edges in the graph.
 
-\section{Pathological Cases }
+\section{Pathological Cases}
 
 Overall, the previous section provides a general description of when
 $\Dijkstra$ will perform a lot of operations, but one could be
@@ -745,9 +879,9 @@ $\DecreaseKey$ has the following structure:
   \end{tikzpicture}
 \end{center}
 
-For suitable $k_i$s and $c_j$ we can make $\Dijkstra$ call
+For suitable $k_i$ and $c_j$ we can make $\Dijkstra$ call
 $\DecreaseKey$ for every node $n+1$ to $m$, for each of the nodes in
-the vertical list $2$ to $n$. If $n=m=|V|$ we will use $\BigO{n^2}$ calls
+the vertical list $2$ to $n$. If $n=m=|V|$ $\Dijkstra$ will make $\BigO{n^2}$ calls
 to $\DecreaseKey$.
 
 \chapter{Empirical Testing}
