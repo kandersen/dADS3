@@ -216,7 +216,7 @@ reallocation by paying more per insertion.
 
 \paragraph{\DeleteMin} Runs logarithmically in the number of elements
 inserted: $O(\log n)$. We Remove the minimal element according to
-\FindMin and replace it as root with the last element in the tree
+$\FindMin$ and replace it as root with the last element in the tree
 (always found at position \textsc{Size} in the array). We then bubble
 the element down through the tree, at most two comparisons and a swap
 per level in the tree. The depth of a balanced binary tree is $O(\log
