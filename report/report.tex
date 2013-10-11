@@ -696,13 +696,19 @@ generator in C but we will use the resulting graphs as if they were
 completely randomly generated graphs with an expected probability on the
 number of edges in the graph.
 
-\section{Special cases for graphs }
+\section{Pathological Cases }
 
-Overall, the previous section provides a generel desription of when $\Dijkstra$ will perform a lot of operations, but one could be interested in graphs that has a many or few $\Insert$- or $\DecreaseKey$ operations.
+Overall, the previous section provides a general description of when
+$\Dijkstra$ will perform a lot of operations, but one could be
+interested in graphs that has many or few $\Insert$- or
+$\DecreaseKey$ operations.
 
-If the first path that $\Dijkstra$ computes to each node is the optimal path only $n$ $\DecreaseKey$ operations will be called. A trivial case is when the graph is a tree.
+If the first path that $\Dijkstra$ computes to each node is the
+optimal path only $n$ $\DecreaseKey$ operations will be called. A
+trivial case is when the graph is a tree.
 
-A more interesting case that can result in many or few calls to $\DecreaseKey$ has the following structure:
+A more interesting case that can result in many or few calls to
+$\DecreaseKey$ has the following structure:
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
@@ -738,7 +744,10 @@ A more interesting case that can result in many or few calls to $\DecreaseKey$ h
   \end{tikzpicture}
 \end{center}
 
-For suitable $k_i$s and $c_j$ we can make $\Dijkstra$ call $\DecreaseKey$ for every node $n+1$ to $m$, for each of the nodes in the vertical list $2$ to $n$. If $n=m=|V|$ we will $\BigOh{n^2}$ calls to $\DecreaseKey$.
+For suitable $k_i$s and $c_j$ we can make $\Dijkstra$ call
+$\DecreaseKey$ for every node $n+1$ to $m$, for each of the nodes in
+the vertical list $2$ to $n$. If $n=m=|V|$ we will use $\BigO{n^2}$ calls
+to $\DecreaseKey$.
 
 \chapter{Empirical Testing}
 
