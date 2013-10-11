@@ -303,7 +303,15 @@ discrepancies in behaviour.
 
 \chapter{Fibonacci heaps}
 
-In this chapter we focus on Fibonacci heaps, which is a data structure that has a forest of rooted trees as opposed to a binary heap that only has one tree \cite{FT87}. The data structure was invented by Michael L. Fredman and Robert Endre Tarjan and was published in the Journal of ACM in 1987. It has it name because the size of any subtree in a Fibonacci heap will be lower bounded by $F_{k+2}$ where $k$ is the degree of the root in that subtree and $F_k$ is the kth Fibonacci number. Below is the time-complexities of each of the heap operations listed:
+In this chapter we focus on Fibonacci heaps, which is a data structure
+that has a forest of rooted trees as opposed to a binary heap that
+only has one tree \cite{FT87}. The data structure was invented by
+Michael L. Fredman and Robert Endre Tarjan and was published in the
+Journal of ACM in 1987. It has it name because the size of any subtree
+in a Fibonacci heap will be lower bounded by $F_{k+2}$ where $k$ is
+the degree of the root in that subtree and $F_k$ is the kth Fibonacci
+number. Below is the time-complexities of each of the heap operations
+listed:
 
 \begin{center}
   \begin{tabular}{ l | c | c | c }
@@ -320,13 +328,40 @@ In this chapter we focus on Fibonacci heaps, which is a data structure that has 
 
 \section{Properties of the Fibonacci heap}
 
-The Fibonacci heap is a heap that has better amortized bounds than binary heaps, and one of the reasons to this is that some of the operations are lazy. We will later see that this has a big impact on worst-case time complexities for the operations that do the heavy lifting.
+The Fibonacci heap is a heap that has better amortized bounds than
+binary heaps, and one of the reasons to this is that some of the
+operations are lazy. We will later see that this has a big impact on
+worst-case time complexities for the operations that do the heavy
+lifting.
 
-The heap maintains a collection of root nodes in a doubly linked circular list that supports inserting, joining and single deletions in constant time. Each node has a left and a right sibling pointer that facilitates the circular doubly linked list, a pointer to the parent and a pointer to an arbitrary child. If there is no parent or child the pointers point to \NULL. A node is marked if it has had a child removed. If a child is removed from a parent that is already marked the parent will be moved to the root and the parents parent will be marked or moved. A mark on a node is removed when it is added as a child to another node.
+The heap maintains a collection of root nodes in a doubly linked
+circular list that supports inserting, joining and single deletions in
+constant time. Each node has a left and a right sibling pointer that
+facilitates the circular doubly linked list, a pointer to the parent
+and a pointer to an arbitrary child. If there is no parent or child
+the pointers point to \NULL. A node is marked if it has had a child
+removed. If a child is removed from a parent that is already marked
+the parent will be moved to the root and the parents parent will be
+marked or moved. A mark on a node is removed when it is added as a
+child to another node.
 
-Items added to the heap are added as single-item trees rooted with a node for the corresponding item. It is only when performing a linking step that trees grow. Therefore, the degree of nodes can only change when linking, removing or decreasing the key of an item, since decreasing the key of an item cuts the node from its parent and move the node up to be joined with the roots. 
+Items added to the heap are added as single-item trees rooted with a
+node for the corresponding item. It is only when performing a linking
+step that trees grow. Therefore, the degree of nodes can only change
+when linking, removing or decreasing the key of an item, since
+decreasing the key of an item cuts the node from its parent and move
+the node up to be joined with the roots.
 
-The upper bound $D(n)$ on the degree of any node of an n-node Fibonacci is $\BigO{\log n}$~\cite[p.~523]{ITA09}~\cite[p.~604]{FT87}. This can be shown by first observing that the degree of any node $y$ in the Fibonacci heap is bounded by when it was inserted into the list of its parent $x$ childs, where $degree(x) = k$. When $y_i$ was linked to $x$, where $i$ declares when $y$ was added to the children list of $x$, $x$ and $y_i$ must have had the same degree which results in $degree(y_i) \le k - 1$. $y$ could have lost at most one child before it would be cut from $x$ resulting in $degree(y_i) \ge i - 2$ where $i = 1,2,\cdots,k$.
+The upper bound $D(n)$ on the degree of any node of an n-node
+Fibonacci is $\BigO{\log
+  n}$~\cite[p.~523]{ITA09}~\cite[p.~604]{FT87}. This can be shown by
+first observing that the degree of any node $y$ in the Fibonacci heap
+is bounded by when it was inserted into the list of its parent $x$
+childs, where $degree(x) = k$. When $y_i$ was linked to $x$, where $i$
+declares when $y$ was added to the children list of $x$, $x$ and $y_i$
+must have had the same degree which results in $degree(y_i) \le k -
+1$. $y$ could have lost at most one child before it would be cut from
+$x$ resulting in $degree(y_i) \ge i - 2$ where $i = 1,2,\cdots,k$.
 
 By three different induction proofs and the lemma described above, it can be shown that if $k = degree(x)$ for any node in a Fibonacci heap then $size(x) \ge F_{k+2} \ge \phi^k$, where $\phi = (1+\sqrt{5}) / 2$ also known as the golden ratio. Hereafter, showing the bound of $D(n)$ is straight forward:
 \begin{gather*}
@@ -577,43 +612,9 @@ Attached in the zipped-file companying the report are generated images we have u
 
 Lastly, since we now have four datastructures, we could check the output for each and compare it with the others, to make sure, that all our heaps answer correctly (or all could answer wrong the same way, which is highly unlikely).
 
-\chapter{Test-results}
-
-needs content
-
 \chapter{\Dijkstra's algorithm}
 
-\Dijkstra's~algorithm is an graph search algorithm that can be used to
-solve the single-source shortest path problem. Without a min-priority
-queue, the algorithm runs in $\BigO{V^2} \ge \BigO{E}$ for a graph $G
-=(V, E)$[3]. However, we have two heaps that can actually be used as
-priority queues, so this will give us better asymptotic running times
-depending on the connectivity of the graph.  Normally, $\Dijkstra$ is
-implemented by using the $\DecreaseKey$ operation, but if we disregard
-space, we can actually implement $\Dijkstra$ without $\DecreaseKey$
-and just insert new nodes every time we find a shorter path. Below is
-a summary of the time complexities follows:
-
-\begin{center}
-  \begin{tabular}{ l | c | c}
-    Runtime of \Dijkstra & using \DecreaseKey & using \Insert \\ \hline
-    Binary Heaps & $\BigO{(\mid V\mid+ \mid E \mid)\log \mid V\mid}$ &
-    $\BigO{(\mid V\mid+ \mid E \mid)\log \mid V\mid}$\\
-    Fibonacci v1 & $\BigO{(\mid V \mid+ \mid E \mid)\log \mid V
-      \mid}$&$\BigO{(\mid V \mid+ \mid E \mid)\log \mid V
-      \mid}$ \\
-    Fibonacci v2 &$\BigO{(\mid V \mid+ \mid E \mid)\log \mid V
-      \mid}$ &$\BigO{(\mid V \mid+ \mid E \mid)\log \mid V
-      \mid}$
-  \end{tabular}
-\end{center}
-
-
-We represent graphs with an adjacency matrix, which already consumes space $\BigO{n^2}$, so there will only be a constant increase if $\Dijkstra$ insert nodes as we go along.
-
-\chapter{\Dijkstra's algorithm}
-
-\Dijkstra's~algorithm is an graph search algorithm that computes that solves the single-source shortest path problem. Without a min-priority queue the algorithm runs in $\BigO{V^2} \ge \BigO{E}$ for a graph $G=(V, E)$[3]. But we have two heaps that can actually be used as priority queues, so this will give us better asymptotic running times depending on the connectivity of the graph.
+\Dijkstra's~algorithm is an graph search algorithm that solves the single-source shortest path problem. Without a min-priority queue the algorithm runs in $\BigO{V^2} \ge \BigO{E}$ for a graph $G=(V, E)$[3]. But we have two heaps that can actually be used as priority queues, so this will give us better asymptotic running times depending on the connectivity of the graph.
 Normally, $\Dijkstra$ is implemented by using the $\DecreaseKey$ operation, but if we disregard space, we can actually implement $\Dijkstra$ without $\DecreaseKey$ and just insert new nodes every time we find a shorter path. Below is a summery of the running time and space complexities:
 
 \begin{center}
@@ -624,47 +625,186 @@ Normally, $\Dijkstra$ is implemented by using the $\DecreaseKey$ operation, but 
   \end{tabular}
 \end{center}
 
-We represent graphs with an by a linked list so running $\Dijkstra$ with inserts will make a drastic increase in memory consumption for sparsely connected graphs, but only be a constant factor larger for a fully connected graph.
+We represent graphs by a linked list so running $\Dijkstra$ with inserts will make a drastic increase in memory consumption for sparsely connected graphs, but only be a constant factor larger for a fully connected graph.
 
 \section{Running times for $\Dijkstra$ with heaps}
 
-We can show an upper bound on the time complexity for $\Dijkstra$ as a function taking the number of nodes $n=|V|$ and the numbers of edges $m=|E|$ as such: $\BigO{n \cdot dm + m \cdot dk}$ where $dm$ denotes the number of $\DeleteMin$ operations and $dk$ denotes the number of $\DecreaseKey$ operations.
+We can show an upper bound on the time complexity for $\Dijkstra$ as a
+function taking the number of nodes $n=|V|$ and the numbers of edges
+$m=|E|$ as such: $\BigO{n \cdot dm + m \cdot dk}$ where $dm$ denotes
+the number of $\DeleteMin$ operations and $dk$ denotes the number of
+$\DecreaseKey$ operations.
 
-First, let us consider Binary heaps and the case for $\Dijkstra$ with $\DecreaseKey$ operations. A node can never be readded once it has been deleted by $\DeleteMin$, therefore there can only be $n$ $dm$ operations. For each node, there can be up to $m$ $dk$ operations, one for each adjacent node in the graph. Since $\Insert$, $\DeleteMin$ and $\DecreaseKey$ all take logarithmic time, the total time is $\BigO{(n+m)\lg n}$. For the $\Dijkstra$ version with $\Insert$s only, the $m$ previus calls to $\DecreaseKey$ will now call $\Insert$ instead but the time will remain the same.
+First, let us consider Binary heaps and the case for $\Dijkstra$ with
+$\DecreaseKey$ operations. A node can never be readded once it has
+been deleted by $\DeleteMin$, therefore there can only be $n$ $dm$
+operations. For each node, there can be up to $m$ $dk$ operations, one
+for each adjacent node in the graph. Since $\Insert$, $\DeleteMin$ and
+$\DecreaseKey$ all take logarithmic time, the total time is
+$\BigO{(n+m)\lg n}$. For the $\Dijkstra$ version with $\Insert$s only,
+the $m$ previus calls to $\DecreaseKey$ will now call $\Insert$
+instead but the time will remain the same.
 
-We are able to reduce the time complexity asymptotically when we use a Fibonacci heap. For Fibonacci heaps, $\DecreaseKey $ takes amortized time $\BigO{1}$ and $\DeleteMin$ takes amortized time $\BigO{\lg n}$ resulting in the time-complexity $\BigO{m+n\lg n}$ for $\Dijkstra$ with Fibonacci heap version 1. Because the time-complexity for $\Insert$ is also $\BigO{1}$, using $\Dijkstra$ without $\DecreaseKey$ has the same total time complexity.
+We are able to reduce the time complexity asymptotically when we use a
+Fibonacci heap. For Fibonacci heaps, $\DecreaseKey $ takes amortized
+time $\BigO{1}$ and $\DeleteMin$ takes amortized time $\BigO{\lg n}$
+resulting in the time-complexity $\BigO{m+n\lg n}$ for $\Dijkstra$
+with Fibonacci heap version 1. Because the time-complexity for
+$\Insert$ is also $\BigO{1}$, using $\Dijkstra$ without $\DecreaseKey$
+has the same total time complexity.
 
-So what happens when we are lazy with deletions, and for $\DeleteMin$ mark a node as vacant in Fibonacci version 2? There are no random deletions in the Fibonacci heap when running $\Dijkstra$, therefore $l$, which denotes the number of vacant nodes, has an upper bound of $1$. Therefore, the amortized time for $\FindMin$ is $\BigO{\lg n + 1}$ which results in the same running times for $\Dijkstra$ as Fibonacci heap version 1.
+So what happens when we are lazy with deletions, and for $\DeleteMin$
+mark a node as vacant in Fibonacci version 2? There are no random
+deletions in the Fibonacci heap when running $\Dijkstra$, therefore
+$l$, which denotes the number of vacant nodes, has an upper bound of
+$1$. Therefore, the amortized time for $\FindMin$ is $\BigO{\lg n +
+  1}$ which results in the same running times for $\Dijkstra$ as
+Fibonacci heap version 1.
 
 \section{Connectivity and generating graphs}
 
-Above we argued for the running times of the $\Dijkstra$ algorithms, and as we can see, the running times are dominated by the number of edges for the graph. This suggest, that sparsely connected graphs can run quicker than highly connected graphs.
+Above we argued for the running times of the $\Dijkstra$ algorithms,
+and as we can see, the running times are dominated by the number of
+edges for the graph. This suggest, that sparsely connected graphs can
+run quicker than highly connected graphs.
 
-If the graph is sufficiently sparse it is an effective speed-up to implement $\Dijkstra$ using a min-priority queue of some sort. For Binary heaps, the threshold is when $m = o(n^2 / \lg n)$:
+If the graph is sufficiently sparse it is an effective speed-up to
+implement $\Dijkstra$ using a min-priority queue of some sort. For
+Binary heaps, the threshold is when $m = o(n^2 / \lg n)$:
 \begin{align*}
     \BigO{(n+m)\lg n} = \BigO{(n^2/\lg n)\lg n} = \BigO{n^2}
 \sum_{i=1}^l \phi^{k_j-2} \le n
  \end{align*}
  which is the same running time as without a min-priority queue.
  
-For Fibonacci heaps the time $\BigO{n\lg n + m}$ suggest, since $m$ dominates $n \lg n$, that if the graphs is not totally connected the Fibonacci heap will run quicker or in the same time as $\Dijkstra$ without min-priority queues. We are very confident, that the graph should be stricly sparser since the running time in $\operatorname{O}$-notation for Fibonacci heaps hide away a very large constant.
+For Fibonacci heaps the time $\BigO{n\lg n + m}$ suggest, since $m$
+dominates $n \lg n$, that if the graphs is not totally connected the
+Fibonacci heap will run quicker or in the same time as $\Dijkstra$
+without min-priority queues. We are very confident, that the graph
+should be stricly sparser since the running time in
+$\operatorname{O}$-notation for Fibonacci heaps hide away a very large
+constant.
 
-Because connectivety is a factor when running $\Dijkstra$ we are, when testing the running times for the $\Dijkstra$ algorithms, generating graphs by supplying size and connectivity probability as parameters to our graph-creation program. This is based on the pseudo-random number generator in C but we will use the resulting graphs as if they were completely randomly generated graphs with an expected probality on the number of edges in the graph.
+Because connectivety is a factor when running $\Dijkstra$ we are, when
+testing the running times for the $\Dijkstra$ algorithms, generating
+graphs by supplying size and connectivity probability as parameters to
+our graph-creation program. This is based on the pseudo-random number
+generator in C but we will use the resulting graphs as if they were
+completely randomly generated graphs with an expected probality on the
+number of edges in the graph.
 
-\section{Testing time-complexities for \Dijkstra}
 
-Because we have four different heaps and two different implementations of $\Dijkstra$ we have a lot of test to perform. We are generating graphs in the interval from 100 to 20.000 and increments of 100 nodes. A graph with 20.000 nodes represented by an adjacency matrix where all indicies are int is by our calculation around 1.5 GB, which should give us enough information about running times for large graphs.
+\chapter{Empirical Testing}
 
-For each level in our node-size interval we have 10 different graph connectivity-probabilities, 10 \% to 100 \% in steps of 10 \%, where we do following three times: generate a random graph with beforementioned probability and size and run all heaps and dijkstra algorithms on this instance three times to find an average. Thus:
+In this chapter we present out findings gathered through emprical
+testing of the heap implementations discussed in this report. We run
+two rounds of testing. One a general stress-testing round where we try
+to force corner-cases and worst-case behaviour, in order to verify our
+implementations and the time complexities we claim in the preceeding
+chapters.
+
+Secondly, we investigate the performance of each of the 4
+implementations discussed so far, when plugged into the two variations
+Dijsktra's Algorithm found above.
+
+\section{Stress-Testing}
+
+We have devised a series of 9 tests in order to exhibit the various
+time complexities of each operation facilitated by our
+implementations. The first five tests listed below are run with on the
+order of 600.000 elements, for all 4 implementations.
+
+\begin{itemize}
+\item A series of \Insert s, elements inserted in increasing key
+  order. We expect linear behaviour, as the keys are inserted
+  immeadiately in the right location.
+\item As before, followed by a single \DeleteMin. This forces rebalancing
+  of Fibonacci heaps.
+\item As the previous test, but with elements inserted in decreasing
+  key order, in order to force bubbling and tree traversals on each
+  insert.
+\item As the first test, followed by as many \DeleteMin operations.
+\item Mixed insertions and deletions.
+\item As the first, followed by as many \DecreaseKey operations.
+\end{itemize}
+
+The following 4 test cases are run only for the Fibonacci heaps, as
+they are designed to force worst-case behaviour as opposed to the
+amortized bounds, which should be exhibited by the preceeding 5 tests.
+
+\begin{itemize}
+\item A series of inserts, followed by a single \DeleteMin, followed
+  by as many \Delete operations. The point is that \Insert and \Delete
+  are both amortized constant operations, but the \DeleteMin forces
+  the logarithmic worst-case behaviour expected.
+\item Same as the first, but removing in reverse order.
+\item Same as the first, but removing from the middle of the range of
+  keys, in alternatingly decreasing and increasing order.
+\item A series of deletions and insertions to force the phenomenon of
+  cascading deletions.
+\end{itemize}
+
+\section{Dijsktra's Algorithm Tests}
+
+We have 4 different datastructures and 2 variations, for a total of 8
+different combinations.
+
+We generate graphs of input sizes in the interval of 100 to 20.000 in
+increments of 500 nodes. A graph with 20.000 nodes is represented by
+adjancency matrix where all indices are integers is by our calculation
+around 1.5 GB of space, which by all considerations should be a
+``fairly large'' graph. This should reveal asymptotic discrepancies if
+any.
+
+In order to exercise worst- and best-case cases, we run each
+configuration at each input size with 10 different graphs, distributed
+evenly on the parameter of connectivity. We range from 10\% to 100\%
+connectivity in steps of 10\%.
+
+Finally, we run the algorithm-data structure-input size-connectivity
+configuration 3 times to account for effects out of our hands such as
+the operating system of the test machine.
+
+We thus have a grand total of 144.000 test runs, withnessed by the
+following formula.
+
 \begin{align*}
     \text{\# of tests} = 200 * 10 * 3 * 8 * 3 = 144.000 
  \end{align*}
 
-\chapter{Binary heap vs Fibonacci heap}
+We measure running times through the use of the GNU \texttt{time}
+command, from which we gather the actual CPU time spent on running the
+test, not the wall clock time. This accounts for various, unforeseen
+effects on the running time such as premption by the operating system
+or other disturbances.
 
-needs content
+Instrumentation that allows us to tally the number of comparisons are
+implemented through the use of C macros. By doing it this way, we can
+selectively compile the instrumented comparison functions out when we
+are not counting comparisons, removing any overhead imposed by such.
 
-\chapter{Test-results}
+\section{Raw Data}
+We here present 10 plots of running times. The 10 plots are for each
+of the degrees of connectivity, in decreasing order. That is, Figure
+5.1 displays the running times of each algoritm / data structure pair
+as a function of input size, on completely connected graphs.
+
+We obeserve no discernible difference in the choice of data
+structure. The plots group into 2 significant divisions, one using
+implementation of Dijkstra's Algorithm that usses \DecreaseKey, the
+other using \Insert. 
+
+In general, we observe shorter absolute running times in inverse
+proportion to the connectivity: the denser the graph, the longer the
+running time. This is to be expected, as the run time complexity of
+Dijkstra's is a function of the number of edges in the graph.
+
+However, as the connectivity decreases, we observe that the
+implementation of Dijkstra's Algorithm using \Insert pulls away from
+the other combinations - that is, given a choice between the two
+implementations of the algorithm, the \Insert based is expected to
+perform better asymptotically, regardless of the choice of underlying
+datastructure.
 
 \input{dijkstra_0_real}
 \input{dijkstra_1_real}
@@ -678,10 +818,40 @@ needs content
 \input{dijkstra_9_real}
 
 
+
+\input{dijkstra_0}
+\input{dijkstra_1}
+\input{dijkstra_2}
+\input{dijkstra_3}
+\input{dijkstra_4}
+\input{dijkstra_5}
+\input{dijkstra_6}
+\input{dijkstra_7}
+\input{dijkstra_8}
+\input{dijkstra_9}
+
+
 \chapter{Conlusion}
 
-needs contents
+The conclusion of the paper is one we draw with mixed feelings. From
+the bounds analyzed in the first few chapters we expected to
+empricially observe a clear advantage of the Fibonacci family of heaps
+over the classical binary heaps (there are after all almost 3 decades
+of research between them), at the least on sparse graphs.
 
+However, our empirical data leads us to the conclusion, that Fibonacci
+heaps are not worth the implementation effort. That is, faced with the
+forced choice of implementing a heap structure for any given project,
+choose the simplest possible structure of the 4 -- the classical, array
+based binary heap -- \emph{until} other signs indicate that the choice
+of heap is a performance bottle neck. In our case study, the
+implementation of Dijkstra's algorithm proved to be far more
+influential than the choice of heap.
+
+While not figuring in the above report, we experienced first hand the
+implementation effort involved in all 4 data structures, and the array
+based implementation is by far the simplest, simply by virtue of not
+using pointers, and had a remarkably shorter development time.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
