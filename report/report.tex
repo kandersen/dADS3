@@ -909,16 +909,29 @@ order of 600.000 elements, for all 4 implementations.
 \begin{itemize}
 \item A series of \Insert s, elements inserted in increasing key
   order. We expect linear behaviour, as the keys are inserted
-  immediately in the right location. Our results prove us correct in \ref{time_0} and \ref{comp_0}. 
+  immediately in the right location. Our results prove us correct in
+  \ref{fig:time_0} and \ref{fig:comp_0}.
 \item As before, followed by a single \DeleteMin. This forces re-balancing
-  of Fibonacci heaps. We point to \ref{time_1} and \ref{comp_1}. 
+  of Fibonacci heaps. We point to \ref{fig:time_1} and \ref{fig:comp_1}. 
 \item As the previous test, but with elements inserted in decreasing
   key order, in order to force bubbling and tree traversals on each
-  insert. This behaves as expected as \ref{time_2} and \ref{comp_2} show. 
-\item As the first test, followed by as many $\DeleteMin$ operations, testing correctness of repeated bubbling actions. This is surely something that is expected to be $n\logn$ operations as we also show in \ref{time_3} and \ref{comp_3}. 
-\item Mixed insertions and deletions, to simulate some degree of normal use, i.e. inserts may or may not introduce new minimums. Any chain of operations will be $\BigO{\log n}$ per operation for Binary heaps and for Fibonacci heap we can establish the same upper bound due to Theorem 1~\cite[p.604]{FT87}. Please see \ref{time_4} and \ref{comp_4} for running time and comparison measurements. 
-\item As the first, followed by as many $\DecreaseKey$ operations; each making the currently largest element the smallest. 
-Showcasing the worst case for the binary heaps, as each $\DecreaseKey$ operation bubbles the element from a leaf to the root. Again, this is expected to be $n\logn$ and can bee seen in \ref{time_5} and \ref{comp_5}.
+  insert. This behaves as expected as \ref{fig:time_2} and \ref{fig:comp_2} show. 
+\item As the first test, followed by as many $\DeleteMin$ operations,
+  testing correctness of repeated bubbling actions. This is surely
+  something that is expected to be $n\log n$ operations as we also show
+  in \ref{fig:time_3} and \ref{fig:comp_3}.
+\item Mixed insertions and deletions, to simulate some degree of
+  normal use, i.e. inserts may or may not introduce new minimums. Any
+  chain of operations will be $\BigO{\log n}$ per operation for Binary
+  heaps and for Fibonacci heap we can establish the same upper bound
+  due to Theorem 1~\cite[p.604]{FT87}. Please see \ref{fig:time_4} and
+  \ref{fig:comp_4} for running time and comparison measurements.
+\item As the first, followed by as many $\DecreaseKey$ operations;
+  each making the currently largest element the smallest.  Showcasing
+  the worst case for the binary heaps, as each $\DecreaseKey$
+  operation bubbles the element from a leaf to the root. Again, this
+  is expected to be $n\log n$ and can bee seen in \ref{fig:time_5} and
+  \ref{fig:comp_5}.
 \end{itemize}
 
 The following five test cases are run only for the Fibonacci heaps,
@@ -928,16 +941,20 @@ worst-case behaviour as opposed to the amortized bounds of remove.
 These tests were also run on an order of 600.000 elements.
 
 \begin{itemize}
-\item A series of inserts, followed by as many $\Delete$ operations. 
-  Removing the elements in decreasing order. \ref{time_14} and \ref{comp_14}.
-\item Same as the first, but with a $\DeleteMin$ operation before
-the $\Delete$ (one less now) operations. The point being that
-the $\DeleteMin$ operation will force the Fibonacci heap to make a linking step. \ref{time_15} and \ref{comp_15}
-\item Same as above, but removing in reverse(increasing) order. \ref{time_16} and \ref{comp_16}
+\item A series of inserts, followed by as many $\Delete$ operations.
+  Removing the elements in decreasing order. \ref{fig:time_14} and
+  \ref{fig:comp_14}.
+\item Same as the first, but with a $\DeleteMin$ operation before the
+  $\Delete$ (one less now) operations. The point being that the
+  $\DeleteMin$ operation will force the Fibonacci heap to make a
+  linking step. \ref{fig:time_15} and \ref{fig:comp_15}
+\item Same as above, but removing in reverse(increasing)
+  order. \ref{fig:time_16} and \ref{fig:comp_16}
 \item Same as above, but removing from the middle of the range of
-  keys, in alternatingly decreasing and increasing order. \ref{time_17} and \ref{comp_17}
+  keys, in alternatingly decreasing and increasing
+  order. \ref{fig:time_17} and \ref{fig:comp_17}
 \item A series of deletions and insertions to force the phenomenon of
-  cascading deletions. \ref{time_18} and \ref{comp_18}
+  cascading deletions. \ref{fig:time_18} and \ref{fig:comp_18}
 \end{itemize}
 
 We mention them here for completeness as they were part of our
