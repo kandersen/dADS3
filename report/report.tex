@@ -55,9 +55,9 @@
 \pagestyle{empty} 
 \pagenumbering{roman} 
 \vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
-  {\Huge\sf Binary Heaps, Fibonacci Heaps and\\[2ex]Dijkstras shortest path}\\[4ex]
-  {\huge\sf Kristoffer Just Andersen, 20051234\\[2ex]
-    \huge\sf Troels Leth Jensen, 20051234 \\[2ex]
+  {\Huge\sf Binary Heaps, Fibonacci Heaps and\\[2ex]Dijkstra's shortest path}\\[4ex]
+  {\huge\sf Kristoffer Just Andersen, 20103316\\[2ex]
+    \huge\sf Troels Leth Jensen, 20095039 \\[2ex]
     \huge\sf Morten Krogh-Jespersen, 20022362}\\[2ex]
   \noindent\rule{\linewidth}{1mm}\\[4ex]
   \noindent{\Large\sf Project 1, Advanced Data Structures 2013, Computer Science\\[1ex] 
@@ -83,12 +83,12 @@ place for heaps.
 This paper will explore two general approaches, the binary and
 Fibonacci heaps, and demonstrate two ways of implementing each, for a
 total of four different data structures. We argue for their worst case
-time behaviour.
+time behavior.
 
-We then put them to the emprical test, stressing them under load from
-Dijsktra's Single Source Shortest Path algorithm, which we use to
+We then put them to the empirical test, stressing them under load from
+Dijkstra's Single Source Shortest Path algorithm, which we use to
 demonstrate the performance characteristics of the data
-structures. Dijsktra's can be implemented in two different ways, and
+structures. Dijkstra's can be implemented in two different ways, and
 we investigate the consequence of one method over the other.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,7 +101,7 @@ binary search tree over its elements that it maintains. We shall see
 two ways to achieve this, one maintaining an explicit search tree, the
 other relying on the isomorphism between arrays and balanced trees.
 
-The key to using a binary tree for the purpose of a priority que is
+The key to using a binary tree for the purpose of a priority queue is
 the ``heap invariant'': that the priority of each element in the tree
 is smaller than its children. Maintaining this invariant is the focus
 of each operation on binary heaps, and the notion of ``bubbling''
@@ -163,15 +163,15 @@ statements in favor of familiar looping control flow. This does not
 alter the asymptotic running times or space consumption of the
 algorithm.
 
-We choose to inline the \textsc{Swopheap} operation as used by
+We choose to in-line the \textsc{Swopheap} operation as used by
 \cite{Forsythe:1964}, as we believe it makes the intent
-clearer. \textsc{Swop} has the effect of ``bubbling'' an element down
+clearer. \textsc{Swopheap} has the effect of ``bubbling'' an element down
 through the heap until the heap invariant is reestablished. This is
 used for \DeleteMin, where the root of the tree is removed and replaced
 by the last leaf of the tree, which is then bubbled downwards.
 
 For the \DecreaseKey\ operation, we refer to Cormen \emph{et al.} \cite{ITA09}, which
-demonstates an implementation of maximum priority queues supporting an
+demonstrates an implementation of maximum priority queues supporting an
 \textsc{IncreaseKey} operation. It is easy to transfer the algorithm
 to our implementation. The basic algorithm decreases they key of an
 element, and then proceeds to bubble the element up through the heap
@@ -195,7 +195,7 @@ key is always in root position - the first element in our underlying
 array.
 
 \paragraph{\Insert} Runs linearly in the number of elements in
-the heap: \BigO{n}. We insert the incomming node into the last position
+the heap: \BigO{n}. We insert the incoming node into the last position
 of the tree, which we know by maintaining the current element
 count. We then bubble the element upwards, performing a comparison and
 a swap per level it moves. Thus we achieve a logarithmic running time
@@ -243,23 +243,23 @@ original implementation, is observing that position of a node $i$ in
 the tree is given uniquely by the binary representation of $i -
 1$. Read from most significant bit, the ones and zeroes gives
 ``directions'' from the root to the particular node. We defer to the
-implementation for the goary details.
+implementation for the bloody details.
 
 \section{Time-complexity for Binary Heaps with Pointers}
 
 We here detail the worst case running times for the key operations of
-a minimum priority que: \MakeHeap, \FindMin, \Insert, \DeleteMin and
+a minimum priority queue: \MakeHeap, \FindMin, \Insert, \DeleteMin and
 \DecreaseKey.
 
 \paragraph{\MakeHeap} Runs in constant time: \BigO{1}. Allocation of
-the necessary varibales for keeping count of the elements inserted and
+the necessary variables for keeping count of the elements inserted and
 a pointer to the root node, once inserted.
 
 \paragraph{\FindMin} Runs in constant time: \BigO{1}. By maintaining a
 pointer to the root node, we have constant time access to it.
 
 \paragraph{\Insert} Runs logarithmically in the number of elements:
-\BigO{\log n}. Ny maintaining the number of elements inserted, we
+\BigO{\log n}. By maintaining the number of elements inserted, we
 can calculate directions to the position of the next element. This
 involves reading bits and following pointers. We follow one pointer
 per bit of ``direction''. The binary representation of $n$ uses $\log
@@ -298,8 +298,8 @@ particularly in the case of the pointer based implementation. Between
 two nodes, we have a total of 4 children pointers and 6 parent
 pointers that needs to be updated, which is a lot for any programmer
 to manage at a single time. Visualizing the pointers gave us
-immeadiate feedback when on a by-need basis testing proved
-discrepancies in behaviour.
+immediate feedback when on a by-need basis testing proved
+discrepancies in behavior.
 
 \chapter{Fibonacci heaps}
 
@@ -309,7 +309,7 @@ only has one tree \cite{FT87}. The data structure was invented by
 Michael L. Fredman and Robert Endre Tarjan and was published in the
 Journal of ACM in 1987. It has it name because the size of any subtree
 in a Fibonacci heap will be lower bounded by $F_{k+2}$ where $k$ is
-the degree of the root in that subtree and $F_k$ is the kth Fibonacci
+the degree of the root in that subtree and $F_k$ is the $k$th Fibonacci
 number. Below is the time-complexities of each of the heap operations
 listed:
 
@@ -357,7 +357,7 @@ Fibonacci is $\BigO{\log
   n}$~\cite[p.~523]{ITA09}~\cite[p.~604]{FT87}. This can be shown by
 first observing that the degree of any node $y$ in the Fibonacci heap
 is bounded by when it was inserted into the list of its parent $x$
-childs, where $degree(x) = k$. When $y_i$ was linked to $x$, where $i$
+child, where $degree(x) = k$. When $y_i$ was linked to $x$, where $i$
 declares when $y$ was added to the children list of $x$, $x$ and $y_i$
 must have had the same degree which results in $degree(y_i) \le k -
 1$. $y$ could have lost at most one child before it would be cut from
@@ -372,11 +372,11 @@ By three different induction proofs and the lemma described above, it can be sho
 
 \section{The potential method}
 
-We will analyse the amortized running times of the Fibonacci heaps by using the potential function \cite[p.~215]{FT87}. A potential function maps a state of a data structure to a real number representing the potential contained in that data structure \cite[p.~459]{ITA09}. The amortized cost of an operation $c_i$ that transforms a data structure in state $D_{i-1}$ to $D_{i}$ is:
+We will analyze the amortized running times of the Fibonacci heaps by using the potential function \cite[p.~215]{FT87}. A potential function maps a state of a data structure to a real number representing the potential contained in that data structure \cite[p.~459]{ITA09}. The amortized cost of an operation $c_i$ that transforms a data structure in state $D_{i-1}$ to $D_{i}$ is:
 \begin{align*}
   \hat{c} = c_i + \Phi(D_i) - \Phi(D_{i-1})
 \end{align*}
-The amortized cost is therefore the cost of the operation $c_i$ plus the change in the potential. If the operation releases potential, the relased potential gets subtracted from the cost of the operation. For the Fibonacci heaps we define the potential function as:
+The amortized cost is therefore the cost of the operation $c_i$ plus the change in the potential. If the operation releases potential, the released potential gets subtracted from the cost of the operation. For the Fibonacci heaps we define the potential function as:
 
 \begin{align*}
   \Phi(H) = trees(H) + 2marked(H)
@@ -386,11 +386,11 @@ Where trees define the number of trees/roots in the forest and marked is the num
 
 \section{Fibonacci heap version 1}
 
-The first Fibonacci heap variant we present is the original version proposed in FT87. A potential function is used to analyze the perfomance, thus the above stated time-complexities are amortized.
+The first Fibonacci heap variant we present is the original version proposed in FT87. A potential function is used to analyze the performance, thus the above stated time-complexities are amortized.
 
 Our implementation pretty much follows from the article, with few minor exceptions. The article do not specify exactly how a node is found from an item in constant time, so we decided to place a pointer on the item. Also, melding is not totally destructable since we join the heap in of the two existing heaps and return an arbitrary one. 
 
-The article mentions that $\Delete$ takes $\BigO{1}$ if the node to remove is not the min-node and without cascading deletes. The children of the node to delete must be moved up onto the root which can only be done in constant time if every children has a pointer to a parent pointer. In this way, we only have to change one pointer to update all parent pointers for the children of the beforementioned node. Since the running time of the \Delete~operation is amortized $\BigO{\log n}$ we chose a simpler version where we just update all parent pointers one by one. As stated above $size(node) \le \BigO{\log n}$ so this only takes $\BigT{\log n}$ time.
+The article mentions that $\Delete$ takes $\BigO{1}$ if the node to remove is not the min-node and without cascading deletes. The children of the node to delete must be moved up onto the root which can only be done in constant time if every children has a pointer to a parent pointer. In this way, we only have to change one pointer to update all parent pointers for the children of the aforementioned node. Since the running time of the \Delete~operation is amortized $\BigO{\log n}$ we chose a simpler version where we just update all parent pointers one by one. As stated above $size(node) \le \BigO{\log n}$ so this only takes $\BigT{\log n}$ time.
 
 \MakeHeap~constructs a new empty Fibonacci heap, which means there are not roots and no marked nodes. Therefore, the potential of the empty heap is 0 and constructing the heap can be done in constant time. \FindMin~does not alter the potential and is only a pointer lookup which clearly is also a constant time operation. \Insert~inserts a new root which increments the potential by one. Combine that with the actual cost which is $\BigO{1}$ the \Insert~operation is $\BigO{1}$. \Meld~can be carried out in $\BigO{1}$ actual time and since the change is:
 \begin{align*}
@@ -398,10 +398,10 @@ The article mentions that $\Delete$ takes $\BigO{1}$ if the node to remove is no
 \end{align*}
 the \Meld~operation has time $\BigO{1}$.
 
-When analyzing the amortized cost of $\DeleteMin$, let us say that the minimum node to delete is actually the node with degree $D(n)$ which is the upper bound on the maximum degree for any node. Setting the parent pointer to \NULL and concatinating each node with the root list takes constant time for each of the $D(n)$ children. 
+When analyzing the amortized cost of $\DeleteMin$, let us say that the minimum node to delete is actually the node with degree $D(n)$ which is the upper bound on the maximum degree for any node. Setting the parent pointer to \NULL and concatenating each node with the root list takes constant time for each of the $D(n)$ children. 
 The linking phase work on at most $D(n) + tress(H) - 1$ trees, since we have removed the minimum node from the root list and at most will be adding $D(n)$. We also join trees of same degree, but when two trees are joined only one will remain in the root list, so this can happen at most the number of roots in the root list. Therefore, the actual working time is $\BigO{D(n) + trees(H)}$.
 
-The potential before the $\DeleteMin$ operation executues is $trees(H) + 2marked(H)$. After, at most $D(n) + 1$ roots will exist because all others would be removed during the linking phase and there is no change to marked nodes. Therefore, we have that:
+The potential before the $\DeleteMin$ operation executes is $trees(H) + 2marked(H)$. After, at most $D(n) + 1$ roots will exist because all others would be removed during the linking phase and there is no change to marked nodes. Therefore, we have that:
 \begin{align*}
   \DeleteMin & = \BigO{D(n) + trees(H)} + \left(\left(D(n) + 1\right) + 2marked(H)\right) \\
   & - \left(trees(H) + 2marked(H)\right) \\
@@ -503,13 +503,13 @@ If we delete a child to an arbitrary node $x$ we mark $x$ if is not marked and i
   \end{tikzpicture}
 \end{center}
 
-where a diamond is modelling a marked node. If either $\DecreaseKey$ or $\Delete$ is called with an item corresponding to node $n$ a cascading delete will begin and will not stop until it reaches $2$ in this example. The amount of operations is therefore the entire chain:
+where a diamond is modeling a marked node. If either $\DecreaseKey$ or $\Delete$ is called with an item corresponding to node $n$ a cascading delete will begin and will not stop until it reaches $2$ in this example. The amount of operations is therefore the entire chain:
 \begin{align*}
   \text{length of chain} = n - 1
 \end{align*}
 which is $\BigT{n}$.
 
-Such a configuration can be obtained by constructring triangles, chaining and deleting (as a side note, this is exercise 19.4-1 in \cite{ITA09}). In order for us to create the first triangle, we insert five nodes, call $\DeleteMin$ and then remove the bottom most:
+Such a configuration can be obtained by constructing triangles, chaining and deleting (as a side note, this is exercise 19.4-1 in \cite{ITA09}). In order for us to create the first triangle, we insert five nodes, call $\DeleteMin$ and then remove the bottom most:
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
@@ -581,20 +581,20 @@ In this second version of a Fibonacci heap we try to be more lazy, by doing as l
 
 We have to do some work at one point which happens in $\FindMin$. Now, $\FindMin$ works like $\DeleteMin$ in version 1, but also has to delete every vacant node it meets on the path. $\Meld$ also requires little work, such that when melding two heaps, if a root is marked as vacant it should be the new root of the resulting heap. There is no change in actual time for $\Meld$.
 
-Below is an image from our test-framwork showing how a tree looks like with vacant nodes:
+Below is an image from our test-framework showing how a tree looks like with vacant nodes:
 
 \mbox{} \par
 \noindent\centerimg{delete_39.png}
-After a call to $\FindMin$ thee heap looks like:
+After a call to $\FindMin$ the heap looks like:
 
 \mbox{} \par
 \noindent\centerimg{find_min}
 
-Let us analyze the time for the $\FindMin$ operation. Let $l$ mark the number of vacant nodes. If $l=0$ then $\FindMin$ points to the node representing the item with the minimum key, and the work is constant. If $l \ge 1$ then the amortized running time is the new roots created from destroying vacant nodes and moving the non-vacant child nodes to the root plus the linking of the trees which is at most $\BigO{\log n}$. We argued previously that a node $y$ have $degree(y_i) \ge i - 2$ for $i = 1,2,\cdots,k$ where $k$ is the degree of its parent. We use this to say that at least one of the vacant nodes will have a rank of $k-2$. We also know that the size of subtree rootet at a node with degree $k-2$ will be at least be of size $\phi^{k-2}$. If all children of the vacant nodes we destroy are nonvacant, they will increase the number of trees and thereby the potential by:
+Let us analyze the time for the $\FindMin$ operation. Let $l$ mark the number of vacant nodes. If $l=0$ then $\FindMin$ points to the node representing the item with the minimum key, and the work is constant. If $l \ge 1$ then the amortized running time is the new roots created from destroying vacant nodes and moving the non-vacant child nodes to the root plus the linking of the trees which is at most $\BigO{\log n}$. We argued previously that a node $y$ have $degree(y_i) \ge i - 2$ for $i = 1,2,\cdots,k$ where $k$ is the degree of its parent. We use this to say that at least one of the vacant nodes will have a rank of $k-2$. We also know that the size of subtree rooted at a node with degree $k-2$ will be at least be of size $\phi^{k-2}$. If all children of the vacant nodes we destroy are non-vacant, they will increase the number of trees and thereby the potential by:
 \begin{align*}
   \sum_{i=1}^l \phi^{k_j-2} \le n
 \end{align*}
-where $k_1, k_2,\cdots,k_i$ are nonvacant nodes. The sum is maximized for $k_i$. MAYBE SOME MORE??
+where $k_1, k_2,\cdots,k_i$ are non-vacant nodes. The sum is maximized for $k_i$. MAYBE SOME MORE??
 
 \section{Worst case time-complexity for Fib heap v2}
 
@@ -602,20 +602,20 @@ The worst case example is extremely easy. Since $l$ and $n$ are disjoint, the ca
 
 \section{Testing correctness of Fibonacci Heaps}
 
-Implementing the Fibonacci heaps in C required a lot of work and since we are working with that many pointers, we decided very early in the proces that we needed some kind of test-framework to assist us. 
+Implementing the Fibonacci heaps in C required a lot of work and since we are working with that many pointers, we decided very early in the process that we needed some kind of test-framework to assist us. 
 
 First, we implemented a consistency checker, that checks the following properties for each node $x$: That the nodes the sibling pointers of $x$ points to points to $x$ with the corresponding sibling pointer. That the parent pointer is correct if the node $x$ is a child of any node and that the key is larger than its parent. Still, this tests the implementation more than the properties of the Fibonacci heaps, so we needed one more tool.
 
 We build a pretty printer that could convert any subtree (or heap) to a graphical representation, such that we could see how the heap looked like. We then made test-cases, that for each operation printed the output, and then we could manually check if $\DeleteMin$, $\Delete$ and $\DecreaseKey$ behaved as it should. We manually checked test-instances of size less than or equal to 100 operations.
 
-Attached in the zipped-file companying the report are generated images we have used to check correctness.
+Attached in the zipped-file accompanying the report are generated images we have used to check correctness.
 
-Lastly, since we now have four datastructures, we could check the output for each and compare it with the others, to make sure, that all our heaps answer correctly (or all could answer wrong the same way, which is highly unlikely).
+Lastly, since we now have four data structures, we could check the output for each and compare it with the others, to make sure, that all our heaps answer correctly (or all could answer wrong the same way, which is highly unlikely).
 
 \chapter{\Dijkstra's algorithm}
 
 \Dijkstra's~algorithm is an graph search algorithm that solves the single-source shortest path problem. Without a min-priority queue the algorithm runs in $\BigO{V^2} \ge \BigO{E}$ for a graph $G=(V, E)$[3]. But we have two heaps that can actually be used as priority queues, so this will give us better asymptotic running times depending on the connectivity of the graph.
-Normally, $\Dijkstra$ is implemented by using the $\DecreaseKey$ operation, but if we disregard space, we can actually implement $\Dijkstra$ without $\DecreaseKey$ and just insert new nodes every time we find a shorter path. Below is a summery of the running time and space complexities:
+Normally, $\Dijkstra$ is implemented by using the $\DecreaseKey$ operation, but if we disregard space, we can actually implement $\Dijkstra$ without $\DecreaseKey$ and just insert new nodes every time we find a shorter path. Below is a summary of the running time and space complexities:
 
 \begin{center}
   \begin{tabular}{ l | c | c | c}
@@ -636,13 +636,13 @@ the number of $\DeleteMin$ operations and $dk$ denotes the number of
 $\DecreaseKey$ operations.
 
 First, let us consider Binary heaps and the case for $\Dijkstra$ with
-$\DecreaseKey$ operations. A node can never be readded once it has
+$\DecreaseKey$ operations. A node can never be re-added once it has
 been deleted by $\DeleteMin$, therefore there can only be $n$ $dm$
 operations. For each node, there can be up to $m$ $dk$ operations, one
 for each adjacent node in the graph. Since $\Insert$, $\DeleteMin$ and
 $\DecreaseKey$ all take logarithmic time, the total time is
 $\BigO{(n+m)\lg n}$. For the $\Dijkstra$ version with $\Insert$s only,
-the $m$ previus calls to $\DecreaseKey$ will now call $\Insert$
+the $m$ previous calls to $\DecreaseKey$ will now call $\Insert$
 instead but the time will remain the same.
 
 We are able to reduce the time complexity asymptotically when we use a
@@ -681,31 +681,31 @@ For Fibonacci heaps the time $\BigO{n\lg n + m}$ suggest, since $m$
 dominates $n \lg n$, that if the graphs is not totally connected the
 Fibonacci heap will run quicker or in the same time as $\Dijkstra$
 without min-priority queues. We are very confident, that the graph
-should be stricly sparser since the running time in
+should be strictly sparser since the running time in
 $\operatorname{O}$-notation for Fibonacci heaps hide away a very large
 constant.
 
-Because connectivety is a factor when running $\Dijkstra$ we are, when
+Because connectivity is a factor when running $\Dijkstra$ we are, when
 testing the running times for the $\Dijkstra$ algorithms, generating
 graphs by supplying size and connectivity probability as parameters to
 our graph-creation program. This is based on the pseudo-random number
 generator in C but we will use the resulting graphs as if they were
-completely randomly generated graphs with an expected probality on the
+completely randomly generated graphs with an expected probability on the
 number of edges in the graph.
 
 
 \chapter{Empirical Testing}
 
-In this chapter we present out findings gathered through emprical
+In this chapter we present out findings gathered through empirical
 testing of the heap implementations discussed in this report. We run
 two rounds of testing. One a general stress-testing round where we try
-to force corner-cases and worst-case behaviour, in order to verify our
-implementations and the time complexities we claim in the preceeding
+to force corner-cases and worst-case behavior, in order to verify our
+implementations and the time complexities we claim in the preceding
 chapters.
 
 Secondly, we investigate the performance of each of the 4
 implementations discussed so far, when plugged into the two variations
-Dijsktra's Algorithm found above.
+Dijkstra's Algorithm found above.
 
 \section{Stress-Testing}
 
@@ -716,9 +716,9 @@ order of 600.000 elements, for all 4 implementations.
 
 \begin{itemize}
 \item A series of \Insert s, elements inserted in increasing key
-  order. We expect linear behaviour, as the keys are inserted
-  immeadiately in the right location.
-\item As before, followed by a single \DeleteMin. This forces rebalancing
+  order. We expect linear behavior, as the keys are inserted
+  immediately in the right location.
+\item As before, followed by a single \DeleteMin. This forces re-balancing
   of Fibonacci heaps.
 \item As the previous test, but with elements inserted in decreasing
   key order, in order to force bubbling and tree traversals on each
@@ -729,14 +729,14 @@ order of 600.000 elements, for all 4 implementations.
 \end{itemize}
 
 The following 4 test cases are run only for the Fibonacci heaps, as
-they are designed to force worst-case behaviour as opposed to the
-amortized bounds, which should be exhibited by the preceeding 5 tests.
+they are designed to force worst-case behavior as opposed to the
+amortized bounds, which should be exhibited by the preceding 5 tests.
 
 \begin{itemize}
 \item A series of inserts, followed by a single \DeleteMin, followed
   by as many \Delete operations. The point is that \Insert and \Delete
   are both amortized constant operations, but the \DeleteMin forces
-  the logarithmic worst-case behaviour expected.
+  the logarithmic worst-case behavior expected.
 \item Same as the first, but removing in reverse order.
 \item Same as the first, but removing from the middle of the range of
   keys, in alternatingly decreasing and increasing order.
@@ -744,14 +744,18 @@ amortized bounds, which should be exhibited by the preceeding 5 tests.
   cascading deletions.
 \end{itemize}
 
-\section{Dijsktra's Algorithm Tests}
+We mention them here for completeness as they were part of our
+verification/testing approach, but not strictly asked of the
+report. We refer to Appendix A.2 for plots of the running times.
 
-We have 4 different datastructures and 2 variations, for a total of 8
+\section{Dijkstra's Algorithm Tests}
+
+We have 4 different data structures and 2 variations, for a total of 8
 different combinations.
 
 We generate graphs of input sizes in the interval of 100 to 20.000 in
 increments of 500 nodes. A graph with 20.000 nodes is represented by
-adjancency matrix where all indices are integers is by our calculation
+adjacency matrix where all indices are integers is by our calculation
 around 1.5 GB of space, which by all considerations should be a
 ``fairly large'' graph. This should reveal asymptotic discrepancies if
 any.
@@ -765,7 +769,7 @@ Finally, we run the algorithm-data structure-input size-connectivity
 configuration 3 times to account for effects out of our hands such as
 the operating system of the test machine.
 
-We thus have a grand total of 144.000 test runs, withnessed by the
+We thus have a grand total of 144.000 test runs, witnessed by the
 following formula.
 
 \begin{align*}
@@ -775,7 +779,7 @@ following formula.
 We measure running times through the use of the GNU \texttt{time}
 command, from which we gather the actual CPU time spent on running the
 test, not the wall clock time. This accounts for various, unforeseen
-effects on the running time such as premption by the operating system
+effects on the running time such as preemption by the operating system
 or other disturbances.
 
 Instrumentation that allows us to tally the number of comparisons are
@@ -786,12 +790,12 @@ are not counting comparisons, removing any overhead imposed by such.
 \section{Raw Data}
 We here present 10 plots of running times. The 10 plots are for each
 of the degrees of connectivity, in decreasing order. That is, Figure
-5.1 displays the running times of each algoritm / data structure pair
+5.1 displays the running times of each algorithm / data structure pair
 as a function of input size, on completely connected graphs.
 
-We obeserve no discernible difference in the choice of data
+We observe no discernible difference in the choice of data
 structure. The plots group into 2 significant divisions, one using
-implementation of Dijkstra's Algorithm that usses \DecreaseKey, the
+implementation of Dijkstra's Algorithm that uses \DecreaseKey, the
 other using \Insert. 
 
 In general, we observe shorter absolute running times in inverse
@@ -804,7 +808,7 @@ implementation of Dijkstra's Algorithm using \Insert pulls away from
 the other combinations - that is, given a choice between the two
 implementations of the algorithm, the \Insert based is expected to
 perform better asymptotically, regardless of the choice of underlying
-datastructure.
+data structure.
 
 \input{dijkstra_0_real}
 \input{dijkstra_1_real}
@@ -818,24 +822,11 @@ datastructure.
 \input{dijkstra_9_real}
 
 
-
-\input{dijkstra_0}
-\input{dijkstra_1}
-\input{dijkstra_2}
-\input{dijkstra_3}
-\input{dijkstra_4}
-\input{dijkstra_5}
-\input{dijkstra_6}
-\input{dijkstra_7}
-\input{dijkstra_8}
-\input{dijkstra_9}
-
-
-\chapter{Conlusion}
+\chapter{Conclusion}
 
 The conclusion of the paper is one we draw with mixed feelings. From
 the bounds analyzed in the first few chapters we expected to
-empricially observe a clear advantage of the Fibonacci family of heaps
+empirically observe a clear advantage of the Fibonacci family of heaps
 over the classical binary heaps (there are after all almost 3 decades
 of research between them), at the least on sparse graphs.
 
@@ -858,6 +849,25 @@ using pointers, and had a remarkably shorter development time.
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{plain} 
 \bibliography{report}
+
+\chapter*{Appendix A: Plots of Running Time}
+
+\section*{A.1: Plots of Stress Test Running Times}
+\section*{A.2: Plots of Running Times divided by Big-Oh times}
+\input{dijkstra_0}
+\input{dijkstra_1}
+\input{dijkstra_2}
+\input{dijkstra_3}
+\input{dijkstra_4}
+\input{dijkstra_5}
+\input{dijkstra_6}
+\input{dijkstra_7}
+\input{dijkstra_8}
+\input{dijkstra_9}
+
+
+
+
 
 \end{document}
 
