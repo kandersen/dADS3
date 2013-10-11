@@ -27,9 +27,13 @@ void dijkstra(graph* g, int source, item** ph) {
     insert_item(itm, h);
   }
 
+  to_dot(h, "start.dot");
+
   item* val = find_min(h);
   delete_min(h);
-  
+  int counter = 0;
+  char fname[50];
+
   while (val != NULL) {
 
     int u_index = *((int*)(val->value));
@@ -50,10 +54,23 @@ void dijkstra(graph* g, int source, item** ph) {
       int alt = val->key + dist_between;
       if (alt < v->key) {
         item* newitem = (item*)malloc(sizeof(item));
+<<<<<<< HEAD
         newitem->key = alt;
         newitem->value = v->value;
         insert_item(newitem, h);
         ph[target_id] = newitem;
+=======
+        if (v->key > alt) {
+          newitem->key = alt;
+          newitem->visited = v->visited;
+          newitem->value = v->value;
+          insert_item(newitem, h);
+          ph[v_index] = newitem;
+          sprintf(fname, "%i.dot", counter);
+          counter += 1;
+          //to_dot(h, fname);
+        }
+>>>>>>> e325c43fe4d2267d83b8a1313d82aa953128b53b
       }
     }
     
