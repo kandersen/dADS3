@@ -4,25 +4,11 @@
 \begin{tikzpicture}
         \begin{axis}[
             xlabel = \# vertices,
-            ylabel = Running time ms,
             height=9cm,
             width=16cm,
             grid=major,
             legend pos=north west
     	]
-    		
-    		
-    	\addplot coordinates {
-[bha_plots]
-    	};
-        
-    	\addlegendentry{\textsc{djk1-bha}}
-
-                \addplot coordinates {
-[bhp_plots]
-    	};
-        
-    	\addlegendentry{\textsc{djk1-bhp}}
 
         \addplot coordinates {
 (20000,0.1400)
@@ -58,7 +44,7 @@
 
     	};
         
-    	\addlegendentry{\textsc{djk1-fh1}}
+    	\addlegendentry{\textsc{fh1}}
 
         \addplot coordinates {
 (20000,0.0700)
@@ -94,12 +80,12 @@
 
     	};
         
-    	\addlegendentry{\textsc{djk1-fh2}}
+    	\addlegendentry{\textsc{fh2}}
 
 
         \end{axis}
 
     \end{tikzpicture}
-    \captionof{figure}{TITEL}
-    \label{fig:sample_figure}
+    \captionof{figure}{\# comparisons on inserts divided by $nlogn$}
+    \label{fig:comp_17}
 \end{minipage}

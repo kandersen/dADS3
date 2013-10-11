@@ -4,7 +4,6 @@
 \begin{tikzpicture}
         \begin{axis}[
             xlabel = \# vertices,
-            ylabel = Running time ms,
             height=9cm,
             width=16cm,
             grid=major,
@@ -46,7 +45,7 @@
 
     	};
         
-    	\addlegendentry{\textsc{djk1-bha}}
+    	\addlegendentry{\textsc{bha}}
 
                 \addplot coordinates {
 (20000,0.0350)
@@ -82,7 +81,7 @@
 
     	};
         
-    	\addlegendentry{\textsc{djk1-bhp}}
+    	\addlegendentry{\textsc{bhp}}
 
         \addplot coordinates {
 (20000,0.0350)
@@ -118,7 +117,7 @@
 
     	};
         
-    	\addlegendentry{\textsc{djk1-fh1}}
+    	\addlegendentry{\textsc{fh1}}
 
         \addplot coordinates {
 (20000,0.0000)
@@ -154,12 +153,12 @@
 
     	};
         
-    	\addlegendentry{\textsc{djk1-fh2}}
+    	\addlegendentry{\textsc{fh2}}
 
 
         \end{axis}
 
     \end{tikzpicture}
-    \captionof{figure}{TITEL}
-    \label{fig:sample_figure}
+    \captionof{figure}{Running time divided by $nlogn$}
+    \label{fig:time_4}
 \end{minipage}
