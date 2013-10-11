@@ -471,68 +471,71 @@ where a diamond is modelling a marked node. If either $\DecreaseKey$ or $\Delete
 \end{align*}
 which is $\BigT{n}$.
 
-Such a configuration can be obtained by calling $\Insert$ with two very high numbers $x$ and $y$ and one smaller and call $\DeleteMin$:
+Such a configuration can be obtained by constructring triangles, chaining and deleting (as a side note, this is exercise 19.4-1 in \cite{ITA09}). In order for us to create the first triangle, we insert five nodes, call $\DeleteMin$ and then remove the bottom most:
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
     \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
-    
-    \node[node]    	  (1) {$x$};
-    \node[node]           (2) [below of=1] {$y$};
-    
-    \path (1) edge (2);
+  
+    \node[node]          (x) {$x$}
+    child{node[node]      (y) {$y$}}
+    child{node[marked]      (z) {$z$}};
 
   \end{tikzpicture}
 \end{center}
 
-If we insert three new items $x'$, $y'$ $z$ with keys slightly smaller where $z$ is the smallest key we will have the following forest:
+We can then create another triangle, having $x'$ being a lesser key than $x$. The picture below is just before joining the two rank two trees.
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
-    
-    \node[node]    	  (x) {$x$};
-    \node[node]           (y) [below of=x] {$y$};
-    \node[node]    	  (x') [right of=x] {$x'$};
-    \node[node]    	  (y') [right of=x'] {$y'$}; 
-    \node[node]    	  (z) [right of=y'] {$z$};
-    
-    \path (1) edge (2);
+    \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
+  
+    \node[node]          (x) {$x$}
+    child{node[node]      (y) {$y$}}
+    child{node[marked]      (z) {$z$}};
+
+    \node[node]          (x') [right=4cm of x] {$x'$}
+    child{node[node]      (y') {$y'$}}
+    child{node[marked]      (z') {$z'$}};
 
   \end{tikzpicture}
 \end{center}
 
-If we call $\DeleteMin$, call $\Delete$ on $y'$ and call insert with three new items as above, we can get the following configuration:
+The result is then: 
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
-    
-    \node[node]    	  (x') {$x'$}
-    child{node[node]      (x) {$x$}
-      child{node[node]    (y) {$y$}}};
-    \node[node]    	  (x'') [right of=x'] {$x''$};
-    \node[node]    	  (y'') [right of=x''] {$y''$}; 
-    \node[node]    	  (z) [right of=y''] {$z$};
-    
+    \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
+
+    \node[node]          (x') {$x'$}
+    child{node[node]      (y') {$y'$}}
+    child{node[marked]      (z') {$z'$}}
+    child{node[node]          (x) {$x$}
+        child{node[node]      (y) {$y$}}
+        child{node[marked]      (z) {$z$}}};
+   
   \end{tikzpicture}
 \end{center}
-where $z$ again is the smallest key. $\DeleteMin$ gives:
+
+Now, we can delete $y$ and $z'$ and we will have the wanted structure. 
 
 \begin{center}
   \begin{tikzpicture}[thick,->,auto,node distance=2cm]
     \tikzstyle{node}=[circle, minimum size=1cm, draw]
-    
-    \node[node]    	  (x'') {$x''$}
-    child{node[node]      (y'') {$y''$}}
-    child{node[node]      (x') {$x'$}
-      child{node[node]    (x) {$x$}
-        child{node[node]  (y) {$y$}}}};
-    
+    \tikzstyle{marked}=[diamond, minimum size=1cm, draw]
+
+    \node[node]          (x') {$x'$}
+    child{node[node]      (y') {$y'$}}
+    child{node[marked]          (x) {$x$}
+        child{node[marked]      (z) {$z$}}};
+   
   \end{tikzpicture}
 \end{center}
-where $\Delete$ with $y''$ as argument will result in a chain. By using this approach we can easily build up a single chain of height $n$.
+
+To create a chain of height $n$, we have to create $n$ triangles.
 
 \section{Fibonacci heap version 2}
 
@@ -605,13 +608,54 @@ a summary of the time complexities follows:
 
 We represent graphs with an adjacency matrix, which already consumes space $\BigO{n^2}$, so there will only be a constant increase if $\Dijkstra$ insert nodes as we go along.
 
+\chapter{\Dijkstra's algorithm}
+
+\Dijkstra's~algorithm is an graph search algorithm that computes that solves the single-source shortest path problem. Without a min-priority queue the algorithm runs in $\BigO{V^2} \ge \BigO{E}$ for a graph $G=(V, E)$[3]. But we have two heaps that can actually be used as priority queues, so this will give us better asymptotic running times depending on the connectivity of the graph.
+Normally, $\Dijkstra$ is implemented by using the $\DecreaseKey$ operation, but if we disregard space, we can actually implement $\Dijkstra$ without $\DecreaseKey$ and just insert new nodes every time we find a shorter path. Below is a summery of the running time and space complexities:
+
+\begin{center}
+  \begin{tabular}{ l | c | c | c}
+    $\Dijkstra$ & Binary heaps & Fibonacci heap v1 & Fibonacci heap v2 \\ \hline
+    with & $\BigO{(n+m)\lg n}$ & $\BigO{n\lg n + m}$ & $\BigO{n\lg n + m}$ \\
+    without & $\BigO{(n+m)\lg n}$ & $\BigO{n\lg n + m}$ & $\BigO{n\lg n + m}$ \\     
+  \end{tabular}
+\end{center}
+
+We represent graphs with an by a linked list so running $\Dijkstra$ with inserts will make a drastic increase in memory consumption for sparsely connected graphs, but only be a constant factor larger for a fully connected graph.
+
+\section{Running times for $\Dijkstra$ with heaps}
+
+We can show an upper bound on the time complexity for $\Dijkstra$ as a function taking the number of nodes $n=|V|$ and the numbers of edges $m=|E|$ as such: $\BigO{n \cdot dm + m \cdot dk}$ where $dm$ denotes the number of $\DeleteMin$ operations and $dk$ denotes the number of $\DecreaseKey$ operations.
+
+First, let us consider Binary heaps and the case for $\Dijkstra$ with $\DecreaseKey$ operations. A node can never be readded once it has been deleted by $\DeleteMin$, therefore there can only be $n$ $dm$ operations. For each node, there can be up to $m$ $dk$ operations, one for each adjacent node in the graph. Since $\Insert$, $\DeleteMin$ and $\DecreaseKey$ all take logarithmic time, the total time is $\BigO{(n+m)\lg n}$. For the $\Dijkstra$ version with $\Insert$s only, the $m$ previus calls to $\DecreaseKey$ will now call $\Insert$ instead but the time will remain the same.
+
+We are able to reduce the time complexity asymptotically when we use a Fibonacci heap. For Fibonacci heaps, $\DecreaseKey $ takes amortized time $\BigO{1}$ and $\DeleteMin$ takes amortized time $\BigO{\lg n}$ resulting in the time-complexity $\BigO{m+n\lg n}$ for $\Dijkstra$ with Fibonacci heap version 1. Because the time-complexity for $\Insert$ is also $\BigO{1}$, using $\Dijkstra$ without $\DecreaseKey$ has the same total time complexity.
+
+So what happens when we are lazy with deletions, and for $\DeleteMin$ mark a node as vacant in Fibonacci version 2? There are no random deletions in the Fibonacci heap when running $\Dijkstra$, therefore $l$, which denotes the number of vacant nodes, has an upper bound of $1$. Therefore, the amortized time for $\FindMin$ is $\BigO{\lg n + 1}$ which results in the same running times for $\Dijkstra$ as Fibonacci heap version 1.
+
 \section{Connectivity and generating graphs}
 
-\section{$\Dijkstra$ with \DecreaseKey}
+Above we argued for the running times of the $\Dijkstra$ algorithms, and as we can see, the running times are dominated by the number of edges for the graph. This suggest, that sparsely connected graphs can run quicker than highly connected graphs.
 
-\section{$\Dijkstra$ without \DecreaseKey}
+If the graph is sufficiently sparse it is an effective speed-up to implement $\Dijkstra$ using a min-priority queue of some sort. For Binary heaps, the threshold is when $m = o(n^2 / \lg n)$:
+\begin{align*}
+    \BigO{(n+m)\lg n} = \BigO{(n^2/\lg n)\lg n} = \BigO{n^2}
+\sum_{i=1}^l \phi^{k_j-2} \le n
+ \end{align*}
+ which is the same running time as without a min-priority queue.
+ 
+For Fibonacci heaps the time $\BigO{n\lg n + m}$ suggest, since $m$ dominates $n \lg n$, that if the graphs is not totally connected the Fibonacci heap will run quicker or in the same time as $\Dijkstra$ without min-priority queues. We are very confident, that the graph should be stricly sparser since the running time in $\operatorname{O}$-notation for Fibonacci heaps hide away a very large constant.
 
-\section{Expectations}
+Because connectivety is a factor when running $\Dijkstra$ we are, when testing the running times for the $\Dijkstra$ algorithms, generating graphs by supplying size and connectivity probability as parameters to our graph-creation program. This is based on the pseudo-random number generator in C but we will use the resulting graphs as if they were completely randomly generated graphs with an expected probality on the number of edges in the graph.
+
+\section{Testing time-complexities for \Dijkstra}
+
+Because we have four different heaps and two different implementations of $\Dijkstra$ we have a lot of test to perform. We are generating graphs in the interval from 100 to 20.000 and increments of 100 nodes. A graph with 20.000 nodes represented by an adjacency matrix where all indicies are int is by our calculation around 1.5 GB, which should give us enough information about running times for large graphs.
+
+For each level in our node-size interval we have 10 different graph connectivity-probabilities, 10 \% to 100 \% in steps of 10 \%, where we do following three times: generate a random graph with beforementioned probability and size and run all heaps and dijkstra algorithms on this instance three times to find an average. Thus:
+\begin{align*}
+    \text{\# of tests} = 200 * 10 * 3 * 8 * 3 = 144.000 
+ \end{align*}
 
 \chapter{Binary heap vs Fibonacci heap}
 
@@ -619,7 +663,17 @@ needs content
 
 \chapter{Test-results}
 
-needs content
+\input{dijkstra_0_real}
+\input{dijkstra_1_real}
+\input{dijkstra_2_real}
+\input{dijkstra_3_real}
+\input{dijkstra_4_real}
+\input{dijkstra_5_real}
+\input{dijkstra_6_real}
+\input{dijkstra_7_real}
+\input{dijkstra_8_real}
+\input{dijkstra_9_real}
+
 
 \chapter{Conlusion}
 
