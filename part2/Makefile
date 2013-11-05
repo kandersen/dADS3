@@ -1,6 +1,6 @@
 COMPILER = clang
-FLAGS = -Wall -O3 -I src/ -I -lm
-COMMON = 
+FLAGS = -Wall -O3 -I -lm
+COMMON = src/int_option.c -lm
 
 veb1 :
 	$(COMPILER) $(FLAGS) -o bin/veb1.out src/veb.c $(COMMON)

@@ -1,5 +1,6 @@
 #include "int_option.h"
 
+int
 is_none (int_option i)
 {
   return (i >> 24) & 1;

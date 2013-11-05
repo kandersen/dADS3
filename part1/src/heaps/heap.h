@@ -1,5 +1,5 @@
-#ifndef DADS3_HEAP_H
-#define DADS3_HEAP_H
+#ifndef DADS3_VEB_H
+#define DADS3_VEB_H
 
 
 #ifndef INSTRUMENT
