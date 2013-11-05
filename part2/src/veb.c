@@ -2,31 +2,40 @@
 #include <stdlib.h>
 
 struct vEB_tree {
-  int* min;
-  int* max;
+  int min;
+  int max;
   int u;
-  vEB_tree** bottom;
-  vEB_tree* top;
+  struct vEB_tree** bottom;
+  struct vEB_tree* top;
 };
 
+typedef struct vEB_tree vEB_tree;
+
+// UTILITIES
+
+double log2( double n )  
+{  
+    // log(n)/log(2) is log2.  
+    return log( n ) / log( 2 );  
+}
 
 int upper(int u) {
-  return pow(2,(int)ceil((lg u)/2));
+  return pow(2,(int)ceil((log2 (u))/2));
 }
 
 int lower(int u) {
-  return pow(2,(int)((lg u)/2));
+  return pow(2,(int)((log2 (u))/2));
 }
 
-int high(int x, vEB_tree veb) {
+int high(int x, vEB_tree* veb) {
   return (int)(x / lower(veb->u));
 }
 
-int low(int x, vEB_tree veb) {
+int low(int x, vEB_tree* veb) {
   return x % lower(veb->u);
 }
 
-int* index(int x, int y, vEB_tree veb) {
+int index(int x, int y, vEB_tree* veb) {
   return x * lower(veb->u) + y;
 }
 
@@ -51,11 +60,11 @@ vEB_tree* make_veb(int u) {
   }
 }
 
-int* minimum(vEB_tree* veb) {
+int minimum(vEB_tree* veb) {
   return veb->min;
 }
 
-int* maximum(vEB_tree* veb) {
+int maximum(vEB_tree* veb) {
   return veb->max;
 }
 
@@ -74,13 +83,13 @@ void insert_item(int x, vEB_tree* veb) {
       x = temp;
     } 
     if (veb->u > 2) {
-      int high = high(x, veb);
-      int low = low(x, veb);
-      if (minimum(veb->bottom[high]) == NULL) {
-        insert_item(high, veb->top);
-        empty_tree_insert(low, veb->bottom[high]);
+      int h = high(x, veb);
+      int l = low(x, veb);
+      if (minimum(veb->bottom[h]) == NULL) {
+        insert_item(h, veb->top);
+        empty_tree_insert(l, veb->bottom[h]);
       } else {
-        insert_item(low, veb->bottom[high]);
+        insert_item(l, veb->bottom[h]);
       }
     }
     if (x > *veb->max) {
@@ -110,11 +119,11 @@ void remove_item(int x, vEB_tree* veb) {
       x = index(*first_cluster, minimum(veb->bottom[*first_cluster]), veb);
       *veb->min = x;
     }
-    int high = high(x, veb);
-    int low = low(x, veb);
-    remove_item(low, veb->bottom[high]);
-    if (minimum(veb->bottom[high]) == NULL) {
-      remove_item(high, veb->top);
+    int h = high(x, veb);
+    int l = low(x, veb);
+    remove_item(l, veb->bottom[h]);
+    if (minimum(veb->bottom[h]) == NULL) {
+      remove_item(h, veb->top);
       if (x == *veb->max) {
         int* top_max = maximum(veb->top);
         if (top_max != NULL) {
@@ -124,7 +133,7 @@ void remove_item(int x, vEB_tree* veb) {
         }
       }
     } else if (x == *veb->max) {
-      veb->max = index(high, maximum(veb->bottom[high]), veb);
+      veb->max = index(h, maximum(veb->bottom[h]), veb);
     }
   }
 }
@@ -146,14 +155,14 @@ item* predecessor(int x, vEB_tree* veb) {
   } else if (veb->max != NULL && x > *veb->max)  {
     return veb->max;
   } else {
-    int high = high(x, veb);
-    int low = low(x, veb);
-    int* min_low = minimum(veb->bottom[high]);
-    if (min_low != NULL && low > *min_low) {
-      int* offset = predecessor(low, veb->bottom[high]);
-      return index(high, *offset, veb);
+    int h = high(x, veb);
+    int l = low(x, veb);
+    int* min_low = minimum(veb->bottom[h]);
+    if (min_low != NULL && l > *min_low) {
+      int* offset = predecessor(l, veb->bottom[h]);
+      return index(h, *offset, veb);
     } else {
-      int* pred_cluster = predecessor(high, veb->top);
+      int* pred_cluster = predecessor(h, veb->top);
       if (pred_cluster == NULL) {
         if (veb->min != NULL && x > *veb->min) {
           return veb->min;
@@ -179,19 +188,19 @@ int* successor(int x, vEB_tree* veb) {
   } else if (veb->min != NULL && x < *veb->min) {
     return veb->min;
   } else {
-    int high = high(x, veb);
-    int low = low(x, veb);
-    int* max_low = maximum(veb->bottom[high]);
-    if (max_low != NULL && low < *max_low) {
-      int* offset = successor(low, veb->bottom[high]);
-      return index(high, *offset, veb);
+    int h = high(x, veb);
+    int l = low(x, veb);
+    int* max_low = maximum(veb->bottom[h]);
+    if (max_low != NULL && l < *max_low) {
+      int* offset = successor(l, veb->bottom[h]);
+      return index(h, *offset, veb);
     } else {
-      int* succ_cluster = successor(high, veb->top);
+      int* succ_cluster = successor(h, veb->top);
       if (succ_cluster == NULL) {
         return NULL;
       } else {
         int* offset = minimum(veb->bottom[*succ_cluster]);
-        return index(*succ_cluster, *offset);
+        return index(*succ_cluster, *offset, veb);
       }
     }
   }
@@ -199,7 +208,7 @@ int* successor(int x, vEB_tree* veb) {
 
 int member(int x, vEB_tree* veb) {
 
-  if (x == veb->min || x == veb->max) {
+  if (x == *veb->min || x == *veb->max) {
     return 1; // true
   } else if (veb->u == 2) {
     return 0; // false
