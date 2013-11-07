@@ -1,10 +1,10 @@
 #!/bin/bash
 
-for (( i = 1000; i <= 6000000; i = i + 10000 ))
+for (( u = 2048; u <= 2^12; u = u * 2 * 2))
 do
-    echo "size: $i"
-    for (( u = 2048; u <= 2^24; u = u * 2 * 2))
+    for (( i = 1000; i < u; i = i + 1000 ))
     do
+    echo "size: $i"
         echo "universe: $u"
         for ex in fh1 fh2 bhp bha veb1_heap
         do
@@ -22,3 +22,4 @@ do
         done
     done
 done
+

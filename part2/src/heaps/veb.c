@@ -1,7 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "int_option.h"
 #include "heap.h"
 
 struct heap {

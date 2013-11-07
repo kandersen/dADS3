@@ -1,7 +1,7 @@
 #ifndef DADS3_VEB_H
 #define DADS3_VEB_H
 
-#include "int_option.h"
+#include "../int_option.h"
 
 
 #ifndef INSTRUMENT
@@ -19,7 +19,6 @@
 #endif
 
 struct heap;
-struct node;
 typedef struct node node;
 
 struct item {

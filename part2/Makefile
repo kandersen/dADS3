@@ -1,16 +1,19 @@
 COMPILER = clang
 FLAGS = -Wall -O3 -lm
-COMMON = src/heaps/int_option.c
+COMMON = src/int_option.c
 COMMON_TREES = -I src/trees/ -lm
-COMMON_HEAPS = -I src/heaps/  -lm
+COMMON_HEAPS = -I src/heaps/ -I src/trees/  -lm
 
 nothing:
 
 tester: COMMON += src/tester.c
-tester: bha bhp fh1 fh2 veb1_heap
+tester: bha bhp fh1 fh2 veb1_heap rb_heap
 
 veb1_heap : 
 	$(COMPILER) $(FLAGS) -o bin/veb1_heap.out src/heaps/veb.c $(COMMON) $(COMMON_HEAPS)
+
+rb_heap : 
+	$(COMPILER) $(FLAGS) -o bin/rb_heap.out src/heaps/rb_heap.c src/trees/rb_tree.c $(COMMON) $(COMMON_HEAPS)
 
 bha:	
 	$(COMPILER) $(FLAGS) -o bin/bha$(NUM).out src/heaps/binary_heap_array.c $(COMMON) $(COMMON_HEAPS)
