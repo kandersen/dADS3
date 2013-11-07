@@ -28,7 +28,7 @@ struct heap {
   node* min_node;
 };
 
-heap* make_heap() {
+heap* make_heap(int universe) {
   heap* h =  (heap*)malloc(sizeof(heap));
   h->min_node = NULL;
   h->rank = 0;
@@ -36,7 +36,7 @@ heap* make_heap() {
 }
 
 void insert_item(item* i, heap* h) {
-  heap* new_h = make_heap();
+  heap* new_h = make_heap(0);
   node* n = (node*)malloc(sizeof(node));
   n->key = i->key;
   n->rank = 0;

@@ -11,18 +11,29 @@ void test_2(int);
 void test_3(int);
 void test_4(int);
 void test_5(int);
-void test_14(int);
-void test_15(int);
-void test_16(int);
-void test_17(int);
-void test_18(int);
+void test_6(int);
+
+int universe;
+heap* h;
 
 int main(int argc, char* argv[]) {
+
+  if (argc < 5) {
+    printf("Usage: <testno> <testsize> <universe> <construct_time> \n");
+    return 1;
+  }
+
+  universe = atoi(argv[3]);
+  int construct_time = atoi(argv[4]);
+
+  if (!construct_time) {
+    h = make_heap(universe);
+  }
+
   clock_t start = clock(), elapsed = 0;
 
-  if (argc < 3) {
-    printf("Usage: <testno> <testsize>\n");
-    return 1;
+  if (construct_time) {
+    h = make_heap(universe);
   }
 
   switch (atoi(argv[1])) {
@@ -44,22 +55,8 @@ int main(int argc, char* argv[]) {
   case 5:
     test_5(atoi(argv[2]));
     break;
-  case 14:
-    test_14(atoi(argv[2]));
-    break;
-  case 15:
-    test_15(atoi(argv[2]));
-    break;
-  case 16:
-    test_16(atoi(argv[2]));
-    break;
-  case 17:
-    test_17(atoi(argv[2]));
-    break;
-  case 18:
-    test_18(atoi(argv[2]));
-    break;
-  default:
+  case 6:
+    test_6(atoi(argv[2]));
     break;
   }
 
@@ -76,7 +73,6 @@ int main(int argc, char* argv[]) {
 // pure inserts
 void 
 test_0 (int size) {
-  heap* h = make_heap();
   for (int k = 0; k < size; k++) {
     item* i = (item*)malloc(sizeof(item));
     i->key = k;
@@ -87,7 +83,6 @@ test_0 (int size) {
 // pure inserts 1 del
 void
 test_1 (int size) {
-  heap* h = make_heap();
   for (int k = 0; k < size; k++) {
     item* i = (item*)malloc(sizeof(item));
     i->key = k;
@@ -99,7 +94,6 @@ test_1 (int size) {
 // pure inserts 1 reverse 1 del
 void
 test_2 (int size) {
-  heap* h = make_heap();
   for (int k = size; k >= 0; k--) {
     item* i = (item*)malloc(sizeof(item));
     i->key = k;
@@ -111,7 +105,7 @@ test_2 (int size) {
 //pure inserts delmin all
 void
 test_3(int size) {
-  heap* h = make_heap();
+  heap* h = make_heap(universe);
   for (int k = 0; k < size; k++) {
     item* i = (item*)malloc(sizeof(item));
     i->key = k;
@@ -126,7 +120,6 @@ test_3(int size) {
 //mixed del inserts
 void
 test_4(int size) {
-  heap* h = make_heap();
   for (int k = 0; k < 4*(size/10); k++) {
     item* i = (item*)malloc(sizeof(item));
     i->key = k;
@@ -168,173 +161,38 @@ test_4(int size) {
 // decrease key
 void
 test_5(int size) {
-  heap* h = make_heap();
-  item* items[size];
-  for (int k = 0; k < size; k++) {
+  int target = size / 2 - 1;
+  item* items[target];
+  for (int k = 0; k < target; k++) {
     item* i = (item*)malloc(sizeof(item));
-    i->key = size+k;
+    i->key = k + target;
     insert_item(i, h);
+    i->key = k + target; // vEB resets the key
     items[k] = i;
   }
-  /*for (int k = size-1; k >= 0; k--) {
+  for (int k = target-1; k >= 0; k--) {
     item* itm = items[k];
-    decrease_key(size + 1, itm, h);
-    }*/
-}
-
-
-//inserts remove all (decreasing) no delmin
-void
-test_14(int size) {
-  heap* h = make_heap();
-  item* items[size];
-
-  for (int k = 0; k < size; k++) {
-    item* i = (item*)malloc(sizeof(item));
-    items[k] = i;
-    i->key = k;
-    insert_item(items[k], h);
-  }
-  for (int kk = 0; kk < size; kk++) {
-    remove_item(items[size - kk - 1], h);
+    decrease_key(target + 1, itm, h);
   }
 }
 
-//inserts remove all (increasing) 1 delmin
-void
-test_15 (int size) {
-  heap* h = make_heap();
-  item* items[size];
+// keys distributed across the entire universe
+void test_6(int size) {
 
-  for (int k = 0; k < size; k++) {
-    item* i = (item*)malloc(sizeof(item));
-    items[k] = i;
-    i->key = k;
-    insert_item(items[k], h);
+  int padding = 0;
+
+  if (2 * size < universe) {
+    padding = universe / size;
   }
 
-  delete_min(h);
-
-  for (int kk = 1; kk < size; kk++) {
-    remove_item(items[kk], h);
-  }  
-}
-
-//inserts remove all (decreasing) 1 delmin
-void
-test_16 (int size) {
-  heap* h = make_heap();
-  item* items[size];
-
-  for (int k = 0; k < size; k++) {
-    item* i = (item*)malloc(sizeof(item));
-    items[k] = i;
-    i->key = k;
-    insert_item(items[k], h);
+  for (int i = 0; i < universe - 1; i++) {
+    item* itm = (item*)malloc(sizeof(item));
+    itm->key = i;
+    insert_item(itm, h);
+    i += padding;
+  } 
+  item* min = delete_min(h);
+  while (min) {    
+    min = delete_min(h);
   }
-
-  delete_min(h);
-
-  for (int kk = 1; kk < size; kk++) {
-    remove_item(items[size - kk - 1], h);
-  }  
 }
-
-//inserts remove all (middle out) 1 delmin
-void
-test_17 (int size) {
-  heap* h = make_heap();
-  item* items[size];
-
-  for (int k = 0; k < size; k++) {
-    item* i = (item*)malloc(sizeof(item));
-    items[k] = i;
-    i->key = k;
-    insert_item(items[k], h);
-  }
-
-  delete_min(h);
-
-  for (int kk = 0; kk < size-1; kk++) {
-    int half = size / 2;
-    if (kk%2 == 0) {
-      remove_item(items[(half+(kk/2))], h);
-    } else {
-      remove_item(items[half-((kk+1)/2)], h);
-    }
-  }  
-}
-
-// makes a chain of nodes that are marked, performing a cascading delete
-item* create_item(int key) {
-
-  item* itm = (item*)malloc(sizeof(item));
-  itm->key = key;
-  return itm;
-}
-
-void test_18(int size) {
-
-  int counter = 0;
-  // char fname[50];
-  item* del_item;
-  item* old_del_item;
-  item* bottom;
-
-  heap* h = make_heap();
-  insert_item(create_item(size), h);
-  bottom = create_item(size+1);
-  insert_item(bottom, h);
-  del_item = create_item(size+2);
-  insert_item(del_item, h);
-  old_del_item = create_item(size+3);
-  insert_item(old_del_item, h);
-  insert_item(create_item(-1), h);
-  delete_min(h);
-
-  //  sprintf(fname, "%i_1.dot", counter);
-  //  to_dot(h, fname);
-
-  remove_item(del_item, h);
-
-  //  sprintf(fname, "%i_2.dot", counter);
-  //to_dot(h, fname);
-
-  counter += 1;
-
-  while (counter < size) {
-    
-    int newroot = size - counter;
-
-    item* itm1 = create_item(newroot);
-    item* itm2 = create_item(newroot + 1);
-    item* itm3 = create_item(newroot + 2);
-    item* itm4  = create_item(newroot + 3);
-    insert_item(itm1, h);
-    insert_item(itm2, h);
-    insert_item(itm3, h);
-    insert_item(itm4, h);
-    insert_item(create_item(-1), h);
-    delete_min(h);
-
-    //    sprintf(fname, "%i_1.dot", counter);
-    //to_dot(h, fname);
-
-    remove_item(itm2, h);
-    remove_item(itm3, h);
-    remove_item(old_del_item, h);
-
-    old_del_item = itm4;
-    
-    //    sprintf(fname, "%i_2.dot", counter);
-    //to_dot(h, fname);
-    
-    counter += 1;
-  }
-
-  remove_item(bottom, h);
-
-  //  sprintf(fname, "%i.dot", counter);
-  //  to_dot(h, fname);
-}
-

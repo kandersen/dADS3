@@ -13,8 +13,6 @@ struct heap {
   struct heap* top;
 };
 
-//typedef struct heap heap;
-
 // UTILITIES
 
 
@@ -63,8 +61,8 @@ heap* make_veb(int u) {
   return t;
 }
 
-heap* make_heap() {
-  return make_veb((int)pow(2, 12)); 
+heap* make_heap(int universe) {
+  return make_veb(universe); 
 }
 
 int_option minimum(heap* veb) {
@@ -157,6 +155,13 @@ void remove_item(item* ix, heap* veb) {
       veb->max = some(find_index(h, maximum(veb->bottom[h]), veb));
     }
   }
+}
+
+void decrease_key(int delta, item* i, heap* h) {
+  int val = i->key;
+  remove_item(i, h);
+  i->key = val - delta;
+  insert_item(i, h);
 }
 
 item* delete_min(heap* veb) {

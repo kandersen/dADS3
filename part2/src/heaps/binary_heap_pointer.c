@@ -93,7 +93,7 @@ node* swap(node* n, node* p) {
 
 //INTERFACE
 
-heap* make_heap() {
+heap* make_heap(int universe) {
   heap* h = (heap*) malloc(sizeof(heap));
   h->root = NULL;
   h->count = 0;

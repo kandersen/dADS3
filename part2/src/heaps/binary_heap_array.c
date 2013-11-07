@@ -31,7 +31,7 @@ node* new_node(int i) {
 
 // INTERFACE
 
-heap* make_heap() {
+heap* make_heap(int universe) {
   heap* res = (heap*) malloc(sizeof(heap));
   item** new_array = (item**) malloc(sizeof(item*) * INITIAL_HEAP_SIZE);
   res->size = INITIAL_HEAP_SIZE;
