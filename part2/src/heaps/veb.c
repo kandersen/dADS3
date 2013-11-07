@@ -2,17 +2,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "int_option.h"
+#include "heap.h"
 
-struct vEB_tree {
+struct heap {
   int_option min;
   int_option max;
   int u;
   int bottom_size;
-  struct vEB_tree** bottom;
-  struct vEB_tree* top;
+  struct heap** bottom;
+  struct heap* top;
 };
 
-typedef struct vEB_tree vEB_tree;
+//typedef struct heap heap;
 
 // UTILITIES
 
@@ -25,21 +26,21 @@ int lower(int u) {
   return pow(2,(int)((log2 (u))/2));
 }
 
-int high(int x, vEB_tree* veb) {
+int high(int x, heap* veb) {
   return (int)(x / lower(veb->u));
 }
 
-int low(int x, vEB_tree* veb) {
+int low(int x, heap* veb) {
   return x % lower(veb->u);
 }
 
-int find_index(int x, int y, vEB_tree* veb) {
+int find_index(int x, int y, heap* veb) {
   return x * lower(veb->u) + y;
 }
 
-vEB_tree* make_veb(int u) {
+heap* make_veb(int u) {
 
-  vEB_tree* t = (vEB_tree*)malloc(sizeof(vEB_tree));
+  heap* t = (heap*)malloc(sizeof(heap));
   t->u = u;
   t->min = none();
   t->max = none();
@@ -49,9 +50,8 @@ vEB_tree* make_veb(int u) {
   // construct clusters recursively?
   if (u > 2) { 
     int up = upper(u);
-    printf("upper %d\n", up);
     t->bottom_size = up;
-    t->bottom = (vEB_tree**)malloc(sizeof(vEB_tree*) * up);
+    t->bottom = (heap**)malloc(sizeof(heap*) * up);
     for (int i = 0; i < up; i++) {
       t->bottom[i] = make_veb(up);
     }
@@ -63,20 +63,31 @@ vEB_tree* make_veb(int u) {
   return t;
 }
 
-int_option minimum(vEB_tree* veb) {
+heap* make_heap() {
+  return make_veb((int)pow(2, 12)); 
+}
+
+int_option minimum(heap* veb) {
   return veb->min;
 }
 
-int_option maximum(vEB_tree* veb) {
+int_option maximum(heap* veb) {
   return veb->max;
 }
 
-void empty_tree_insert(int x, vEB_tree* veb) {
+void empty_tree_insert(int x, heap* veb) {
   veb->min = some(x);
   veb->max = some(x);
 }
 
-void insert_item(int x, vEB_tree* veb) {
+void insert_item(item* ix, heap* veb) {
+
+  int x = ix->key;
+
+  if (x >= veb->u) {
+    printf("ALARM ALARM: input større end univers: %d", x);
+  }
+
   if (is_none(veb->min)) {
     empty_tree_insert(x, veb);
   } else {
@@ -89,10 +100,12 @@ void insert_item(int x, vEB_tree* veb) {
       int h = high(x, veb);
       int l = low(x, veb);
       if (is_none(minimum(veb->bottom[h]))) {
-        insert_item(h, veb->top);
+        ix->key = h;
+        insert_item(ix, veb->top);
         empty_tree_insert(l, veb->bottom[h]);
       } else {
-        insert_item(l, veb->bottom[h]);
+        ix->key = l;
+        insert_item(ix, veb->bottom[h]);
       }
     }
     if (x > veb->max) {
@@ -101,7 +114,10 @@ void insert_item(int x, vEB_tree* veb) {
   }
 }
 
-void remove_item(int x, vEB_tree* veb) {
+void remove_item(item* ix, heap* veb) {
+  
+  int x = ix->key;
+
   if (is_none(veb->min)) {
     return;
   }
@@ -124,9 +140,11 @@ void remove_item(int x, vEB_tree* veb) {
     }
     int h = high(x, veb);
     int l = low(x, veb);
-    remove_item(l, veb->bottom[h]);
+    ix->key = l;
+    remove_item(ix, veb->bottom[h]);
     if (is_none(minimum(veb->bottom[h]))) {
-      remove_item(h, veb->top);
+      ix->key = h;
+      remove_item(ix, veb->top);
       if (x == veb->max) {
         int_option top_max = maximum(veb->top);
         if (is_none(top_max)) {
@@ -141,14 +159,19 @@ void remove_item(int x, vEB_tree* veb) {
   }
 }
 
-void delete_min(vEB_tree* veb) {
+item* delete_min(heap* veb) {
   int_option min = minimum(veb);
   if (is_some(min)) {
-    remove_item(min, veb);
+    item* itm = (item*)malloc(sizeof(item));
+    itm->key = min;
+    remove_item(itm, veb);
+    return itm;
+  } else {
+    return NULL;
   }
 }
 
-int_option predecessor(int x, vEB_tree* veb) {
+int_option predecessor(int x, heap* veb) {
   if (veb->u == 2) {
     if (x == 1 && veb->min == 0) {
       return some(0);
@@ -180,7 +203,7 @@ int_option predecessor(int x, vEB_tree* veb) {
   }
 }
 
-int_option successor(int x, vEB_tree* veb) {
+int_option successor(int x, heap* veb) {
   if (veb->u == 2) {
     if (x == 0 && veb->max == 1) {
       return some(1);
@@ -190,26 +213,17 @@ int_option successor(int x, vEB_tree* veb) {
   } else if (is_some(veb->min) && x < veb->min) {
     return veb->min;
   } else {
-    puts("1");
     int h = high(x, veb);
-    puts("2");
     int l = low(x, veb);
-    printf("h: %d, l: %d, bottom-size: %d\n", h, l, veb->bottom_size);
-    puts("3");
     int_option max_low = maximum(veb->bottom[h]);
-    puts("4");
     if (is_some(max_low) && l < max_low) {
-      puts("5");
       int_option offset = successor(l, veb->bottom[h]);
       return find_index(h, offset, veb);
     } else {
-      puts("6");
       int_option succ_cluster = successor(h, veb->top);
       if (is_none(succ_cluster)) {
-        puts("7");
         return none();
       } else {
-        puts("8");
         int_option offset = minimum(veb->bottom[succ_cluster]);
         return find_index(succ_cluster, offset, veb);
       }
@@ -217,7 +231,7 @@ int_option successor(int x, vEB_tree* veb) {
   }
 }
 
-int member(int x, vEB_tree* veb) {
+int member(int x, heap* veb) {
 
   if (x == veb->min || x == veb->max) {
     return 1; // true
@@ -237,18 +251,25 @@ void test_int_option() {
 
 }
 
+item* create_item_dummy(int key) {
+  item* itm = (item*)malloc(sizeof(item));
+  itm->key = key;
+  return itm;
+}
+
+/*
 int main(int argc, char** argv) {
 
   test_int_option();
 
   int size = 16;
-  vEB_tree* t = make_veb(size);
-  insert_item(2, t);
-  insert_item(6, t);
+  heap* t = make_veb(size);
+  insert_item(create_item_dummy(2), t);
+  insert_item(create_item_dummy(6), t);
   printf("minimum %d\n", minimum(t));
   printf("maximum %d\n", maximum(t));
   printf("member %d\n", member(6, t));
-  printf("not-member %d\n", member(3, t));
+  printf("not-member %d\n", member(2, t));
   if (is_some(successor(4, t))) {
     printf("successor of 4: %d\n", successor(4, t));
   } else {
@@ -264,11 +285,11 @@ int main(int argc, char** argv) {
   } else {
     printf("no-predecessor for 10\n");
   }
-  remove_item(2, t);
+  remove_item(create_item_dummy(2), t);
   printf("minimum %d\n", minimum(t));
   printf("maximum %d\n", maximum(t));  
-  remove_item(6, t);
+  remove_item(create_item_dummy(6), t);
   printf("minimum %d\n", minimum(t));
   printf("maximum %d\n", maximum(t));  
-  remove_item(10, t);
-}
+  remove_item(create_item_dummy(10), t);
+  } */

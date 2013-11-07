@@ -367,7 +367,6 @@ foo* new_foo(int i) {
 
 item* new_item(void* value, int key) {
   item* i = (item*) malloc(sizeof(item));
-  i->value = value;
   i->key = key;
   i->n = 0;
   return i;

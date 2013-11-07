@@ -1,6 +1,8 @@
 #ifndef DADS3_VEB_H
 #define DADS3_VEB_H
 
+#include "int_option.h"
+
 
 #ifndef INSTRUMENT
 #define LE(X, Y) ((X) <= (Y))
@@ -21,9 +23,8 @@ struct node;
 typedef struct node node;
 
 struct item {
-  int key;
+  int_option key;
   node* n;
-  void* value;
 };
 
 typedef struct item item;
@@ -34,7 +35,7 @@ void  insert_item   (item* i, heap* h);
 item* find_min      (heap* h);
 item* delete_min    (heap* h);
 heap* meld          (heap* h1, heap* h2);
-void  decrease_key  (int delta, item* i, heap* h);
+//void  decrease_key  (int delta, item* i, heap* h);
 void  remove_item   (item* i, heap* h);
 void  to_dot	    (heap* h, char* filename);
 int   is_empty      (heap* h);
