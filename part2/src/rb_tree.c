@@ -2,22 +2,24 @@
 #define RED 1
 
 #include <stdlib.h>
-
-typedef int color;
-typedef struct node node;
+#include "rb_tree.h"
 
 // NODE TYPE, CLRS pp. 309
 
-struct node {
+struct rb_node {
   color color;
   int key; 
-  node* right; 
-  node* left;
-  node* p;
+  rb_node* right; 
+  rb_node* left;
+  rb_node* p;
 };
 
-node* make_node(int key) {
-  node* res = (node*) malloc(sizeof(node));
+int rb_key_of(rb_node* n) {
+  return n->key;
+}
+
+rb_node* make_rb_node(int key) {
+  rb_node* res = (rb_node*) malloc(sizeof(rb_node));
   res->color = BLACK;
   res->key = key;
   res->right = NULL;
@@ -26,29 +28,42 @@ node* make_node(int key) {
   return res;
 }
 
-node* make_sentinel() {
-  return make_node(0);
+rb_node* make_sentinel() {
+  return make_rb_node(0);
 }
 
 // TREE TYPE
 
-typedef struct tree tree;
-struct tree {
-  node* nil;
-  node* root;
+struct rb_tree {
+  rb_node* nil;
+  rb_node* root;
+  int count;
 };
 
-tree* make_tree() {
-  tree* res = (tree*) malloc(sizeof(tree));
+rb_node* rb_root_of(rb_tree* t) {
+  return t->root;
+}
+
+int rb_count(rb_tree* t) {
+  return t->count;
+}
+
+int rb_is_empty(rb_tree* t) {
+  return t->count == 0;
+}
+
+rb_tree* make_rb_tree() {
+  rb_tree* res = (rb_tree*) malloc(sizeof(rb_tree));
   res->nil = make_sentinel();
   res->root = res->nil;
+  res->count = 0;
   return res;
 }
 
 // PRIVATE UTILITIES
 
-void left_rotate(tree* T, node* x) {
-  node* y = x->right;
+void left_rotate(rb_tree* T, rb_node* x) {
+  rb_node* y = x->right;
   x->right = y->left;
   if (y->left != T->nil)
     y->left->p = x;
@@ -64,8 +79,8 @@ void left_rotate(tree* T, node* x) {
   x->p = y;
 }
 
-void right_rotate(tree* T, node* y) {
-  node* x = y->left;
+void right_rotate(rb_tree* T, rb_node* y) {
+  rb_node* x = y->left;
   y->left = x->right;
   if(x->right != T->nil)
     x->right->p = y;
@@ -81,10 +96,10 @@ void right_rotate(tree* T, node* y) {
   y->p = x;
 }
 
-void insert_fixup(tree* T, node* z) {
+void insert_fixup(rb_tree* T, rb_node* z) {
   while (z->p->color == RED) {
     if (z->p == z->p->p->left) {
-      node* y = z->p->p->right;
+      rb_node* y = z->p->p->right;
       if (y->color == RED) {
 	z->p->color = BLACK;
 	y->color = BLACK;
@@ -101,7 +116,7 @@ void insert_fixup(tree* T, node* z) {
       }	
     } else {
       if (z->p == z->p->p->right) {
-	node* y = z->p->p->left;
+	rb_node* y = z->p->p->left;
 	if (y->color == RED) {
 	  z->p->color = BLACK;
 	  y->color = BLACK;
@@ -122,7 +137,7 @@ void insert_fixup(tree* T, node* z) {
   T->root->color = BLACK;
 }
 
-void transplant(tree* T, node* u, node* v) {
+void transplant(rb_tree* T, rb_node* u, rb_node* v) {
   if (u->p == T->nil) {
     T->root = v;
   } else if (u == u->p->left) {
@@ -133,10 +148,10 @@ void transplant(tree* T, node* u, node* v) {
   v->p = u->p;
 }
 
-void delete_fixup(tree* T, node* x) {
+void delete_fixup(rb_tree* T, rb_node* x) {
   while (x != T->root && x->color == BLACK) {
     if (x == x->p->left) {
-      node* w = x->p->right;
+      rb_node* w = x->p->right;
       if (w->color == RED)  {
 	w->color = BLACK;
 	x->p->color = RED;
@@ -160,7 +175,7 @@ void delete_fixup(tree* T, node* x) {
 	x = T->root;
       }
     } else {
-      node* w = x->p->left;
+      rb_node* w = x->p->left;
       if (w->color == RED)  {
 	w->color = BLACK;
 	x->p->color = RED;
@@ -190,25 +205,25 @@ void delete_fixup(tree* T, node* x) {
 
 //QUERIES
 
-node* minimum(tree* T, node* x) {
+rb_node* rb_minimum(rb_tree* T, rb_node* x) {
   while (x->left != T->nil) {
     x = x->left;
   }
   return x;
 }   
 
-node* maximum(tree* T, node* x) {
+rb_node* rb_maximum(rb_tree* T, rb_node* x) {
   while (x->right != T->nil) {
     x = x->right;
   }
   return x;
 }
 
-node* successor(tree* T, node* x) {
+rb_node* rb_successor(rb_tree* T, rb_node* x) {
   if (x->right != T->nil) {
-    return minimum(T, x->right);
+    return rb_minimum(T, x->right);
   }
-  node* y = x->p;
+  rb_node* y = x->p;
   while (y != T->nil && x == y->right) {
     x = y;
     y = y->p;
@@ -216,11 +231,11 @@ node* successor(tree* T, node* x) {
   return y;
 }
 
-node* predecessor(tree* T, node* x) {
+rb_node* rb_predecessor(rb_tree* T, rb_node* x) {
   if (x->left != T->nil) {
-    return maximum(T, x->left);
+    return rb_maximum(T, x->left);
   }
-  node* y = x->p;
+  rb_node* y = x->p;
   while(y != T->nil && x == y->left) {
     x = y;
     y = y->p;
@@ -228,8 +243,8 @@ node* predecessor(tree* T, node* x) {
   return y;
 }
 
-node* search(tree* T, int k) {
-  node* x = T->root;
+rb_node* rb_search(rb_tree* T, int k) {
+  rb_node* x = T->root;
   while (x != T->nil && k == x->key) {
     if (k < x->key) {
       x = x->left;
@@ -239,12 +254,11 @@ node* search(tree* T, int k) {
   }
   return x;
 }
-
 //MUTATORS
 
-void insert (tree* T, node* z) {
-  node* y = T->nil;
-  node* x = T->root;
+void rb_insert (rb_tree* T, rb_node* z) {
+  rb_node* y = T->nil;
+  rb_node* x = T->root;
   while (x != T->nil) {
     y = x;
     if (z->key < x->key) {
@@ -265,12 +279,13 @@ void insert (tree* T, node* z) {
   z->right = T->nil;
   z->color = RED;
   insert_fixup(T, z);
+  T->count++;
 }
 	  
-void delete(tree* T, node* z) {
-  node* y = z;
+void rb_delete(rb_tree* T, rb_node* z) {
+  rb_node* y = z;
   color y_original_color = y->color;
-  node* x = NULL;
+  rb_node* x = NULL;
   if (z->left == T->nil) {
     x = z->right;
     transplant(T, z, z->right);
@@ -278,7 +293,7 @@ void delete(tree* T, node* z) {
     x = z->left;
     transplant(T, z, z->left);
   } else {
-    y = minimum(T, z->right);
+    y = rb_minimum(T, z->right);
     y_original_color = y->color;
     x = y->right;
     if (y->p == z) {
@@ -296,4 +311,5 @@ void delete(tree* T, node* z) {
   if (y_original_color == BLACK) {
     delete_fixup(T, x);
   }
+  T->count--;
 }
