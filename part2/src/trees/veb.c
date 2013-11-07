@@ -1,11 +1,14 @@
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "int_option.h"
+#include "heap.h"
 
 struct vEB_tree {
   int_option min;
   int_option max;
   int u;
+  int bottom_size;
   struct vEB_tree** bottom;
   struct vEB_tree* top;
 };
@@ -42,10 +45,13 @@ vEB_tree* make_veb(int u) {
   t->min = none();
   t->max = none();
   t->bottom = NULL;
+  t->bottom_size = 0;
 
   // construct clusters recursively?
   if (u > 2) { 
     int up = upper(u);
+    printf("upper %d\n", up);
+    t->bottom_size = up;
     t->bottom = (vEB_tree**)malloc(sizeof(vEB_tree*) * up);
     for (int i = 0; i < up; i++) {
       t->bottom[i] = make_veb(up);
@@ -185,17 +191,26 @@ int_option successor(int x, vEB_tree* veb) {
   } else if (is_some(veb->min) && x < veb->min) {
     return veb->min;
   } else {
+    puts("1");
     int h = high(x, veb);
+    puts("2");
     int l = low(x, veb);
+    printf("h: %d, l: %d, bottom-size: %d\n", h, l, veb->bottom_size);
+    puts("3");
     int_option max_low = maximum(veb->bottom[h]);
+    puts("4");
     if (is_some(max_low) && l < max_low) {
+      puts("5");
       int_option offset = successor(l, veb->bottom[h]);
       return find_index(h, offset, veb);
     } else {
+      puts("6");
       int_option succ_cluster = successor(h, veb->top);
       if (is_none(succ_cluster)) {
+        puts("7");
         return none();
       } else {
+        puts("8");
         int_option offset = minimum(veb->bottom[succ_cluster]);
         return find_index(succ_cluster, offset, veb);
       }
@@ -214,7 +229,47 @@ int member(int x, vEB_tree* veb) {
   }
 }
 
+void test_int_option() {
+
+  int_option x = 1337;
+  int_option y = some(1337);
+  printf("x: %d\n", x);
+  printf("y: %d\n", y);
+
+}
 
 int main(int argc, char** argv) {
 
+  test_int_option();
+
+  int size = 16;
+  vEB_tree* t = make_veb(size);
+  insert_item(2, t);
+  insert_item(6, t);
+  printf("minimum %d\n", minimum(t));
+  printf("maximum %d\n", maximum(t));
+  printf("member %d\n", member(6, t));
+  printf("not-member %d\n", member(3, t));
+  if (is_some(successor(4, t))) {
+    printf("successor of 4: %d\n", successor(4, t));
+  } else {
+    printf("no-successor for 4\n");
+  }
+  if (is_some(successor(8, t))) {
+    printf("successor of 8: %d\n", successor(8, t));
+  } else {
+    printf("no-successor for 8\n");
+  }
+  if (is_some(predecessor(10, t))) {
+    printf("predecessor of 10: %d\n", predecessor(10, t));
+  } else {
+    printf("no-predecessor for 10\n");
+  }
+  remove_item(2, t);
+  printf("minimum %d\n", minimum(t));
+  printf("maximum %d\n", maximum(t));  
+  remove_item(6, t);
+  printf("minimum %d\n", minimum(t));
+  printf("maximum %d\n", maximum(t));  
+  remove_item(10, t);
 }

@@ -23,6 +23,6 @@ int_option
 some (int i)
 {
   int mask = (1 << 25) - 1;
-  return (i && mask);
+  return (i & mask);
 }
 
