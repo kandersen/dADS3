@@ -178,16 +178,10 @@ test_5(int size) {
 
 // keys distributed across the entire universe
 void test_6(int size) {
-
-  puts("x");
   int padding = 0;
-  puts("y");
-
   if (2 * size < universe) {
     padding = universe / size;
   }
-  puts("z");
-
   for (int i = 0; i < universe - 1; i++) {
     item* itm = (item*)malloc(sizeof(item));
     itm->key = i;

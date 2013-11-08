@@ -5,6 +5,10 @@
 
 #define INITIAL_HEAP_SIZE 1024;
 
+struct node {
+  rb_node* rb;
+};
+
 item* make_item(int key) {
   item* res = (item*) malloc(sizeof(item));
   res->key = key;
@@ -22,17 +26,26 @@ heap* make_heap(int universe) {
 }
 
 void decrease_key(int delta, item* i, heap* h) {
-  rb_delete(h->t, i->n);
-  i->n->key = i->n->key - delta;
-  rb_insert(h->t, i->n);
+  rb_delete(h->t, i->n->rb);
+  rb_node* rbn = i->n->rb;
+  rbn->key = rbn->key - delta;
+  rbn->color = 0;
+  rbn->right = NULL;
+  rbn->left = NULL;
+  rbn->p = NULL;
+  rb_insert(h->t, rbn);
 }
 
 void insert_item(item* i, heap* h) {
-  rb_insert(h->t, make_node(i->key));
+  rb_node* rbnode = make_rb_node(i->key);
+  node* nx = (node*)malloc(sizeof(node));
+  nx->rb = rbnode;
+  i->n = nx;
+  rb_insert(h->t, rbnode);
 }
 
 item* find_min(heap* h) {
-  node* res = rb_minimum(h->t, rb_root_of(h->t));
+  rb_node* res = rb_minimum(h->t, rb_root_of(h->t));
   if(res) {
     return make_item(rb_key_of(res));
   } else {
@@ -41,17 +54,17 @@ item* find_min(heap* h) {
 }
 
 item* delete_min(heap* h) {
-  node* root = rb_root_of(h->t);
-  printf("key %i\n", root->key);
-  node* res = rb_minimum(h->t, root);
-  puts("2");
-  if(res) {
-  puts("3");
-    rb_delete(h->t, res);
-  puts("4");
-    return make_item(rb_key_of(res));
+  rb_node* root = rb_root_of(h->t);
+  if (root) {
+    rb_node* res = rb_minimum(h->t, root);
+    if(res) {
+      rb_delete(h->t, res);
+      return make_item(rb_key_of(res));
+    } else {
+      return NULL;
+    }
   } else {
-    return make_item(none());
+    return NULL;
   }
 }
 
@@ -64,7 +77,7 @@ heap* meld(heap* h1, heap* h2) {
 }
 
 void remove_item (item* i, heap* h) {
-  rb_delete(h->t, make_node(i->key));
+  rb_delete(h->t, i->n->rb);
 }
 
 void to_dot (heap* h, char* filename) {
