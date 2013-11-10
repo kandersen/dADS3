@@ -1,5 +1,6 @@
 #include "int_option.h"
 
+int
 is_none (int_option i)
 {
   return (i >> 24) & 1;
@@ -22,6 +23,7 @@ int_option
 some (int i)
 {
   int mask = (1 << 25) - 1;
-  return (i && mask);
+  
+  return (i & mask);
 }
 
