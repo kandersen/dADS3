@@ -1,6 +1,8 @@
 #ifndef DADS3_VEB_H
 #define DADS3_VEB_H
 
+#include "../int_option.h"
+
 
 #ifndef INSTRUMENT
 #define LE(X, Y) ((X) <= (Y))
@@ -17,19 +19,17 @@
 #endif
 
 struct heap;
-struct node;
 typedef struct node node;
 
 struct item {
-  int key;
+  int_option key;
   node* n;
-  void* value;
 };
 
 typedef struct item item;
 typedef struct heap heap;
 
-heap* make_heap     ();
+heap* make_heap     (int universe);
 void  insert_item   (item* i, heap* h);
 item* find_min      (heap* h);
 item* delete_min    (heap* h);
