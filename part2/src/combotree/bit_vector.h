@@ -10,14 +10,12 @@
 #include <math.h>
 #include <stdbool.h>
 
-typedef char block_type;
+typedef int block_type;
 
 struct vEB_tree;
 
 struct bit_vector {
   uint8_t const universe_bits;
-  uint32_t const block_count;
-  uint32_t const bit_count;
   uint24_option min, max;
   block_type* blocks;
 };

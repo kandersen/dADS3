@@ -7,7 +7,8 @@ typedef struct vEB_tree vEB_tree;
 void
 sort (uint24_option * lo, uint24_option * hi)
 {
-     if (*lo > *hi) {
+     if (*lo > *hi) 
+     {
           uint24_option temp = *lo;
           *lo = *hi;
           *hi = temp;
@@ -20,6 +21,7 @@ fits (uint8_t const bits, uint24_option const value)
      uint32_t mask = (1 << bits) - 1;
      return (!is_none(value)) && (value == (value & mask));
 }
+
 uint24_option
 hi_value (uint8_t const universe_bits, uint24_option const value)
 {
@@ -86,10 +88,8 @@ vEB_node_init (uint8_t const universe_bits)
 }
 
 bool 
-vEB_node_insert (vEB_tree *const tree, uint24_option const value)
+vEB_node_insert (vEB_tree *const node, uint24_option const value)
 {
-     vEB_node *node = tree->vEB_node;
-
      /* no value to insert or value is kept directly in the node */
      if (is_none(value) ||!fits(node->universe_bits, value) || value == node->min || value == node->max)
           return false;
@@ -120,9 +120,8 @@ vEB_node_insert (vEB_tree *const tree, uint24_option const value)
 }
 
 bool 
-vEB_node_delete (vEB_tree *const tree, uint24_option const value)
+vEB_node_delete (vEB_tree *const node, uint24_option const value)
 {
-     vEB_node *node = tree->vEB_node;
      /* empty node or 'empty' value */
      if (is_none(value) || !fits(node->universe_bits, value) || is_none(node->min))
           return false;
@@ -174,9 +173,8 @@ vEB_node_delete (vEB_tree *const tree, uint24_option const value)
 }
 
 bool 
-vEB_node_contains (vEB_tree const *const tree, uint24_option const value)
+vEB_node_contains (vEB_tree const *const node, uint24_option const value)
 {
-     vEB_node *node = tree->vEB_node;
      if (is_none(value) || !fits(node->universe_bits, value))
           return false;
 
@@ -196,23 +194,20 @@ vEB_node_contains (vEB_tree const *const tree, uint24_option const value)
 }
 
 uint24_option 
-vEB_node_minimum (vEB_tree const *const tree)
+vEB_node_minimum (vEB_tree const *const node)
 {
-     vEB_node *node = tree->vEB_node;
      return some(node->min);
 }
 
 uint24_option 
-vEB_node_maximum (vEB_tree const *const tree)
+vEB_node_maximum (vEB_tree const *const node)
 {
-     vEB_node *node = tree->vEB_node;
      return some(node->max);
 }
 
 uint24_option 
-vEB_node_pred (vEB_tree const *const tree, uint24_option const value)
+vEB_node_pred (vEB_tree const *const node, uint24_option const value)
 {
-     vEB_node *node = tree->vEB_node;
      if (is_none(value) || !fits(node->universe_bits, value))
          return none();
      
@@ -252,9 +247,8 @@ vEB_node_pred (vEB_tree const *const tree, uint24_option const value)
 }
 
 uint24_option 
-vEB_node_succ (vEB_tree const *const tree, uint24_option const value)
+vEB_node_succ (vEB_tree const *const node, uint24_option const value)
 {
-     vEB_node *node = tree->vEB_node;
      if (is_none(value) || !fits(node->universe_bits, value))
          return none();
      

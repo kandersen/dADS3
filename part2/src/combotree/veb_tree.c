@@ -14,13 +14,22 @@ vEB_tree * vEB_init (uint8_t const universe_bits)
      
      if (universe_bits < MIN_VEB_UNIVERSE_BITS) 
      {
+          bit_vector * bt = bit_vector_init(universe_bits);
           tree->kind = _KIND_BIT;
-          tree->bit_vector = bit_vector_init(universe_bits);
+          tree->min = bt->min;
+          tree->max = bt->max;
+          tree->blocks = bt->blocks;
+          tree->universe_bits = bt->universe_bits;
      }
      else
      {
+          vEB_node * n = vEB_node_init(universe_bits);
           tree->kind = _KIND_VEB;
-          tree->vEB_node = vEB_node_init(universe_bits);
+          tree->min = n->min;
+          tree->max = n->max;
+          tree->universe_bits = n->universe_bits;
+          tree->bottom = n->bottom;
+          tree->top = n->top;
      }
      return tree;
 }
@@ -84,31 +93,4 @@ uint24_option vEB_succ (vEB_tree const *const tree, uint24_option const value)
      succ[_KIND_BIT] = bit_vector_succ;
      succ[_KIND_VEB] = vEB_node_succ;
      return succ[tree->kind] (tree, value);
-}
-
-
-int main(int a, char** c) {
-     printf("%d\n", MIN_VEB_UNIVERSE_BITS);
-     vEB_tree * t = vEB_init(24);
-
-     assert(vEB_minimum(t) == none());
-     assert(vEB_maximum(t) == none());
-     assert(vEB_contains(t, some(41)) == false);
-     assert(vEB_contains(t, some(24)) == false);   
-     assert(vEB_insert(t, some(24)));
-     assert(vEB_contains(t, some(24)));
-     assert(vEB_minimum(t) == some(24));
-     assert(vEB_maximum(t) == some(24));
-     assert(vEB_insert(t, some(23)));
-     assert(vEB_insert(t, some(22)));
-     assert(vEB_insert(t, some(25)));
-     assert(vEB_minimum(t) == some(22));
-     assert(vEB_maximum(t) == some(25));
-     assert(vEB_delete(t, some(42)) == false);    
-     assert(vEB_delete(t, some(22)));
-     assert(vEB_minimum(t) == some(23));
-     assert(vEB_delete(t, some(25))); // BAD
-     assert(vEB_delete(t, some(25)) == false);
-     assert(vEB_maximum(t) == some(24));
-
 }

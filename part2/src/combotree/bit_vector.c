@@ -3,6 +3,21 @@
 typedef struct bit_vector bit_vector;
 typedef struct vEB_tree vEB_tree;
 
+uint32_t
+bit_count(uint8_t const universe_bits)
+{
+  return sizeof(block_type) * 8;
+}
+
+uint32_t
+block_count(uint8_t const universe_bits)
+{
+     uint32_t vector_bits = 1 << universe_bits;
+     uint32_t bit_count = sizeof(block_type) * 8;
+     uint32_t block_count = ceil(vector_bits / (sizeof(block_type) * 8.0f));
+     return block_count;
+}
+
 bit_vector *
 bit_vector_init (uint8_t const universe_bits) 
 {
@@ -12,8 +27,6 @@ bit_vector_init (uint8_t const universe_bits)
      
      bit_vector const_initialization = {
           .universe_bits = universe_bits, 
-          .block_count   = block_count, 
-          .bit_count     = bit_count,
           .min           = none(),
           .max           = none(),
           .blocks        = malloc(sizeof(block_type) * block_count)
@@ -27,16 +40,14 @@ bit_vector_init (uint8_t const universe_bits)
 }
 
 bool
-bit_vector_insert (vEB_tree * const tree, uint24_option const value) 
+bit_vector_insert (vEB_tree * const vector, uint24_option const value) 
 {
-     bit_vector * vector = tree->bit_vector;
-
      if (is_none(value))
           return false;     
 
-     uint32_t bit_number = value & (vector->bit_count - 1);
-     uint32_t block_number = value / vector->bit_count;
-     uint32_t already_contains_value = vEB_contains(tree, value);
+     uint32_t bit_number = value & (bit_count(vector->universe_bits) - 1);
+     uint32_t block_number = value / bit_count(vector->universe_bits);
+     uint32_t already_contains_value = vEB_contains(vector, value);
 
      vector->blocks[block_number] |= (1 << bit_number);
 
@@ -50,87 +61,79 @@ bit_vector_insert (vEB_tree * const tree, uint24_option const value)
 }
 
 bool
-bit_vector_delete (vEB_tree * const tree, uint24_option const value) 
+bit_vector_delete (vEB_tree * const vector, uint24_option const value) 
 {
-
-     bit_vector * vector = tree->bit_vector;
      if (is_none(value))
           return false;
 
-     uint32_t bit_number = value & (vector->bit_count - 1);
-     uint32_t block_number = value / vector->bit_count;
-     uint32_t already_vacant_value = !vEB_contains(tree, value);
+     uint32_t bit_number = value & (bit_count(vector->universe_bits) - 1);
+     uint32_t block_number = value / bit_count(vector->universe_bits);
+     uint32_t already_vacant_value = !vEB_contains(vector, value);
 
      vector->blocks[block_number] &= ~((block_type) (1 << bit_number));
 
      if (vector->min == value)
-          vector->min = vEB_succ(tree, vector->min);
+          vector->min = vEB_succ(vector, vector->min);
 
      if (vector->max == value)
-          vector->max = vEB_pred(tree, vector->max);
+          vector->max = vEB_pred(vector, vector->max);
 
      return !already_vacant_value;
 }
 
 bool
-bit_vector_contains (vEB_tree const * const tree, uint24_option const value)
+bit_vector_contains (vEB_tree const * const vector, uint24_option const value)
 {
-     bit_vector * vector = tree->bit_vector;
      if (is_none(value))
           return false;
 
-     uint32_t bit_number = value & (vector->bit_count - 1);
-     uint32_t block_number = value / vector->bit_count;
+     uint32_t bit_number = value & (bit_count(vector->universe_bits) - 1);
+     uint32_t block_number = value / bit_count(vector->universe_bits);
      uint32_t mask = 1 << bit_number;
 
      return !!(vector->blocks[block_number] & mask);
 }
 
 uint24_option
-bit_vector_minimum (vEB_tree const * const tree)
+bit_vector_minimum (vEB_tree const * const vector)
 {
-     bit_vector * vector = tree->bit_vector;
      return some(vector->min);
 }
 
 uint24_option
-bit_vector_maximum (vEB_tree const * const tree)
+bit_vector_maximum (vEB_tree const * const vector)
 {
-     bit_vector * vector = tree->bit_vector;
      return some(vector->max);
 }
 
 uint24_option
-bit_vector_pred (vEB_tree const * const tree, uint24_option const value)
+bit_vector_pred (vEB_tree const * const vector, uint24_option const value)
 {
-     bit_vector * vector = tree->bit_vector;
      if (is_none(value))
           return none();
 
      uint24_option min_element = some(0);
-     uint24_option max_element = some(1 << vector->bit_count);
-
+     uint24_option max_element = some(1 << bit_count(vector->universe_bits));
      uint24_option test_value;
      
      for (test_value = some(value) - 1; test_value >= min_element && test_value < max_element; test_value--)
-          if (vEB_contains(tree, test_value))
+          if (vEB_contains(vector, test_value))
                return some(test_value);
      
      return none();
 }
 
 uint24_option
-bit_vector_succ (vEB_tree const * const tree, uint24_option const value)
+bit_vector_succ (vEB_tree const * const vector, uint24_option const value)
 {
-     bit_vector * vector = tree->bit_vector;
      if (is_none(value))
           return none();
 
-     uint24_option max_element = some(1 << vector->bit_count);
+     uint24_option max_element = some(1 << bit_count(vector->universe_bits));
      uint24_option test_value;
 
      for (test_value = some(value) + 1; test_value < max_element; test_value++)
-          if (vEB_contains(tree, test_value))
+          if (vEB_contains(vector, test_value))
                return some(test_value);
      
      return none();

@@ -19,12 +19,14 @@ struct vEB_node;
 struct vEB_tree 
 {
   uint8_t kind;
+  uint8_t universe_bits;
+  uint24_option min, max;
+  struct vEB_tree ** bottom;
   union {
-    struct bit_vector* bit_vector;
-    struct vEB_node* vEB_node;
+    struct vEB_tree* top;
+    int* blocks;
   };
 };
-
 
 struct vEB_tree * vEB_init (uint8_t const);
 bool vEB_insert (struct vEB_tree *const, uint24_option const);
