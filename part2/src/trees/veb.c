@@ -49,11 +49,12 @@ vEB_tree* make_veb(int u) {
   // construct clusters recursively?
   if (u > 2) { 
     int up = upper(u);
+    int lo = lower(u);
     printf("upper %d\n", up);
     t->bottom_size = up;
     t->bottom = (vEB_tree**)malloc(sizeof(vEB_tree*) * up);
     for (int i = 0; i < up; i++) {
-      t->bottom[i] = make_veb(up);
+      t->bottom[i] = make_veb(lo);
     }
 
     // how to construct top, is it just a smaller table of sqrt(u)?
@@ -190,26 +191,17 @@ int_option successor(int x, vEB_tree* veb) {
   } else if (is_some(veb->min) && x < veb->min) {
     return veb->min;
   } else {
-    puts("1");
     int h = high(x, veb);
-    puts("2");
     int l = low(x, veb);
-    printf("h: %d, l: %d, bottom-size: %d\n", h, l, veb->bottom_size);
-    puts("3");
     int_option max_low = maximum(veb->bottom[h]);
-    puts("4");
     if (is_some(max_low) && l < max_low) {
-      puts("5");
       int_option offset = successor(l, veb->bottom[h]);
       return find_index(h, offset, veb);
     } else {
-      puts("6");
       int_option succ_cluster = successor(h, veb->top);
       if (is_none(succ_cluster)) {
-        puts("7");
         return none();
       } else {
-        puts("8");
         int_option offset = minimum(veb->bottom[succ_cluster]);
         return find_index(succ_cluster, offset, veb);
       }

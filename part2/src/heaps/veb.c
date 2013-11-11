@@ -37,6 +37,8 @@ int find_index(int x, int y, heap* veb) {
 
 heap* make_veb(int u) {
 
+  u = pow(2, u);
+
   heap* t = (heap*)malloc(sizeof(heap));
   t->u = u;
   t->min = none();
