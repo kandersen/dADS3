@@ -49,10 +49,13 @@ search tree property, is as follows:
 \begin{enumerate}
   \item The root is black
   \item All leaves are black
-  \item foo 
-  \item bar
-  \item baz
+  \item If a node is red, both its children are black
+  \item For each node, all paths from node to descendant leaves
+    contain the same number of black nodes.
 \end{enumerate}
+
+See Lemma 13.1 in Cormen et al (REF) for how these last two properties
+ensure balancing.
 
 \section{Operations}
 
@@ -99,8 +102,16 @@ $O(\log(n))$ where $n$ is the number of nodes in the tree.
 Updating operations on RBTs are complicated by the need to maintain
 the RBT invariants described in section \ref{sec:rbt}.
 
-\paragraph{Insert}
+\paragraph{Insert} To maintain the search-tree invariant, the
+RBT insertion procedure works operationally the same as the insertion
+procedure, and then does some additional work to reestablish the RBT
+invariants. The first phase of searching runs proportional to the
+depth of the tree, and the reestablishing runs back up the tree in the
+worst case, performing a constant amount of work at each node. This
+gives a grand total of $O(\log(n))$ work for insertions.
 
-\paragraph{Delete}
+\paragraph{Delete} Deletion is similar in argument to insertion,
+albeit complicated when the node to be removed is black. It does a
+search down, and a fix up, for a run-time of $O(\log(n))$.
 
 \end{document}
