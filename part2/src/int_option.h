@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 typedef uint32_t int_option;
+typedef uint32_t uint24_option;
 
 int 
 is_none (int_option);
