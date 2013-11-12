@@ -18,8 +18,7 @@ sort (uint24_option * lo, uint24_option * hi)
 bool
 fits (uint8_t const bits, uint24_option const value)
 {
-     uint32_t mask = (1 << bits) - 1;
-     return (!is_none(value)) && (value == (value & mask));
+     return !is_none(value) && (value >> bits) == 0;
 }
 
 uint24_option
@@ -28,8 +27,8 @@ hi_value (uint8_t const universe_bits, uint24_option const value)
      if (is_none(value))
           return none();
 
-     uint8_t hi_bits = ceil(universe_bits / 2.0f);
-     uint8_t lo_bits = floor(universe_bits / 2.0f);
+     uint8_t lo_bits = universe_bits >> 1;
+     uint8_t hi_bits = lo_bits + (universe_bits & 1);
      uint32_t bit_mask = (1 << hi_bits) - 1;
 
      return some((value >> lo_bits) & bit_mask);
@@ -41,7 +40,7 @@ lo_value (uint8_t const universe_bits, uint24_option const value)
      if (is_none(value))
           return none();
 
-     uint8_t lo_bits = floor(universe_bits / 2.0f);
+     uint8_t lo_bits = universe_bits >> 1;
      uint32_t bit_mask = (1 << lo_bits) - 1;
 
      return some(bit_mask & value);
@@ -53,8 +52,8 @@ combine_value (uint8_t const universe_bits, uint24_option const hi, uint24_optio
      if (is_none(hi) || is_none(lo))
           return none();
 
-     uint8_t hi_bits = ceil(universe_bits / 2.0f);
-     uint8_t lo_bits = floor(universe_bits / 2.0f);
+     uint8_t lo_bits = universe_bits >> 1;
+     uint8_t hi_bits = lo_bits + (universe_bits & 1);
      uint32_t hi_mask = (1 << hi_bits) - 1;
      uint32_t lo_mask = (1 << lo_bits) - 1;
 
@@ -64,8 +63,8 @@ combine_value (uint8_t const universe_bits, uint24_option const hi, uint24_optio
 vEB_node * 
 vEB_node_init (uint8_t const universe_bits)
 {
-     uint8_t hi_bits = ceil(universe_bits / 2.0f);
-     uint8_t lo_bits = floor(universe_bits / 2.0f);
+     uint8_t lo_bits = universe_bits >> 1;
+     uint8_t hi_bits = lo_bits + (universe_bits & 1);
      uint32_t recursive_trees = (universe_bits > 1) ? 1 << hi_bits : 0;
     
      vEB_node const_initialization = {
@@ -75,8 +74,6 @@ vEB_node_init (uint8_t const universe_bits)
           .top = (universe_bits > 1) ? vEB_init(hi_bits) : NULL,
           .bottom = (universe_bits > 1) ? malloc(sizeof(vEB_node)*recursive_trees) : NULL
      };
-     
-
      
      for (int i = 0; i < recursive_trees; i++)
           const_initialization.bottom[i] = vEB_init(lo_bits);
