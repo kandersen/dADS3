@@ -1,0 +1,106 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[applemac]{inputenc}
+
+\usepackage[sc]{mathpazo}
+\linespread{1.05}
+
+\title{Red-Black Trees}
+\date{}
+\author{Kristoffer}
+\begin{document}
+\maketitle
+\section{Intro}
+The simplest search tree we know is the binary search tree (BST). Its
+invariant is simple, and both querying and updating is formulated
+easily, both iteratively and recursively. The runtime guarantees are,
+while equally easy to argue, not optimal.
+
+The root of the problem is an issue of balancing. A plain BST
+maintains no notion of balance, so a pathological use can create 'flat
+trees' where all nodes end up along a single spine, giving worst-case
+linear time for most operations.
+
+One solutions is a red-black tree (RBT), where the idea is to maintain
+additional structure in order to remain balanced.
+
+The remainder of this section describes the structure of an RBT, and
+describes the operations which we have implemented with the aim of
+empirical comparison with van Emda Boas trees.
+
+\section{Red-Black Trees}\label{sec:rbt}
+
+A red black tree is essentially an ordinary BST with an additional bit
+of information per node: the ``color'' of that node, black or
+red. Through the use of a handful of invariants, the color information
+is used to balance the RBT. So in addition to the usual fields of key,
+parent pointer, left and right child pointers, we also store a color
+bit.
+
+The fact that an RBT is just an augmented BST means that the basic
+queries essentially need no changes to work on RBTs, and, indeed,
+Cormen et al. (REF) on which we base our implementation, defers to the
+section on simple BSTs.
+
+The invariants that we place on an RBT, in addition to the basic
+search tree property, is as follows:
+
+\begin{enumerate}
+  \item The root is black
+  \item All leaves are black
+  \item foo 
+  \item bar
+  \item baz
+\end{enumerate}
+
+\section{Operations}
+
+\subsection{Queries}
+
+No queries exploit the RBT structure, and so work procedurally like the
+operations known from simple BSTs. The running times, however, benefit
+from the balancing guarantees of RBTs.
+
+\paragraph{Minimum} The minimum node of a search tree is its left-most
+node, if any. This is given by the basic search tree invariant. By
+virtue of being balanced, the minimum node lies at a maximum depth of
+$\log(n)$, where $n$ is the number of nodes in the tree, and the
+worst-case running time is thus $O(\log(n))$.
+
+\paragraph{Maximum} Symmetric to Minimum.
+
+\paragraph{Predecessor} The Predecessor query asks, given a particular
+node in a search tree: ``what is the greatest node smaller than this
+particular node?'' In the case of an internal node, the answer can be
+constructed using Maximum, as we simply query the left subtree of the
+given node for its maximum node: running time proportional to the
+depth of the given node. In the case of a leaf, we must find the first
+ancestor such that the given node is in its right sub-tree. This will
+ensure $Successor \circ Predecessor = id$. The running time is again
+proportional to the depth of the given node, and so is always
+$O(\log(n))$.
+
+\paragraph{Successor} Symmetric to Predecessor.
+
+\paragraph{Search} The Search query asks, given a key and a search
+tree, ``does the tree contain a node with the given key?'', and relies
+entirely on the basic search tree invariant. If the node at the root
+of the given tree has the desired key, we have found what we are
+looking for. Otherwise, the desired key is either smaller or larger
+than the key at the root of the given tree, and we can thus
+recursively search either the left or right tree, respectively. We
+answer negatively upon hitting a leaf. The running time is
+proportional to the depth of the initial tree, and thus runs
+$O(\log(n))$ where $n$ is the number of nodes in the tree.
+
+\subsection{Updates}
+
+Updating operations on RBTs are complicated by the need to maintain
+the RBT invariants described in section \ref{sec:rbt}.
+
+\paragraph{Insert}
+
+\paragraph{Delete}
+
+\end{document}
