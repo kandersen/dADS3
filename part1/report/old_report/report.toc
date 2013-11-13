@@ -1,0 +1,12 @@
+\contentsline {section}{\numberline {1}Binary heap with array}{2}
+\contentsline {section}{\numberline {2}Implementing decrease key}{2}
+\contentsline {section}{\numberline {3}Time-complexity for binary heap with array}{3}
+\contentsline {section}{\numberline {4}Binary heap with pointers}{3}
+\contentsline {section}{\numberline {5}Implementing decrease key}{3}
+\contentsline {section}{\numberline {6}Time-complexity for binary heap with pointers}{3}
+\contentsline {section}{\numberline {7}Testing correctness of Binary Heaps}{3}
+\contentsline {section}{\numberline {8}Fibonacci heap version 1}{3}
+\contentsline {section}{\numberline {9}Worst case time-complexity for fib-v1}{3}
+\contentsline {section}{\numberline {10}Fibonacci heap version 2}{4}
+\contentsline {section}{\numberline {11}Worst case time-complexity for fib-v2}{4}
+\contentsline {section}{\numberline {12}Testing correctness of Fibonacci Heaps}{4}

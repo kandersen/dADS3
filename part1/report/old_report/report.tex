@@ -1,0 +1,142 @@
+\documentclass[12pt,a4paper,twoside,danish,article]{article}
+\usepackage{memhfixc} % Dynamic updates to memoir class
+
+\setulmarginsandblock{1.3in}{1.3in}{*} % 1-inch margins on top and bottom
+\setlrmarginsandblock{1.3in}{1.3in}{*} % 1-inch margins on left and right
+\checkandfixthelayout
+
+\makeatletter % Suppress various auxiliary commands in bib-file
+\newcommand\Firstpublished[1]{\expandafter\ignorespaces\@gobble}
+\newcommand\Editedby[1]{\expandafter\ignorespaces\@gobble}
+\newcommand\biband{\expandafter\ignorespaces\@gobble}
+\newcommand\Bookreview{\expandafter\ignorespaces\@gobble}
+\newcommand\Moviereview{\expandafter\ignorespaces\@gobble}
+\makeatother
+
+\usepackage{cite}
+\usepackage[T1]{fontenc} % Font encoding
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{caption}
+
+\usepackage{eurosym} % Symbol for \euro
+
+\begin{document}
+
+\frontmatter
+\begin{titlingpage}
+  \begin{center}
+    \mbox{}\vfill
+    \Huge{\textsc{Dynamic transitive closure problem for unweighted directed graphs}} \\
+    \vspace{3cm}
+    \Large{20095039 : Troels Leth Jensen \\ 20094924 : Jens Olaf Svanholm Fogh \\ 20022362 : Morten Krogh-Jespersen}\\
+    \vspace{10cm}
+    \vspace{1cm}
+    Supervisor: Gudmund Skovbjerg Frandsen,\\ Department of Computer Science, Aarhus Universitet\\
+    \today
+    \vfill
+    \vfill\mbox{}
+  \tableofcontents*
+  \end{center}
+\end{titlingpage}
+
+\mainmatter
+
+\raggedbottom
+
+\renewcommand{\labelitemi}{$\bullet$}
+
+\renewcommand{\baselinestretch}{1.2}\normalsize % Increase line spacing
+
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.
+    #1}{\thechapter. #1}} % Chapter marks
+\renewcommand{\bibmark}{\markboth{\bibname}{\bibname}} % Formatting of
+                                % default chapter marks
+\renewcommand{\tocmark}{\markboth{\contentsname}{\contentsname}}
+
+\setlength{\parindent}{10pt} 
+
+
+\chapter{Introduction}
+
+needs content
+
+\chapter{Binary heaps}
+
+needs content
+
+\section{Binary heap with array}
+
+needs content
+
+\section{Implementing decrease key}
+
+needs content
+
+\section{Time-complexity for binary heap with array}
+
+\section{Binary heap with pointers}
+
+needs content
+
+\section{Implementing decrease key}
+
+needs content
+
+\section{Time-complexity for binary heap with pointers}
+
+\section{Testing correctness of Binary Heaps}
+
+needs content
+
+\chapter{Fibonacci heaps}
+
+In this chapter we focus on Fibonacci heaps, which is a data structure that has a forest of rooted trees as opposed to a binary heap that only has one tree ~\cite{FT87}. The data structure was invented by Michael L. Fredman and Robert Endre Tarjan and was published in the Journal of ACM in 1989. It has it name because the size of any subtree in a Fibonacci heap will be lower bounded by $F_{k+2}$ where $k$ is the degree of the root.
+
+\section{Fibonacci heap version 1}
+
+
+\section{Worst case time-complexity for fib-v1}
+
+needs content
+
+\section{Fibonacci heap version 2}
+
+needs content
+
+\section{Worst case time-complexity for fib-v2}
+
+needs content
+
+\section{Testing correctness of Fibonacci Heaps}
+
+needs content
+
+\chapter{Test-results}
+
+needs content
+
+\chapter{Dijkstra}
+
+needs content
+
+\chapter{Binary heap vs Fibonacci heap}
+s
+needs content
+
+\chapter{Test-results}
+
+needs content
+
+\chapter{Conlusion}
+
+needs contents
+
+\bibliographystyle{abbrv}
+\bibliography{report}
+
+\end{document}

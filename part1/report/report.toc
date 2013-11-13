@@ -1,0 +1,39 @@
+\select@language {american}
+\contentsline {chapter}{\numberline {1}Introduction}{2}
+\contentsline {chapter}{\numberline {2}Binary heaps}{3}
+\contentsline {section}{\numberline {2.1}Binary Heaps with Arrays}{3}
+\contentsline {section}{\numberline {2.2}Implementation Decisions}{4}
+\contentsline {section}{\numberline {2.3}Time-complexity for Binary Heaps with Arrays}{4}
+\contentsline {paragraph}{\textsc {MakeHeap}}{4}
+\contentsline {paragraph}{\textsc {FindMin}}{4}
+\contentsline {paragraph}{\textsc {Insert}}{4}
+\contentsline {paragraph}{\textsc {DeleteMin}}{5}
+\contentsline {paragraph}{\textsc {DecreaseKey}}{5}
+\contentsline {section}{\numberline {2.4}Binary Heaps with Pointers}{5}
+\contentsline {section}{\numberline {2.5}Time-complexity for Binary Heaps with Pointers}{5}
+\contentsline {paragraph}{\textsc {MakeHeap}}{5}
+\contentsline {paragraph}{\textsc {FindMin}}{6}
+\contentsline {paragraph}{\textsc {Insert}}{6}
+\contentsline {paragraph}{\textsc {DeleteMin}}{6}
+\contentsline {paragraph}{\textsc {DecreaseKey}}{6}
+\contentsline {section}{\numberline {2.6}Correctness of Binary Heaps}{6}
+\contentsline {chapter}{\numberline {3}Fibonacci heaps}{7}
+\contentsline {section}{\numberline {3.1}Properties of the Fibonacci heap}{7}
+\contentsline {section}{\numberline {3.2}The potential method}{8}
+\contentsline {section}{\numberline {3.3}Fibonacci heap version 1}{9}
+\contentsline {section}{\numberline {3.4}Worst case time-complexity for Fib heap v1}{10}
+\contentsline {subsection}{\numberline {3.4.1}Worst case time-complexity for $\textsc {DeleteMin}$}{10}
+\contentsline {subsection}{\numberline {3.4.2}Worst case time-complexity for $\textsc {Delete}$ and $\textsc {DecreaseKey}$}{11}
+\contentsline {section}{\numberline {3.5}Fibonacci heap version 2}{13}
+\contentsline {section}{\numberline {3.6}Worst case time-complexity for Fib heap v2}{13}
+\contentsline {section}{\numberline {3.7}Testing correctness of Fibonacci Heaps}{14}
+\contentsline {chapter}{\numberline {4}\textsc {Dijkstra}'s algorithm}{15}
+\contentsline {section}{\numberline {4.1}Running times for $\textsc {Dijkstra}$ with heaps}{15}
+\contentsline {section}{\numberline {4.2}Connectivity and generating graphs}{16}
+\contentsline {section}{\numberline {4.3}Pathological Cases}{16}
+\contentsline {chapter}{\numberline {5}Empirical Testing}{18}
+\contentsline {section}{\numberline {5.1}Stress-Testing}{18}
+\contentsline {section}{\numberline {5.2}Dijkstra's Algorithm Tests}{19}
+\contentsline {section}{\numberline {5.3}Raw Data}{20}
+\contentsline {chapter}{\numberline {6}Conclusion}{26}
+\contentsline {chapter}{Bibliography}{26}
