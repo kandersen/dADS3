@@ -1,85 +1,88 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "int_option.h"
+#include "veb_only.h"
 
-struct vEB_tree {
-  int_option min;
-  int_option max;
+struct tree {
+  uint24_option min, max;
   int u;
   int bottom_size;
-  struct vEB_tree** bottom;
-  struct vEB_tree* top;
+  struct tree** bottom;
+  struct tree* top;
 };
-
-typedef struct vEB_tree vEB_tree;
 
 // UTILITIES
 
 
-int upper(int u) {
+int upper(uint24_option const u) {
   return pow(2,(int)ceil((log2 (u))/2));
+  // CHANGE this
 }
 
-int lower(int u) {
+int lower(uint24_option const u) {
+  // CHANGE this
   return pow(2,(int)((log2 (u))/2));
 }
 
-int high(int x, vEB_tree* veb) {
+int high(uint24_option const x, tree const* veb) {
+  // CHANGE this
   return (int)(x / lower(veb->u));
 }
 
-int low(int x, vEB_tree* veb) {
+int low(uint24_option const x, tree const* veb) {
+  // CHANGE this
   return x % lower(veb->u);
 }
 
-int find_index(int x, int y, vEB_tree* veb) {
+int find_index(uint24_option const x, uint24_option const y, tree const* veb) {
   return x * lower(veb->u) + y;
 }
 
-vEB_tree* make_veb(int u) {
+tree* make_veb(int u) {
 
-  vEB_tree* t = (vEB_tree*)malloc(sizeof(vEB_tree));
+  tree* t = (tree*)malloc(sizeof(tree));
   t->u = u;
   t->min = none();
   t->max = none();
   t->bottom = NULL;
   t->bottom_size = 0;
 
-  // construct clusters recursively?
+  // construct clusters recursively
   if (u > 2) { 
     int up = upper(u);
     int lo = lower(u);
-    printf("upper %d\n", up);
     t->bottom_size = up;
-    t->bottom = (vEB_tree**)malloc(sizeof(vEB_tree*) * up);
+    t->bottom = (tree**)malloc(sizeof(tree*) * up);
     for (int i = 0; i < up; i++) {
       t->bottom[i] = make_veb(lo);
     }
 
-    // how to construct top, is it just a smaller table of sqrt(u)?
     t->top = make_veb(up);
   }
 
   return t;
 }
 
-int_option minimum(vEB_tree* veb) {
+tree* make_tree(uint8_t bits) {
+  return make_veb((1 << bits));
+}
+
+uint24_option minimum(tree const* veb) {
   return veb->min;
 }
 
-int_option maximum(vEB_tree* veb) {
+uint24_option maximum(tree const* veb) {
   return veb->max;
 }
 
-void empty_tree_insert(int x, vEB_tree* veb) {
+void empty_tree_insert_item(int x, tree* veb) {
   veb->min = some(x);
   veb->max = some(x);
 }
 
-void insert_item(int x, vEB_tree* veb) {
+bool insert_item(tree* veb, uint24_option x) {
   if (is_none(veb->min)) {
-    empty_tree_insert(x, veb);
+    empty_tree_insert_item(x, veb);
   } else {
     if (x < veb->min) {
       int temp = veb->min;
@@ -90,21 +93,22 @@ void insert_item(int x, vEB_tree* veb) {
       int h = high(x, veb);
       int l = low(x, veb);
       if (is_none(minimum(veb->bottom[h]))) {
-        insert_item(h, veb->top);
-        empty_tree_insert(l, veb->bottom[h]);
+        insert_item(veb->top, h);
+        empty_tree_insert_item(l, veb->bottom[h]);
       } else {
-        insert_item(l, veb->bottom[h]);
+        insert_item(veb->bottom[h], l);
       }
     }
     if (x > veb->max) {
       veb->max = some(x);
     }
   }
+  return true;
 }
 
-void remove_item(int x, vEB_tree* veb) {
+bool delete_item(tree* veb, uint24_option x) {
   if (is_none(veb->min)) {
-    return;
+    return false;
   }
 
   if (veb->min == veb->max) {
@@ -119,17 +123,17 @@ void remove_item(int x, vEB_tree* veb) {
     veb->max = veb->min;
   } else {
     if (x == veb->min) {
-      int_option first_cluster = minimum(veb->top);
+      uint24_option first_cluster = minimum(veb->top);
       x = find_index(first_cluster, minimum(veb->bottom[first_cluster]), veb);
       veb->min = some(x);
     }
     int h = high(x, veb);
     int l = low(x, veb);
-    remove_item(l, veb->bottom[h]);
+    delete_item(veb->bottom[h], l);
     if (is_none(minimum(veb->bottom[h]))) {
-      remove_item(h, veb->top);
+      delete_item(veb->top, h);
       if (x == veb->max) {
-        int_option top_max = maximum(veb->top);
+        uint24_option top_max = maximum(veb->top);
         if (is_none(top_max)) {
           veb->max = veb->min;
         } else {
@@ -137,19 +141,13 @@ void remove_item(int x, vEB_tree* veb) {
         }
       }
     } else if (x == veb->max) {
-      veb->max = some(find_index(h, maximum(veb->bottom[h]), veb));
+      veb->max = some(find_index(h, minimum(veb->bottom[h]), veb));
     }
   }
+  return true;
 }
 
-void delete_min(vEB_tree* veb) {
-  int_option min = minimum(veb);
-  if (is_some(min)) {
-    remove_item(min, veb);
-  }
-}
-
-int_option predecessor(int x, vEB_tree* veb) {
+uint24_option pred(tree const* veb, uint24_option const x) {
   if (veb->u == 2) {
     if (x == 1 && veb->min == 0) {
       return some(0);
@@ -161,12 +159,12 @@ int_option predecessor(int x, vEB_tree* veb) {
   } else {
     int h = high(x, veb);
     int l = low(x, veb);
-    int_option min_low = minimum(veb->bottom[h]);
+    uint24_option min_low = minimum(veb->bottom[h]);
     if (is_some(min_low) && l > min_low) {
-      int_option offset = predecessor(l, veb->bottom[h]);
+      uint24_option offset = pred(veb->bottom[h], l);
       return find_index(h, offset, veb);
     } else {
-      int_option pred_cluster = predecessor(h, veb->top);
+      uint24_option pred_cluster = pred(veb->top, h);
       if (is_none(pred_cluster)) {
         if (is_some(veb->min) && x > veb->min) {
           return veb->min;
@@ -174,14 +172,14 @@ int_option predecessor(int x, vEB_tree* veb) {
           return none();
         }
       } else {
-        int_option offset = maximum(veb->bottom[pred_cluster]);
+        uint24_option offset = maximum(veb->bottom[pred_cluster]);
         return find_index(pred_cluster, offset, veb);
       }
     }
   }
 }
 
-int_option successor(int x, vEB_tree* veb) {
+uint24_option succ(tree const* veb, uint24_option const x) {
   if (veb->u == 2) {
     if (x == 0 && veb->max == 1) {
       return some(1);
@@ -193,74 +191,67 @@ int_option successor(int x, vEB_tree* veb) {
   } else {
     int h = high(x, veb);
     int l = low(x, veb);
-    int_option max_low = maximum(veb->bottom[h]);
+    uint24_option max_low = maximum(veb->bottom[h]);
     if (is_some(max_low) && l < max_low) {
-      int_option offset = successor(l, veb->bottom[h]);
+      uint24_option offset = succ(veb->bottom[h], l);
       return find_index(h, offset, veb);
     } else {
-      int_option succ_cluster = successor(h, veb->top);
+      uint24_option succ_cluster = succ(veb->top, h);
       if (is_none(succ_cluster)) {
         return none();
       } else {
-        int_option offset = minimum(veb->bottom[succ_cluster]);
+        uint24_option offset = minimum(veb->bottom[succ_cluster]);
         return find_index(succ_cluster, offset, veb);
       }
     }
   }
 }
 
-int member(int x, vEB_tree* veb) {
+bool contains(tree const* veb, uint24_option const x) {
 
   if (x == veb->min || x == veb->max) {
     return 1; // true
   } else if (veb->u == 2) {
     return 0; // false
   } else {
-    return member(low(x, veb), veb->bottom[high(x, veb)]);
+    return contains(veb->bottom[high(x, veb)], low(x, veb));
   }
 }
 
-void test_int_option() {
-
-  int_option x = 1337;
-  int_option y = some(1337);
-  printf("x: %d\n", x);
-  printf("y: %d\n", y);
-
-}
-
+/*
 int main(int argc, char** argv) {
 
-  test_int_option();
+  int size = 12;
+  tree* t = make_tree(size);
 
-  int size = 16;
-  vEB_tree* t = make_veb(size);
-  insert_item(2, t);
-  insert_item(6, t);
+  insert_item(t, 2);
+  insert_item(t, 6);
   printf("minimum %d\n", minimum(t));
   printf("maximum %d\n", maximum(t));
-  printf("member %d\n", member(6, t));
-  printf("not-member %d\n", member(3, t));
-  if (is_some(successor(4, t))) {
-    printf("successor of 4: %d\n", successor(4, t));
+  printf("member %d\n", contains(t, 6));
+  printf("not-member %d\n", contains(t, 3));
+  if (is_some(succ(t, 4))) {
+    printf("successor of 4: %d\n", succ(t, 4));
   } else {
     printf("no-successor for 4\n");
   }
-  if (is_some(successor(8, t))) {
-    printf("successor of 8: %d\n", successor(8, t));
+  if (is_some(succ(t, 8))) {
+    printf("successor of 8: %d\n", succ(t, 8));
   } else {
     printf("no-successor for 8\n");
   }
-  if (is_some(predecessor(10, t))) {
-    printf("predecessor of 10: %d\n", predecessor(10, t));
+  if (is_some(pred(t, 10))) {
+    printf("predecessor of 10: %d\n", pred(t, 10));
   } else {
     printf("no-predecessor for 10\n");
   }
-  remove_item(2, t);
+
+  delete_item(t, 2);
   printf("minimum %d\n", minimum(t));
   printf("maximum %d\n", maximum(t));  
-  remove_item(6, t);
+  delete_item(t, 6);
   printf("minimum %d\n", minimum(t));
   printf("maximum %d\n", maximum(t));  
-  remove_item(10, t);
+  delete_item(t, 10);
 }
+*/

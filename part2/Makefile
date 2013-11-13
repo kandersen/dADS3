@@ -1,16 +1,27 @@
 COMPILER = clang
 FLAGS = -Wall -O3 -lm
-COMMON = src/int_option.c
-COMMON_TREES = -I src/trees/ -lm
-COMMON_HEAPS = -I src/heaps/ -I src/trees/  -lm
+COMMON = src/int_option.c 
+COMMON_TREES = -I src/ -I src/trees/ -I src/combotree/ -lm
+COMMON_HEAPS = -I src/ -I src/heaps/ -I src/trees/  -lm
 
 nothing:
 
-tester: COMMON += src/tester.c
-tester: bha bhp fh1 fh2 veb1_heap rb_heap
+# TREES
 
-veb1_heap : 
-	$(COMPILER) $(FLAGS) -o bin/veb1_heap.out src/heaps/veb.c $(COMMON) $(COMMON_HEAPS)
+veb_only_tree :
+	$(COMPILER) $(FLAGS) -o bin/veb_only_tree.out src/trees/veb_only.c src/tests/test_tree_veb.c $(COMMON) $(COMMON_TREES)
+
+veb_combo_tree :
+	$(COMPILER) $(FLAGS) -o bin/veb_combo_tree.out src/combotree/veb_tree.c src/combotree/veb_node.c src/combotree/bit_vector.c src/tests/test_tree_combo.c $(COMMON) $(COMMON_TREES)
+
+rb_tree :
+	$(COMPILER) $(FLAGS) -o bin/rb_tree.out src/trees/rb_tree.c $(COMMON) $(COMMON_TREES)
+
+# HEAPS
+
+veb_only_heap :
+
+	$(COMPILER) $(FLAGS) -o bin/veb_only_heap.out src/heaps/veb_heap.c src/trees/veb_only.c $(COMMON) $(COMMON_HEAPS)
 
 rb_heap : 
 	$(COMPILER) $(FLAGS) -o bin/rb_heap.out src/heaps/rb_heap.c src/trees/rb_tree.c $(COMMON) $(COMMON_HEAPS)
@@ -26,6 +37,9 @@ fh1:
 
 fh2:	
 	$(COMPILER) $(FLAGS) -o bin/fh2$(NUM).out src/heaps/fibonacci_v2.c $(COMMON) $(COMMON_HEAPS)
+
+tester: COMMON += src/tester.c
+tester: bha bhp fh1 fh2 veb1_heap rb_heap
 
 all: clean
 
