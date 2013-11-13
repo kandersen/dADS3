@@ -4,6 +4,7 @@
 #include "int_option.h"
 #include "veb_tree.h"
 
+typedef struct timespec timespec;
 typedef struct vEB_tree vEB_tree;
 
 /* elements per procent */

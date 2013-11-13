@@ -21,7 +21,7 @@ int upper(uint24_option const u) {
 
 int lower(uint24_option const u) {
   // CHANGE this
-  return pow(2,(int)((log2 (u))/2));
+  return pow(2,(int)floor((log2 (u))/2));
 }
 
 int high(uint24_option const x, tree const* veb) {
@@ -222,8 +222,10 @@ bool contains(tree const* veb, uint24_option const x) {
 int main(int argc, char** argv) {
 
   int size = 12;
-  tree* t = make_tree(size);
+  tree* t = make_tree(24);
 
+  int el = (1 << 23);
+  insert_item(t, el);
   insert_item(t, 2);
   insert_item(t, 6);
   printf("minimum %d\n", minimum(t));
@@ -254,4 +256,5 @@ int main(int argc, char** argv) {
   printf("maximum %d\n", maximum(t));  
   delete_item(t, 10);
 }
+
 */

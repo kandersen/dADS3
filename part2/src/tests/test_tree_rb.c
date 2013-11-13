@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include "int_option.h"
-#include "veb_only.h"
+#include "rb_tree.h"
 
 typedef struct timespec timespec;
 
@@ -177,6 +177,6 @@ test_minimum(int fill)
 int main (int c, char** v)
 {
   srand(time(NULL));
-  void (*f[7]) (int) = {test_insert, test_remove, test_contains1, test_contains2, test_succ1, test_succ2, test_minimum};
+  void (*f[6]) (int) = {test_insert, test_remove, test_contains1, test_contains2, test_succ1, test_succ2};
   f[atoi(v[1])](atoi(v[2]));
 }

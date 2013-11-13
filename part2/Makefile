@@ -1,10 +1,16 @@
 COMPILER = clang
 FLAGS = -Wall -O3 -lm
 COMMON = src/int_option.c 
-COMMON_TREES = -I src/ -I src/trees/ -I src/combotree/ -lm
+COMMON_TREES = -I src/ -I src/trees/ -I src/combotree/ -DMIN_VEB_UNIVERSE_BITS=0 -lm
 COMMON_HEAPS = -I src/ -I src/heaps/ -I src/trees/  -lm
 
-nothing:
+nothings:
+
+# DEBUG
+
+veb_only_debug :
+	$(COMPILER) $(FLAGS) -o bin/veb_only_tree.out src/trees/veb_only.c $(COMMON) $(COMMON_TREES)
+
 
 # TREES
 
