@@ -1,5 +1,7 @@
 #include <time.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include "int_option.h"
 #include "search_tree.h"
@@ -45,11 +47,11 @@ permute(int* p, int len)
     }
 }
 
-tree* create_and_fill(int fill, int* n) {
-  tree * t = make_tree(24);
+search_tree* create_and_fill(int fill, int* n) {
+  search_tree* t = make_search_tree();
   permute(n, 1 << 24);
   for (int i = 0; i < fill*EPP; i++) {
-    insert_item(t, n[i]);
+    insert(n[i], t);
   }
   return t;
 }
@@ -58,13 +60,13 @@ void
 test_insert(int fill)
 {
   int* n = malloc(sizeof(int) * (1<<24));
-  tree* t = create_and_fill(fill, n);
+  search_tree* t = create_and_fill(fill, n);
 
   timespec time1, time2;
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
   for (int i = fill*EPP; i < (1+fill)*EPP; i++)
-    insert_item(t, n[i]);
+    insert(n[i],t);
 
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
   print_result("insert", fill, time1, time2);
@@ -74,13 +76,13 @@ void
 test_remove(int fill)
 {
   int* n = malloc(sizeof(int) * (1<<24));
-  tree* t = create_and_fill(fill, n);
+  search_tree* t = create_and_fill(fill, n);
 
   timespec time1, time2;
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
   for (int i = 0; i < EPP; i++)
-    delete_item(t, n[i]);
+    delete(n[i], t);
 
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
   print_result("remove", fill, time1, time2);
@@ -91,13 +93,13 @@ void
 test_succ1(int fill)
 {
   int* n = malloc(sizeof(int) * (1<<24));
-  tree* t = create_and_fill(fill, n);
+  search_tree* t = create_and_fill(fill, n);
 
   timespec time1, time2;
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
   for (int i = 0; i < EPP; i++)
-    succ(t, n[i]);
+    successor_key(n[i], t);
 
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
   print_result("succ1", fill, time1, time2);
@@ -108,7 +110,7 @@ void
 test_succ2(int fill)
 {
   int* n = malloc(sizeof(int) * (1<<24));
-  tree* t = create_and_fill(fill, n);
+  search_tree* t = create_and_fill(fill, n);
 
   permute(n, 1 << 24);
 
@@ -116,7 +118,7 @@ test_succ2(int fill)
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
   for (int i = 0; i < EPP; i++)
-    succ(t, n[i]);
+    successor_key(n[i], t);
 
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
   print_result("succ2", fill, time1, time2);
@@ -126,13 +128,13 @@ void
 test_contains1(int fill)
 {
   int* n = malloc(sizeof(int) * (1<<24));
-  tree* t = create_and_fill(fill, n);
+  search_tree* t = create_and_fill(fill, n);
 
   timespec time1, time2;
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
   for (int i = 0; i < EPP; i++)
-    contains(t, n[i]);
+    search(n[i], t);
 
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
   print_result("contains1", fill, time1, time2);
@@ -142,7 +144,7 @@ void
 test_contains2(int fill)
 {
   int* n = malloc(sizeof(int) * (1<<24));
-  tree* t = create_and_fill(fill, n);
+  search_tree* t = create_and_fill(fill, n);
 
   permute(n, 1 << 24);
 
@@ -150,7 +152,7 @@ test_contains2(int fill)
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
   for (int i = 0; i < EPP; i++)
-    contains(t, n[i]);
+    search(n[i], t);
 
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
   print_result("contains2", fill, time1, time2);
@@ -160,7 +162,7 @@ void
 test_minimum(int fill)
 {
   int* n = malloc(sizeof(int) * (1<<24));
-  tree* t = create_and_fill(fill, n);
+  search_tree* t = create_and_fill(fill, n);
 
   permute(n, 1 << 24);
 
@@ -174,9 +176,14 @@ test_minimum(int fill)
   print_result("minimum", fill, time1, time2);
 }
 
+void
+test_correct(int fill) {
+  search_tree* t = make_search_tree();
+}
+
 int main (int c, char** v)
 {
   srand(time(NULL));
-  void (*f[6]) (int) = {test_insert, test_remove, test_contains1, test_contains2, test_succ1, test_succ2};
+  void (*f[8]) (int) = {test_insert, test_remove, test_contains1, test_contains2, test_succ1, test_succ2, test_minimum, test_correct};
   f[atoi(v[1])](atoi(v[2]));
 }

@@ -57,6 +57,7 @@ tree* create_and_fill(int fill, int* n) {
 void
 test_insert(int fill)
 {
+  printf("%d\n", __linux);
   int* n = malloc(sizeof(int) * (1<<24));
   tree* t = create_and_fill(fill, n);
 

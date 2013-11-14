@@ -15,8 +15,8 @@ search_tree* make_search_tree();
 
 int_option  minimum     (search_tree*);
 int_option  maximum     (search_tree*);
-int_option  successor   (int, search_tree*);
-int_option  predecessor (int, search_tree*);
+int_option  successor_key   (int, search_tree*);
+int_option  predecessor_key (int, search_tree*);
 int_option  search      (int, search_tree*);
 
 // MUTATORS
