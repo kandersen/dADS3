@@ -10,7 +10,7 @@ typedef struct vEB_tree vEB_tree;
 /* elements per procent */
 int EPP = (1 << 24) / 100;
 
-int* n;
+int *n, *m;
 vEB_tree* t;
 
 void
@@ -65,9 +65,8 @@ test_succ1()
 void
 test_succ2()
 {
-  permute(n, 1 << 24);
   for (int i = 0; i < EPP; i++)
-    vEB_succ(t, n[i]);
+    vEB_succ(t, m[i]);
 }
 
 void
@@ -80,9 +79,8 @@ test_contains1()
 void
 test_contains2()
 {
-  permute(n, 1 << 24);
   for (int i = 0; i < EPP; i++)
-    vEB_contains(t, n[i]);
+    vEB_contains(t, m[i]);
 }
 
 void
@@ -96,7 +94,9 @@ int main (int c, char** v)
 {
   srand(time(NULL));
   n = malloc(sizeof(int) * (1<<24));
-  permute(n, 1 << 24);
+  m = malloc(sizeof(int) * (1<<24));
+  permute(n, 1 << 24); 
+  permute(m, 1 << 24);
   fill = atoi(v[2]);
   create_and_fill(fill);
 
@@ -104,5 +104,5 @@ int main (int c, char** v)
   
   uint64_t elapsed = measure_function(f[atoi(v[1])]);
 
-  printf("Took %lld\n", elapsed);
+  printf("%lld\n", elapsed);
 }

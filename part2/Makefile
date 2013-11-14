@@ -15,13 +15,13 @@ veb_only_debug :
 # TREES
 
 veb_only_tree :
-	$(COMPILER) $(FLAGS) -o bin/veb_only_tree.out src/trees/veb_only.c src/tests/test_tree_veb.c $(COMMON) $(COMMON_TREES)
+	$(COMPILER) $(FLAGS) -o bin/veb_only_tree.out src/trees/veb_only.c src/tests/test_tree_veb.c src/timer.c $(COMMON) $(COMMON_TREES)
 
 veb_combo_tree :
 	./scripts/compile_combo.sh
 
 rb_tree :
-	$(COMPILER) $(FLAGS) -o bin/rb_tree.out src/trees/rb_tree.c src/trees/rb_search_tree.c src/tests/test_tree_rb.c $(COMMON) $(COMMON_TREES)
+	$(COMPILER) $(FLAGS) -o bin/rb_tree.out src/trees/rb_tree.c src/trees/rb_search_tree.c src/tests/test_tree_rb.c src/timer.c $(COMMON) $(COMMON_TREES)
 
 # HEAPS
 
