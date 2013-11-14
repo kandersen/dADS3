@@ -29,7 +29,7 @@ get_elapsed ()
      int64_t t = 0;
      
      t += _end_time.tv_sec*1000000000;
-     t -= _start_time.tv_sec;
+     t -= _start_time.tv_sec*1000000000;
      t += _end_time.tv_nsec;
      t -= _start_time.tv_nsec;
      return t;
