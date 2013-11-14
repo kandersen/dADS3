@@ -31,7 +31,7 @@ node* new_node(int i) {
 
 // INTERFACE
 
-heap* make_heap(int universe) {
+heap* make_heap(uint8_t universe) {
   heap* res = (heap*) malloc(sizeof(heap));
   item** new_array = (item**) malloc(sizeof(item*) * INITIAL_HEAP_SIZE);
   res->size = INITIAL_HEAP_SIZE;
@@ -40,7 +40,7 @@ heap* make_heap(int universe) {
   return res;
 }
 
-void insert_item(item* k, heap* h) {
+void insert_item_heap(item* k, heap* h) {
   if(h->count == h->size) {
     h->array = (item**)realloc(h->array, (sizeof(item*) * (h->size = h->size * 2)));
   }

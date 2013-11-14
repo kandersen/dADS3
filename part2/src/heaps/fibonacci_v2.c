@@ -29,14 +29,14 @@ struct heap {
   node* min_node;
 };
 
-heap* make_heap(int universe) {
+heap* make_heap(uint8_t universe) {
   heap* h =  (heap*)malloc(sizeof(heap));
   h->min_node = NULL;
   h->rank = 0;
   return h;
 }
 
-void insert_item(item* i, heap* h) {
+void insert_item_heap(item* i, heap* h) {
   heap* new_h = make_heap(0);
   node* n = (node*)malloc(sizeof(node));
   n->key = i->key;
