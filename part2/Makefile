@@ -18,10 +18,10 @@ veb_only_tree :
 	$(COMPILER) $(FLAGS) -o bin/veb_only_tree.out src/trees/veb_only.c src/tests/test_tree_veb.c $(COMMON) $(COMMON_TREES)
 
 veb_combo_tree :
-	$(COMPILER) $(FLAGS) -o bin/veb_combo_tree.out src/combotree/veb_tree.c src/combotree/veb_node.c src/combotree/bit_vector.c src/tests/test_tree_combo.c $(COMMON) $(COMMON_TREES)
+	./scripts/compile_combo.sh
 
 rb_tree :
-	$(COMPILER) $(FLAGS) -o bin/rb_tree.out src/trees/rb_tree.c $(COMMON) $(COMMON_TREES)
+	$(COMPILER) $(FLAGS) -o bin/rb_tree.out src/trees/rb_tree.c src/trees/rb_search_tree.c src/tests/test_tree_rb.c $(COMMON) $(COMMON_TREES)
 
 # HEAPS
 

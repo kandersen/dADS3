@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include "int_option.h"
-#include "rb_tree.h"
+#include "search_tree.h"
 
 typedef struct timespec timespec;
 
