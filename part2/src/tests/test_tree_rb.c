@@ -82,7 +82,7 @@ test_remove(int fill)
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
   for (int i = 0; i < EPP; i++)
-    delete(n[i], t);
+    delete_item(n[i], t);
 
   clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
   print_result("remove", fill, time1, time2);
@@ -179,11 +179,30 @@ test_minimum(int fill)
 void
 test_correct(int fill) {
   search_tree* t = make_search_tree();
+  insert(25, t);
+  insert(10, t);
+  insert(18, t);
+  insert(11, t);
+  insert(13, t);
+  insert(12, t);
+  insert(14, t);
+  printf("succ til 25: %d\n", successor_key(25, t));
+  printf("succ til 19: %d\n", successor_key(19, t));
+  printf("succ til 18: %d\n", successor_key(18, t));
+  printf("succ til 17: %d\n", successor_key(17, t));
+  printf("succ til 16: %d\n", successor_key(16, t));
+  printf("succ til 15: %d\n", successor_key(15, t));
+  printf("succ til 14: %d\n", successor_key(14, t));
+  printf("succ til 13: %d\n", successor_key(13, t));
+  printf("succ til 12: %d\n", successor_key(12, t));
+  printf("succ til 11: %d\n", successor_key(11, t));
+  printf("succ til 10: %d\n", successor_key(10, t));
+  printf("succ til 9: %d\n", successor_key(9, t));
 }
 
 int main (int c, char** v)
 {
   srand(time(NULL));
-  void (*f[8]) (int) = {test_insert, test_remove, test_contains1, test_contains2, test_succ1, test_succ2, test_minimum, test_correct};
+  void (*f[7]) (int) = {test_insert, test_remove, test_contains1, test_contains2, test_succ1, test_succ2, test_minimum};
   f[atoi(v[1])](atoi(v[2]));
 }

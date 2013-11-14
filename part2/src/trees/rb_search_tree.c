@@ -57,7 +57,7 @@ void insert (int key, search_tree* st) {
   rb_insert(st->t, make_rb_node(key));
 }
 
-void delete (int key, search_tree* st) {
+void delete_item (int key, search_tree* st) {
   rb_delete(st->t, make_rb_node(key));
 }
 

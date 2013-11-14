@@ -30,6 +30,6 @@ rb_node* rb_search      (rb_tree*, int);
 
 // MUTATORS
 void     rb_insert      (rb_tree*, rb_node*);
-void     rb_delete      (rb_tree*, rb_node*);
+void     rb_delete (rb_tree*, rb_node*);
 
 #endif //RB_TREE_H

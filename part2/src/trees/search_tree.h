@@ -21,6 +21,6 @@ int_option  search      (int, search_tree*);
 
 // MUTATORS
 void insert      (int, search_tree*);
-void delete      (int, search_tree*);
+void delete_item (int, search_tree*);
 
 #endif //SEARCH_TREE_H
