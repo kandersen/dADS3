@@ -23,11 +23,13 @@ int      rb_count       (rb_tree*);
 rb_node* rb_minimum     (rb_tree*, rb_node*);
 rb_node* rb_maximum     (rb_tree*, rb_node*);
 rb_node* rb_successor   (rb_tree*, rb_node*);
+int rb_successor_key   (rb_tree*, int);
 rb_node* rb_predecessor (rb_tree*, rb_node*);
+int rb_predecessor_key   (rb_tree*, int);
 rb_node* rb_search      (rb_tree*, int);
 
 // MUTATORS
 void     rb_insert      (rb_tree*, rb_node*);
-void     rb_delete      (rb_tree*, rb_node*);
+void     rb_delete (rb_tree*, rb_node*);
 
 #endif //RB_TREE_H

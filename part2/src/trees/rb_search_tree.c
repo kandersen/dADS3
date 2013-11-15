@@ -1,5 +1,4 @@
 #include <stdlib.h>
-
 #include "rb_tree.h"
 #include "search_tree.h"
 #include "int_option.h"
@@ -34,22 +33,14 @@ int_option maximum (search_tree* st) {
   }
 }
 
-int_option successor (int key, search_tree* st) {
-  rb_node* res = rb_successor(st->t, key);
-  if(res) {
-    return some(rb_key_of(res));
-  } else {
-    return none();
-  }
+int_option successor_key (int key, search_tree* st) {
+  int res = rb_successor_key(st->t, key);
+  return some(res);
 }
 
-int_option predecessor (int key, search_tree* st) {
-  rb_node* res = rb_predecessor(st->t, key);
-  if(res) {
-    return some(rb_key_of(res));
-  } else {
-    return none();
-  }
+int_option predecessor_key (int key, search_tree* st) {
+  int res = rb_predecessor_key(st->t, key);
+  return some(res);
 }
 
 int_option search (int key, search_tree* st) {
@@ -66,8 +57,9 @@ void insert (int key, search_tree* st) {
   rb_insert(st->t, make_rb_node(key));
 }
 
-void delete (int key, search_tree* st) {
-  rb_delete(st->t, make_rb_node(key));
+void delete_item (int key, search_tree* st) {
+  rb_node* target = rb_search(st->t, key);
+  if (target) rb_delete(st->t, target);
 }
 
 

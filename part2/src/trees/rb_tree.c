@@ -231,6 +231,28 @@ rb_node* rb_successor(rb_tree* T, rb_node* x) {
   return y;
 }
 
+int rb_successor_key(rb_tree* T, int x) {
+  int succ = (1 << 24);
+  rb_node* y = T->root;
+  while (y != T->nil) {
+    if (y->key <= x) {
+      if (y->right == T->nil) {
+        return succ;
+      } else {
+        y = y->right;
+      }
+    } else {
+      succ = y->key;
+      if (y->left == T->nil) {
+        return succ;
+      } else {
+        y = y->left;
+      }
+    }
+  }
+  return succ;
+}
+
 rb_node* rb_predecessor(rb_tree* T, rb_node* x) {
   if (x->left != T->nil) {
     return rb_maximum(T, x->left);
@@ -241,6 +263,28 @@ rb_node* rb_predecessor(rb_tree* T, rb_node* x) {
     y = y->p;
   } 
   return y;
+}
+
+int rb_predecessor_key(rb_tree* T, int x) {
+  int pred = 0;
+  rb_node* y = T->root;
+  while (y != T->nil) {
+    if (y->key >= x) {
+      if (y->left == T->nil) {
+        return pred;
+      } else {
+        y = y->left;
+      }
+    } else {
+      pred = y->key;
+      if (y->right == T->nil) {
+        return pred;
+      } else {
+        y = y->right;
+      }
+    }
+  }
+  return pred;
 }
 
 rb_node* rb_search(rb_tree* T, int k) {
