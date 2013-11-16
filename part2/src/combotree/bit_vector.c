@@ -71,6 +71,9 @@ bit_vector_delete (vEB_tree * const vector, uint24_option const value)
      uint32_t already_vacant_value = !vEB_contains(vector, value);
 
      vector->blocks[block_number] &= ~((block_type) (1 << bit_number));
+     
+     if (vector->min == value && vector->max == value)
+          return vector->min = vector->max = none(), !already_vacant_value;
 
      if (vector->min == value)
           vector->min = vEB_succ(vector, vector->min);
@@ -91,7 +94,8 @@ bit_vector_contains (vEB_tree const * const vector, uint24_option const value)
      uint32_t block_number = value / bit_count(vector->universe_bits);
      uint32_t mask = 1 << bit_number;
 
-     return !!(vector->blocks[block_number] & mask);
+     bool res = !!(vector->blocks[block_number] & mask);
+     return res;
 }
 
 uint24_option
@@ -113,13 +117,13 @@ bit_vector_pred (vEB_tree const * const vector, uint24_option const value)
           return none();
 
      uint24_option min_element = some(0);
-     uint24_option max_element = some(1 << bit_count(vector->universe_bits));
+     uint24_option max_element = some(((1 << vector->universe_bits)-1));
      uint24_option test_value;
-     
+    
      for (test_value = some(value) - 1; test_value >= min_element && test_value < max_element; test_value--)
-          if (vEB_contains(vector, test_value))
-               return some(test_value);
-     
+         if (vEB_contains(vector, test_value))
+           return some(test_value);
+
      return none();
 }
 
@@ -129,12 +133,12 @@ bit_vector_succ (vEB_tree const * const vector, uint24_option const value)
      if (is_none(value))
           return none();
 
-     uint24_option max_element = some(1 << bit_count(vector->universe_bits));
+     uint24_option max_element = some((1 << vector->universe_bits)-1);
      uint24_option test_value;
 
-     for (test_value = some(value) + 1; test_value < max_element; test_value++)
-          if (vEB_contains(vector, test_value))
-               return some(test_value);
-     
+     for (test_value = some(value) + 1; test_value <= max_element; test_value++)
+         if (vEB_contains(vector, test_value))
+           return some(test_value);
+
      return none();
 }

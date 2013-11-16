@@ -31,25 +31,32 @@ vEB_tree * vEB_init (uint8_t const universe_bits)
           tree->bottom = n->bottom;
           tree->top = n->top;
      }
+     
+     
      return tree;
 }
 
 bool vEB_insert (vEB_tree *const tree, uint24_option const value)
 {
+     
      bool (*insert[2]) (vEB_tree *const, uint24_option const);
      insert[_KIND_BIT] = bit_vector_insert;
      insert[_KIND_VEB] = vEB_node_insert;
-
-     return insert[tree->kind] (tree, value);
+     bool success = insert[tree->kind] (tree, value);
+     
+     return success;
 }
 
 bool vEB_delete (vEB_tree *const tree, uint24_option const value)
 {
+     
      bool (*delete[2]) (vEB_tree *const, uint24_option const);
      delete[_KIND_BIT] = bit_vector_delete;
      delete[_KIND_VEB] = vEB_node_delete;
 
-     return delete[tree->kind] (tree, value);
+     bool success =  delete[tree->kind] (tree, value);
+     
+     return success;
 }
 
 bool vEB_contains (vEB_tree const *const tree, uint24_option const value)
@@ -58,39 +65,52 @@ bool vEB_contains (vEB_tree const *const tree, uint24_option const value)
      contains[_KIND_BIT] = bit_vector_contains;
      contains[_KIND_VEB] = vEB_node_contains;
 
-     return contains[tree->kind] (tree, value);
+     bool success = contains[tree->kind] (tree, value);
+     
+     return success;
 }
 
 uint24_option vEB_minimum (vEB_tree const *const tree)
 {
+     
      uint24_option (*minimum[2]) (vEB_tree const *const);
      minimum[_KIND_BIT] = bit_vector_minimum;
      minimum[_KIND_VEB] = vEB_node_minimum;
-
-     return minimum[tree->kind] (tree);
+     uint24_option res = minimum[tree->kind] (tree);
+     
+     return res;
 }
 
 uint24_option vEB_maximum (vEB_tree const *const tree)
 {
+     
      uint24_option (*maximum[2]) (vEB_tree const *const);
      maximum[_KIND_BIT] = bit_vector_maximum;
      maximum[_KIND_VEB] = vEB_node_maximum;
 
-     return maximum[tree->kind] (tree);
+     uint24_option res = maximum[tree->kind] (tree);
+     
+     return res;
 }
 
 uint24_option vEB_pred (vEB_tree const *const tree, uint24_option const value)
 {
+     
      uint24_option (*pred[2]) (vEB_tree const *const, uint24_option const);
      pred[_KIND_BIT] = bit_vector_pred;
      pred[_KIND_VEB] = vEB_node_pred;
-     return pred[tree->kind] (tree, value);
+     uint24_option res = pred[tree->kind] (tree, value);
+     
+     return res;
 }
 
 uint24_option vEB_succ (vEB_tree const *const tree, uint24_option const value)
 {
+     
      uint24_option (*succ[2]) (vEB_tree const * const, uint24_option const);
      succ[_KIND_BIT] = bit_vector_succ;
      succ[_KIND_VEB] = vEB_node_succ;
-     return succ[tree->kind] (tree, value);
+     uint24_option res = succ[tree->kind] (tree, value);
+     
+     return res;
 }
