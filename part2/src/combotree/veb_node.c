@@ -210,8 +210,8 @@ vEB_node_pred (vEB_tree const *const node, uint24_option const value)
      
      uint24_option a = hi_value(node->universe_bits, value);
      uint24_option b = lo_value(node->universe_bits, value);    
-     uint24_option pred_a = vEB_minimum(node->top);
-     uint24_option pred_b = vEB_minimum(node->bottom[a]);
+     uint24_option pred_a = universe_bits > 1 ? vEB_minimum(node->top) : none();
+     uint24_option pred_b = universe_bits > 1 ? vEB_minimum(node->bottom[a]) : none();
 
      /* a'th subtree has a pred */
      if (is_some(pred_b) && pred_b < b && node->universe_bits > 1) 
@@ -251,8 +251,8 @@ vEB_node_succ (vEB_tree const *const node, uint24_option const value)
      
      uint24_option a = hi_value(node->universe_bits, value);
      uint24_option b = lo_value(node->universe_bits, value);    
-     uint24_option succ_a = vEB_maximum(node->top);
-     uint24_option succ_b = vEB_maximum(node->bottom[a]);
+     uint24_option succ_a = universe_bits > 1 ? vEB_maximum(node->top) : none();
+     uint24_option succ_b = universe_bits > 1 ? vEB_maximum(node->bottom[a]) : none();
 
      /* a'th subtree has a succ */
      if (is_some(succ_b) && succ_b > b && node->universe_bits > 1) 
