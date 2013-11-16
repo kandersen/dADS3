@@ -248,7 +248,7 @@ vEB_node_succ (vEB_tree const *const node, uint24_option const value)
 {
      if (is_none(value) || !fits(node->universe_bits, value))
          return none();
-     
+
      uint24_option a = hi_value(node->universe_bits, value);
      uint24_option b = lo_value(node->universe_bits, value);    
      uint24_option succ_a = vEB_maximum(node->top);
