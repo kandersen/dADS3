@@ -6,13 +6,6 @@
 
 // NODE TYPE, CLRS pp. 309
 
-struct rb_node {
-  color color;
-  int key; 
-  rb_node* right; 
-  rb_node* left;
-  rb_node* p;
-};
 
 int rb_key_of(rb_node* n) {
   return n->key;

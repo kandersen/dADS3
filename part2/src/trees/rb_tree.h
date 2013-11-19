@@ -3,7 +3,13 @@
 
 typedef int color;
 
-struct rb_node;
+struct rb_node {
+  color color;
+  int key; 
+  struct rb_node* right; 
+  struct rb_node* left;
+  struct rb_node* p;
+};
 struct rb_tree;
 
 typedef struct rb_node rb_node;

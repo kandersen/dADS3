@@ -4,6 +4,7 @@ COMMON = src/int_option.c src/timer.c
 COMMON_TREES = -I src/ -I src/trees/ -I src/combotree/ -DMIN_VEB_UNIVERSE_BITS=0 -lm
 COMMON_HEAPS = -I src/ -I src/heaps/ -I src/trees/ src/tests/test_heap.c -DMIN_VEB_UNIVERSE_BITS=0 -lm
 
+
 nothings:
 
 # DEBUG
@@ -50,6 +51,7 @@ fh1:
 fh2:	
 	$(COMPILER) $(FLAGS) -o bin/fh2_heap.out src/heaps/fibonacci_v2.c $(COMMON) $(COMMON_HEAPS)
 
+heaps: 	veb_only_heap veb_combo_heap rb_heap bha bhp fh1 fh2
 
 tester: COMMON += src/tester.c
 tester: bha bhp fh1 fh2 veb1_heap rb_heap

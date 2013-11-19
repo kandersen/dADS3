@@ -20,10 +20,10 @@ permute(int* p, int len)
 {
   int j;
   int temp;
-  for (int i = 0; i < len; i++)
-    p[i] = i;
-
   for (int i = 1; i < len; i++)
+    p[i-1] = i;
+
+  for (int i = 0; i < len; i++)
     {
       j = rand() % len;
       if (j > 0) {
@@ -50,8 +50,9 @@ void create_and_fill(int fill) {
 void
 test_insert()
 {
-  for (int i = fill*EPP; i < (1+fill)*EPP; i++)
+  for (int i = fill*EPP; i < (1+fill)*EPP; i++) {
     insert_item_heap(create_item(n[i]),t);
+  }
 
   delete_min(t);
 }
@@ -98,22 +99,26 @@ int main (int c, char** v)
   fill = atoi(v[2]);
 
   create_and_fill(fill);
+  item* null_key_item = create_item(0);
+  insert_item_heap(null_key_item, t);
 
   int start = (fill-1)*EPP;
   items = (item**)malloc(sizeof(item*) * EPP);
-  
   for (int i = start; i < (fill)*EPP; i++) {
     item* itm = create_item(n[i]);
     items[i-start] = itm;
-    insert_item_heap(itm, t);
-  }
-
+    insert_item_heap(itm, t); 
+ }
   delete_min(t);
-
+  find_min(t);
   // generate decrease keys before timing
   dec = malloc(sizeof(int) * EPP);
   for (int i = 0; i < EPP; i++) {
-    dec[i] = rand() % items[i]->key;
+    if (items[i]->key <= 0) {
+      dec[i] = 0;
+    } else {
+      dec[i] = (int)(rand() % items[i]->key);
+    }
   }
 
   void (*f[5]) (void) = {test_insert, test_remove, test_delete_min, test_decrease_key, test_minimum};

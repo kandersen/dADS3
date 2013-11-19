@@ -19,7 +19,7 @@ struct heap {
   rb_tree* t;
 };
 
-heap* make_heap(int universe) {
+heap* make_heap(uint8_t universe) {
   heap* res = (heap*) malloc(sizeof(heap));
   res->t = make_rb_tree();
   return res;
@@ -36,7 +36,7 @@ void decrease_key(int delta, item* i, heap* h) {
   rb_insert(h->t, rbn);
 }
 
-void insert_item(item* i, heap* h) {
+void insert_item_heap(item* i, heap* h) {
   rb_node* rbnode = make_rb_node(i->key);
   node* nx = (node*)malloc(sizeof(node));
   nx->rb = rbnode;
@@ -68,16 +68,19 @@ item* delete_min(heap* h) {
   }
 }
 
+/*
 heap* meld(heap* h1, heap* h2) {
   item* next = NULL;
   while(is_some((next = delete_min(h2))->key)) {
     insert_item(next, h1);
   }
   return h1;
-}
+  } */
 
 void remove_item (item* i, heap* h) {
-  rb_delete(h->t, i->n->rb);
+  if (i->n != NULL) 
+    rb_delete(h->t, i->n->rb);
+  i->n = NULL;
 }
 
 void to_dot (heap* h, char* filename) {
@@ -93,13 +96,14 @@ int count(heap* h) {
   return rb_count(h->t);
 }
 
+/*
 heap* make_queue (void* items[], int keys[], int count) {
   heap* res = make_heap(0);
   for(int i = 0; i < count; i++) {
     insert_item(make_item(keys[i]), res);
   }
   return res;
-}
+  } */
 
 int is_consistent (heap* h) {
   puts("rb_heap.c:is_consistent not implemented yet! -- Crashing the program");
