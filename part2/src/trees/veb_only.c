@@ -13,7 +13,6 @@ struct tree {
 
 // UTILITIES
 
-
 int upper(uint24_option const u) {
   return (1<<(int)ceil((log2 (u))/2));
 }
@@ -33,7 +32,7 @@ int low(uint24_option const x, tree const* veb) {
 int find_index(uint24_option const x, uint24_option const y, tree const* veb) {
   return x * lower(veb->u) + y;
 }
-
+ 
 tree* make_veb(int u) {
 
   tree* t = (tree*)malloc(sizeof(tree));

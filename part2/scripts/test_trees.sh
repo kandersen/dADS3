@@ -6,9 +6,9 @@ do
     for ex in veb_only_tree rb_tree veb_combo_tree_100 veb_combo_tree_24 veb_combo_tree_12 veb_combo_tree_6 veb_combo_tree_3 veb_combo_tree_2 veb_combo_tree_1
     do
         echo $ex
-        for (( t = 0; t <= 6; t++ ))
+        for (( t = 0; t <= 0; t++ ))
         do
-            for (( r = 1; r <= 3; r++ ))
+            for (( r = 1; r <= 10; r++ ))
             do
                 printf $ex"\t"$t"\t"$f"\t" >> tree_test.csv
                 ./bin/$ex.out $t $f >> tree_test.csv
@@ -23,9 +23,9 @@ do
     for ex in veb_only_tree rb_tree veb_combo_tree_100 veb_combo_tree_24 veb_combo_tree_12 veb_combo_tree_6 veb_combo_tree_3 veb_combo_tree_2 veb_combo_tree_1
     do
         echo $ex
-        for (( t = 0; t <= 6; t++ ))
+        for (( t = 0; t <= 0; t++ ))
         do
-            for (( r = 1; r <= 3; r++ ))
+            for (( r = 1; r <= 10; r++ ))
             do
                 printf $ex"\t"$t"\t"$f"\t" >> tree_test.csv
                 ./bin/$ex.out $t $f >> tree_test.csv
@@ -40,9 +40,9 @@ do
     for ex in veb_only_tree rb_tree veb_combo_tree_100 veb_combo_tree_24 veb_combo_tree_12 veb_combo_tree_6 veb_combo_tree_3 veb_combo_tree_2 veb_combo_tree_1
     do
         echo $ex
-        for (( t = 0; t <= 6; t++ ))
+        for (( t = 0; t <= 0; t++ ))
         do
-            for (( r = 1; r <= 3; r++ ))
+            for (( r = 1; r <= 10; r++ ))
             do
                 printf $ex"\t"$t"\t"$f"\t" >> tree_test.csv
                 ./bin/$ex.out $t $f >> tree_test.csv

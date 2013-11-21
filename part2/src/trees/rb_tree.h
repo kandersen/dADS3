@@ -2,6 +2,7 @@
 #define RB_TREE_H
 
 typedef int color;
+struct item;
 
 struct rb_node {
   color color;
@@ -9,6 +10,7 @@ struct rb_node {
   struct rb_node* right; 
   struct rb_node* left;
   struct rb_node* p;
+  struct item* i;
 };
 struct rb_tree;
 

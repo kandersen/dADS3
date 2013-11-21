@@ -39,6 +39,7 @@ void decrease_key(int delta, item* i, heap* h) {
 void insert_item_heap(item* i, heap* h) {
   rb_node* rbnode = make_rb_node(i->key);
   node* nx = (node*)malloc(sizeof(node));
+  rbnode->i = i;
   nx->rb = rbnode;
   i->n = nx;
   rb_insert(h->t, rbnode);
@@ -59,6 +60,7 @@ item* delete_min(heap* h) {
     rb_node* res = rb_minimum(h->t, root);
     if(res) {
       rb_delete(h->t, res);
+      res->i->n = NULL;
       return make_item(rb_key_of(res));
     } else {
       return NULL;
