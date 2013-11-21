@@ -29,8 +29,8 @@ struct item {
 typedef struct item item;
 typedef struct heap heap;
 
-heap* make_heap     (int universe);
-void  insert_item   (item* i, heap* h);
+heap* make_heap     (uint8_t universe);
+void  insert_item_heap   (item* i, heap* h);
 item* find_min      (heap* h);
 item* delete_min    (heap* h);
 heap* meld          (heap* h1, heap* h2);

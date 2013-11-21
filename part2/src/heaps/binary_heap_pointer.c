@@ -93,14 +93,14 @@ node* swap(node* n, node* p) {
 
 //INTERFACE
 
-heap* make_heap(int universe) {
+heap* make_heap(uint8_t universe) {
   heap* h = (heap*) malloc(sizeof(heap));
   h->root = NULL;
   h->count = 0;
   return h;
 }
 
-void insert_item (item* k, heap* h) {
+void insert_item_heap(item* k, heap* h) {
   node* n = new_node(k);
   
   if(h->count == 0) {

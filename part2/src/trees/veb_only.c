@@ -19,27 +19,14 @@ int upper(uint24_option const u) {
 }
 
 int lower(uint24_option const u) {
-  // CHANGE this
   return (1<<(int)floor((log2 (u))/2));
 }
-/*
-int upper(uint24_option const u) {
-  return pow(2,(int)ceil((log2 (u))/2));
-  // CHANGE this
-}
-
-int lower(uint24_option const u) {
-  // CHANGE this
-  return pow(2,(int)floor((log2 (u))/2));
-  }*/
 
 int high(uint24_option const x, tree const* veb) {
-  // CHANGE this
   return (int)(x / lower(veb->u));
 }
 
 int low(uint24_option const x, tree const* veb) {
-  // CHANGE this
   return x % lower(veb->u);
 }
 

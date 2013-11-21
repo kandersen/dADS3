@@ -8,7 +8,7 @@
 #include "timer.h"
 
 /* elements per procent */
-int EPP = (1 << 24) / 100;
+int EPP = (1 << 24) / 1000;
 
 int *n, *m;
 search_tree* t;

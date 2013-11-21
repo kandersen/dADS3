@@ -89,15 +89,30 @@ needs content
 
 \chapter{Bit-vector}
 
-A bit-vector or a bit array is a structure that supports $\Insert$, $\Delete$ and $\Member$ in constant time~\cite[p. 532]{ITA09}. To support storing elements of universe size $u$ we must have an array of length $u$ bits. An entry will be one if the element that the bit represents is in the set and it will be zero if not.
+A bit-vector or a bit array is a datastructure that supports
+$\Insert$, $\Delete$ and $\Member$ in constant
+time~\cite[p. 532]{ITA09}. The bit-vector consists of a set of bits,
+for which the $i'th$ bit indicates the presence of the
+$i'th$ key. Thus, in order to support queries over an universe of size $u$ we must
+have a bit-vector with $u$ bits.
 
-For $\Insert$ we set the bit to 1 for the index representing the key value of $u$. $\Delete$ clears the corresponding bit. Checking if the set contains an element is just checking if the bit for the element is set to 1~\footnote{\begin{align*}
-& \textsc{TEST\_BIT}(var,pos) = ((var)\quad \&=\quad(1<<(pos))) \\
-& \textsc{SET\_BIT}(var,pos)  = ((var)\quad|=\quad(1<<(pos))) \\
-& \textsc{CLEAR\_BIT}(var,pos)  = ((var)\quad\&=\quad\textsf{\textasciitilde}(1<<(pos)))
-\end{align*}}.
+To $\Insert$ some key $i$ into the bit-vector the $i'th$ bit is set to
+true, similarly to $\Delete$ the same key $i$, the $i'th$ bit is
+cleared. The $\Member$ test for key $i$ is done by checking the $i'th$
+bit. All these operations are supported easily through bit
+shifts~\footnote{\begin{align*} & \textsc{TEST\_BIT}(var,pos) =
+    ((var)\quad \&=\quad(1<<(pos))) \\ & \textsc{SET\_BIT}(var,pos) =
+    ((var)\quad|=\quad(1<<(pos))) \\ & \textsc{CLEAR\_BIT}(var,pos) =
+    ((var)\quad\&=\quad\textsf{\textasciitilde}(1<<(pos)))
+\end{align*}}. 
+Please note, that these bit operations assume that the universe size
+does not exceed the word size. If that is not the case, extra
+computation is needed to first find the correct block; this however is
+also constant time.
 
-The bit-vector performs badly for $\Minimum$, $\Maximum$, $\Predecessor$ and $\Successor$ because the entire array could be traversed.
+The bit-vector performs badly for $\Minimum$, $\Maximum$,
+$\Predecessor$ and $\Successor$ because the entire array could be
+traversed in search for the answer.
 
 \begin{center}
   \begin{tabular}{ l | c }
@@ -112,16 +127,48 @@ The bit-vector performs badly for $\Minimum$, $\Maximum$, $\Predecessor$ and $\S
   \end{tabular}
 \end{center}
 
+Alternatively, $\Minimum$ and $\Maximum$ can be maintained during all
+changes to the bit vector, i.e. during insert and delete. With this
+approach the running time $\Delete$ would in worst case be completly
+dominated by the linear search for a new $\Minimum$ or $\Maximum$ while
+querying for the $\Minimum$ or $\Maximum$ would become constant time
+operations.
 
 \chapter{Van Emde Boas Tree}
 
-A van Emde Boas tree is a recursive data structure that supports finding the predecessor and successor in \BigT{\log \log m} time where $m$ is the size of the universe, in other words, the amount of distinct keys with a total ordering that the tree support~\cite[p. 545]{ITA09}~\cite{VEB04}. Because van Emde Boas Trees allow universe sizes of any power of 2, we denote $\HIGHER = 2^{\lceil{(\log u)/2}\rceil}$ and $\LOWER = 2^{\lfloor{(\log u)/2}\rfloor}$. Each level of the van Emde Boas Tree has a universe $u$ and it contains $\HIGHER$ clusters/bottom van Emde Boas trees of universe size $\LOWER$ and one auxilary van Emde Boas Tree of size $\HIGHER$ we denote top. For each recursion the universe shrinks by $\sqrt{u}$.
+A van Emde Boas tree is a recursive data structure that supports
+finding the predecessor and successor in \BigT{\log \log m} time where
+$m$ is the size of the universe, in other words, the amount of
+distinct keys with a total ordering that the tree
+support~\cite[p. 545]{ITA09}~\cite{VEB04}. Because van Emde Boas Trees
+allow universe sizes of any power of 2, we denote $\HIGHER =
+2^{\lceil{(\log u)/2}\rceil}$ and $\LOWER = 2^{\lfloor{(\log
+    u)/2}\rfloor}$.  Each level of the van Emde Boas Tree has a
+universe $u$ and it contains $\HIGHER$ clusters/bottom van Emde Boas
+trees of universe size $\LOWER$ and one auxilary van Emde Boas Tree of
+size $\HIGHER$ we denote top.  For each recursion the universe shrinks
+by $\sqrt{u}$.
 
-For each tree we have two attributes that store the minimum and the maximum key. The minimum key cannot be found in any of the bottom trees, neither can the maximum unless it differs from the minimum, which happens if there are more than one element in the tree. The attributes helps reduce the number of recursive calls, because one can in constant time decide if a value lies within the range, without the need to recurse.
+For each tree we have two attributes that store the minimum and the
+maximum key. The minimum key cannot be found in any of the bottom
+trees, neither can the maximum unless it differs from the minimum,
+which happens if there are more than one element in the tree. The
+attributes helps reduce the number of recursive calls, because one can
+in constant time decide if a value lies within the range, without the
+need to recurse.
 
-Van Emde Boas Trees utilizes that keys are represented as bits and if we view a key $x$ as a $\log u$-bit binary integer, we can divide the bits up in a most significant and a least significant part. The most significant part of the bit vector identifies the cluster $\lfloor{x/\sqrt{u}}\rfloor$ where $x$ will apear in position $x \mod \sqrt{u}$ in the beforementioned bottom tree. Let us denote $\HIGH(x) = \lfloor{x/\sqrt{u}}\rfloor$ and $\LOW(x) = x \mod \sqrt{u}$ then we get the identity $x = \HIGH(x) \sqrt{u} + \LOW(x)$.
+Van Emde Boas Trees utilizes that keys are represented as bits and if
+we view a key $x$ as a $\log u$-bit binary integer, we can divide the
+bits up in a most significant and a least significant part. The most
+significant part of the bit vector identifies the cluster
+$\lfloor{x/\sqrt{u}}\rfloor$ where $x$ will apear in position $x \mod
+\sqrt{u}$ in the beforementioned bottom tree. Let us denote $\HIGH(x)
+= \lfloor{x/\sqrt{u}}\rfloor$ and $\LOW(x) = x \mod \sqrt{u}$ then we
+get the identity $x = \HIGH(x) \sqrt{u} + \LOW(x)$.
 
-Below is the time-complexities of each operation listed for the corresponding data structure and let $u$ denote the size of the universe and $n$ the number of keys stored in the structure:
+Below is the time-complexities of each operation listed for the
+corresponding data structure and let $u$ denote the size of the
+universe and $n$ the number of keys stored in the structure:
 
 \begin{center}
   \begin{tabular}{ l | c | c | c }
