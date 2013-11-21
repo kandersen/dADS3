@@ -72,7 +72,7 @@
 \huge\sf Morten Krogh-Jespersen, 20022362}\\[2ex]
 \noindent\rule{\linewidth}{1mm}\\[4ex]
 \noindent{\Large\sf Project 1, Advanced Data Structures 2013, Computer Science\\[1ex] 
-\monthname\ \the\year  \\[1ex] Advisor: Gerth StÃ¸lting Brodal\\[15ex]}\\[\fill]}
+\monthname\ \the\year  \\[1ex] Advisor: Gerth Stølting Brodal\\[15ex]}\\[\fill]}
 \epsfig{file=logo.eps}\clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,11 +100,8 @@ To $\Insert$ some key $i$ into the bit-vector the $i'th$ bit is set to
 true, similarly to $\Delete$ the same key $i$, the $i'th$ bit is
 cleared. The $\Member$ test for key $i$ is done by checking the $i'th$
 bit. All these operations are supported easily through bit
-shifts~\footnote{\begin{align*} & \textsc{TEST\_BIT}(var,pos) =
-    ((var)\quad \&=\quad(1<<(pos))) \\ & \textsc{SET\_BIT}(var,pos) =
-    ((var)\quad|=\quad(1<<(pos))) \\ & \textsc{CLEAR\_BIT}(var,pos) =
-    ((var)\quad\&=\quad\textsf{\textasciitilde}(1<<(pos)))
-\end{align*}}. 
+shifts. 
+
 Please note, that these bit operations assume that the universe size
 does not exceed the word size. If that is not the case, extra
 computation is needed to first find the correct block; this however is
@@ -115,29 +112,147 @@ $\Predecessor$ and $\Successor$ because the entire array could be
 traversed in search for the answer.
 
 \begin{center}
-  \begin{tabular}{ l | c }
-    Operation & Bit-Vector  \\ \hline
-    \Member & $\BigT{1}$ \\ 
-    \Minimum & $\BigT{u}$ \\ 
-    \Maximum & $\BigT{u}$ \\ 
-    \Predecessor & $\BigT{u}$ \\ 
-    \Successor & $\BigT{u}$ \\ 
-    \Insert & $\BigT{1}$ \\ 
-    \Delete & $\BigT{1}$ \\
+  \begin{tabular}{ l | c | c}
+    Operation & Bit-Vector & Bit-Vector w. min \& max \\ \hline
+    \Member & $\BigT{1}$ & $\BigT{1}$ \\ 
+    \Minimum & $\BigO{u}$ & $\BigT{1}$ \\ 
+    \Maximum & $\BigO{u}$ & $\BigT{1}$ \\ 
+    \Predecessor & $\BigO{u}$ & $\BigO{u}$ \\ 
+    \Successor & $\BigO{u}$ & $\BigO{u}$ \\ 
+    \Insert & $\BigT{1}$ & $\BigT{1}$ \\ 
+    \Delete & $\BigT{1}$ & $\BigO{u}$ \\
   \end{tabular}
 \end{center}
 
 Alternatively, $\Minimum$ and $\Maximum$ can be maintained during all
-changes to the bit vector, i.e. during insert and delete. With this
-approach the running time $\Delete$ would in worst case be completly
+changes to the bit vector, i.e. during $\Insert$ and $\Delete$. With this
+approach the running time of $\Delete$ would in worst case be completely
 dominated by the linear search for a new $\Minimum$ or $\Maximum$ while
 querying for the $\Minimum$ or $\Maximum$ would become constant time
-operations.
+operations. For the remaining part of this report, we will refer to the Bit-Vector as the version that maintains $\Minimum$ and $\Maximum$.
+
+\chapter{Red-Black Tree}
+
+The simplest search tree we know is the binary search tree (BST). Its
+invariant is simple, and both querying and updating is formulated
+easily, both iteratively and recursively. The runtime guarantees are,
+while equally easy to argue, not optimal.
+
+The root of the problem is an issue of balancing. A plain BST
+maintains no notion of balance, so a pathological use can create 'flat
+trees' where all nodes end up along a single spine, giving worst-case
+linear time for most operations.
+
+One solutions is a red-black tree (RBT), where the idea is to maintain
+additional structure in order to remain balanced.
+
+The remainder of this section describes the structure of an RBT, and
+describes the operations which we have implemented, that has the following time complexities with compared with the Bit-Vector:
+
+\begin{center}
+  \begin{tabular}{ l | c | c}
+    Operation & Bit-Vector & Red-Black tree \\ \hline
+    \Member & $\BigT{1}$ & $\BigO{\log n}$ \\ 
+    \Minimum & $\BigT{1}$ & $\BigO{\log n}$ \\ 
+    \Maximum & $\BigT{1}$ & $\BigO{\log n}$ \\ 
+    \Predecessor & $\BigO{u}$ & $\BigO{\log n}$ \\ 
+    \Successor & $\BigO{u}$ & $\BigO{\log n}$ \\ 
+    \Insert & $\BigT{1}$ & $\BigO{\log n}$ \\ 
+    \Delete & $\BigO{u}$ & $\BigO{\log n}$ \\
+  \end{tabular}
+\end{center}
+
+
+\section{Red-Black Trees}\label{sec:rbt}
+
+A red black tree is essentially an ordinary BST with an additional bit
+of information per node: the ``color'' of that node, black or
+red. Through the use of a handful of invariants, the color information
+is used to balance the RBT. So in addition to the usual fields of key,
+parent pointer, left and right child pointers, we also store a color
+bit.
+
+The fact that an RBT is just an augmented BST means that the basic
+queries essentially need no changes to work on RBTs, and, indeed,
+Cormen et al. (REF) on which we base our implementation, defers to the
+section on simple BSTs.
+
+The invariants that we place on an RBT, in addition to the basic
+search tree property, is as follows:
+
+\begin{enumerate}
+  \item The root is black
+  \item All leaves are black
+  \item If a node is red, both its children are black
+  \item For each node, all paths from node to descendant leaves
+    contain the same number of black nodes.
+\end{enumerate}
+
+See Lemma 13.1 in Cormen et al (REF) for how these last two properties
+ensure balancing.
+
+\section{Operations}
+
+\subsection{Queries}
+
+No queries exploit the RBT structure, and so work procedurally like the
+operations known from simple BSTs. The running times, however, benefit
+from the balancing guarantees of RBTs.
+
+\paragraph{Minimum} The minimum node of a search tree is its left-most
+node, if any. This is given by the basic search tree invariant. By
+virtue of being balanced, the minimum node lies at a maximum depth of
+$\log(n)$, where $n$ is the number of nodes in the tree, and the
+worst-case running time is thus $O(\log(n))$.
+
+\paragraph{Maximum} Symmetric to Minimum.
+
+\paragraph{Predecessor} The Predecessor query asks, given a particular
+node in a search tree: ``what is the greatest node smaller than this
+particular node?'' In the case of an internal node, the answer can be
+constructed using Maximum, as we simply query the left subtree of the
+given node for its maximum node: running time proportional to the
+depth of the given node. In the case of a leaf, we must find the first
+ancestor such that the given node is in its right sub-tree. This will
+ensure $Successor \circ Predecessor = id$. The running time is again
+proportional to the depth of the given node, and so is always
+$O(\log(n))$.
+
+\paragraph{Successor} Symmetric to Predecessor.
+
+\paragraph{Search} The Search query asks, given a key and a search
+tree, ``does the tree contain a node with the given key?'', and relies
+entirely on the basic search tree invariant. If the node at the root
+of the given tree has the desired key, we have found what we are
+looking for. Otherwise, the desired key is either smaller or larger
+than the key at the root of the given tree, and we can thus
+recursively search either the left or right tree, respectively. We
+answer negatively upon hitting a leaf. The running time is
+proportional to the depth of the initial tree, and thus runs
+$O(\log(n))$ where $n$ is the number of nodes in the tree.
+
+\subsection{Updates}
+
+Updating operations on RBTs are complicated by the need to maintain
+the RBT invariants described in section \ref{sec:rbt}.
+
+\paragraph{Insert} To maintain the search-tree invariant, the
+RBT insertion procedure works operationally the same as the insertion
+procedure, and then does some additional work to reestablish the RBT
+invariants. The first phase of searching runs proportional to the
+depth of the tree, and the reestablishing runs back up the tree in the
+worst case, performing a constant amount of work at each node. This
+gives a grand total of $O(\log(n))$ work for insertions.
+
+\paragraph{Delete} Deletion is similar in argument to insertion,
+albeit complicated when the node to be removed is black. It does a
+search down, and a fix up, for a run-time of $O(\log(n))$.
+
 
 \chapter{Van Emde Boas Tree}
 
 A van Emde Boas tree is a recursive data structure that supports
-finding the predecessor and successor in \BigT{\log \log m} time where
+finding the predecessor and successor in \BigO{\log \log m} time where
 $m$ is the size of the universe, in other words, the amount of
 distinct keys with a total ordering that the tree
 support~\cite[p. 545]{ITA09}~\cite{VEB04}. Because van Emde Boas Trees
@@ -173,13 +288,13 @@ universe and $n$ the number of keys stored in the structure:
 \begin{center}
   \begin{tabular}{ l | c | c | c }
     Operation & Bit-Vector & Red-Black Tree & van Emde Boas Tree \\ \hline
-    \Member & $\BigT{1}$ & $\BigT{\log n}$ & $\BigO{\log \log u}$ \\ 
-    \Minimum & $\BigT{u}$ & $\BigT{\log n}$ & $\BigO{1}$\\ 
-    \Maximum & $\BigT{u}$ & $\BigT{\log n}$ & $\BigO{1}$ \\ 
-    \Predecessor & $\BigT{u}$ & $\BigT{\log n}$ & $\BigO{\log \log u}$  \\ 
-    \Successor & $\BigT{u}$ & $\BigT{\log n}$ & $\BigO{\log \log u}$ \\ 
-    \Insert & $\BigT{1}$ & $\BigT{\log n}$ & $\BigO{\log \log u}$ \\ 
-    \Delete & $\BigT{1}$ & $\BigT{\log n}$ & $\BigO{\log \log u}$ \\
+    \Member & $\BigT{1}$ & $\BigO{\log n}$ & $\BigO{\log \log u}$ \\ 
+    \Minimum & $\BigT{1}$ & $\BigO{\log n}$ & $\BigO{1}$\\ 
+    \Maximum & $\BigT{1}$ & $\BigO{\log n}$ & $\BigO{1}$ \\ 
+    \Predecessor & $\BigO{u}$ & $\BigO{\log n}$ & $\BigO{\log \log u}$  \\ 
+    \Successor & $\BigO{u}$ & $\BigO{\log n}$ & $\BigO{\log \log u}$ \\ 
+    \Insert & $\BigT{1}$ & $\BigO{\log n}$ & $\BigO{\log \log u}$ \\ 
+    \Delete & $\BigO{u}$ & $\BigO{\log n}$ & $\BigO{\log \log u}$ \\
   \end{tabular}
 \end{center}
 
