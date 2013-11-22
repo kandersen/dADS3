@@ -55,19 +55,22 @@ item* find_min(heap* h) {
 }
 
 item* delete_min(heap* h) {
-  rb_node* root = rb_root_of(h->t);
-  if (root) {
-    rb_node* res = rb_minimum(h->t, root);
-    if(res) {
-      rb_delete(h->t, res);
-      res->i->n = NULL;
-      return make_item(rb_key_of(res));
+  if (!rb_is_empty(h->t)) {
+    rb_node* root = rb_root_of(h->t);
+    if (root) {
+      rb_node* res = rb_minimum(h->t, root);
+      if(res) {
+        rb_delete(h->t, res);
+        res->i->n = NULL;
+        return make_item(rb_key_of(res));
+      } else {
+        return NULL;
+      }
     } else {
       return NULL;
-    }
-  } else {
-    return NULL;
+    }    
   }
+  return NULL;
 }
 
 /*
