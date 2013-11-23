@@ -91,6 +91,9 @@ test_minimum()
 
 int main (int c, char** v)
 {
+  create_and_fill(0);
+  delete_min(t);
+
   srand(time(NULL));
   n = malloc(sizeof(int) * (1<<24));
   m = malloc(sizeof(int) * (1<<24));

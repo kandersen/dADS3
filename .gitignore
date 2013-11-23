@@ -27,3 +27,7 @@
 #TeX Junk
 *.log
 *.aux
+
+#Haskell Junk
+*.hi
+*.o
