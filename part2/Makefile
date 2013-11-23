@@ -1,5 +1,5 @@
 COMPILER = clang
-FLAGS = -Wall -O3 -lm
+FLAGS = -Wall -O0 -lm
 COMMON = src/int_option.c src/timer.c
 COMMON_TREES = -I src/ -I src/trees/ -I src/combotree/ -DMIN_VEB_UNIVERSE_BITS=0 -lm
 COMMON_HEAPS = -I src/ -I src/heaps/ -I src/trees/ src/tests/test_heap.c -DMIN_VEB_UNIVERSE_BITS=0 -lm
@@ -12,6 +12,8 @@ nothings:
 veb_only_debug :
 	$(COMPILER) $(FLAGS) -o bin/veb_only_tree.out src/trees/veb_only.c $(COMMON) $(COMMON_TREES)
 
+test_bit :
+	$(COMPILER) $(FLAGS) -o bin/test_bit.out src/tests/test_log_vs_bit.c src/timer.c -I src/ -lm
 
 # TREES
 

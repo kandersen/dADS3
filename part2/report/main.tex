@@ -1,6 +1,7 @@
 \documentclass[oneside,11pt,openright]{report}
 
 \usepackage[latin1]{inputenc}
+\usepackage{listings}
 \usepackage[american]{babel}
 \usepackage{a4}
 \usepackage{latexsym}
@@ -16,6 +17,7 @@
 \usepackage{graphicx}
 \usepackage{pgfplots}
 \usepackage[format=hang]{caption}
+\usepackage{float}
 
 \usepackage{pgf,tikz}
 \usepackage{comment}
@@ -72,7 +74,7 @@
 \huge\sf Morten Krogh-Jespersen, 20022362}\\[2ex]
 \noindent\rule{\linewidth}{1mm}\\[4ex]
 \noindent{\Large\sf Project 1, Advanced Data Structures 2013, Computer Science\\[1ex] 
-\monthname\ \the\year  \\[1ex] Advisor: Gerth Stølting Brodal\\[15ex]}\\[\fill]}
+\monthname\ \the\year  \\[1ex] Advisor: Gerth StÃ¸lting Brodal\\[15ex]}\\[\fill]}
 \epsfig{file=logo.eps}\clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,15 +91,15 @@ needs content
 
 \chapter{Bit-vector}
 
-A  bit-vector  or  a  bit  array  is  a  datastructure  that  supports
-$\Insert$,      $\Delete$      and     $\Member$      in      constant
-time~\cite[p. 532]{ITA09}. The  bit-vector consists of a  set of bits,
-for  which  the  $i'th$  bit  indicates the  presence  of  the  $i'th$
-key. Thus, in order to support queries over an universe of size $u$ we
-must have a bit-vector with $u$ bits.
+A bit-vector or a bit array is a datastructure that supports
+$\Insert$, $\Delete$ and $\Member$ in constant
+time~\cite[p. 532]{ITA09}. The bit-vector consists of a set of bits,
+for which the $i'th$ bit indicates the presence of the
+$i'th$ key. Thus, in order to support queries over an universe of size $u$ we must
+have a bit-vector with $u$ bits.
 
 To $\Insert$ some key $i$ into the bit-vector the $i'th$ bit is set to
-true,  similarly to  $\Delete$ the  same key  $i$, the  $i'th$ bit  is
+true, similarly to $\Delete$ the same key $i$, the $i'th$ bit is
 cleared. The $\Member$ test for key $i$ is done by checking the $i'th$
 bit. All these operations are supported easily through bit
 shifts. 
@@ -107,8 +109,8 @@ does not exceed the word size. If that is not the case, extra
 computation is needed to first find the correct block; this however is
 also constant time.
 
-The   bit-vector   performs    badly   for   $\Minimum$,   $\Maximum$,
-$\Predecessor$  and $\Successor$  because  the entire  array could  be
+The bit-vector performs badly for $\Minimum$, $\Maximum$,
+$\Predecessor$ and $\Successor$ because the entire array could be
 traversed in search for the answer.
 
 \begin{center}
@@ -125,13 +127,11 @@ traversed in search for the answer.
 \end{center}
 
 Alternatively, $\Minimum$ and $\Maximum$ can be maintained during all
-changes to the bit vector, i.e. during $\Insert$ and $\Delete$. With
-this approach the running time of $\Delete$ would in worst case be
-completely dominated by the linear search for a new $\Minimum$ or
-$\Maximum$ while querying for the $\Minimum$ or $\Maximum$ would
-become constant time operations. For the remaining part of this
-report, we will refer to the Bit-Vector as the version that maintains
-$\Minimum$ and $\Maximum$.
+changes to the bit vector, i.e. during $\Insert$ and $\Delete$. With this
+approach the running time of $\Delete$ would in worst case be completely
+dominated by the linear search for a new $\Minimum$ or $\Maximum$ while
+querying for the $\Minimum$ or $\Maximum$ would become constant time
+operations. For the remaining part of this report, we will refer to the Bit-Vector as the version that maintains $\Minimum$ and $\Maximum$.
 
 \chapter{Red-Black Tree}
 
@@ -258,33 +258,33 @@ finding the predecessor and successor in \BigO{\log \log m} time where
 $m$ is the size of the universe, in other words, the amount of
 distinct keys with a total ordering that the tree
 support~\cite[p. 545]{ITA09}~\cite{VEB04}. Because van Emde Boas Trees
-allow  universe  sizes  of  any  power of  2,  we  denote  $\HIGHER  =
-2^{\lceil{(\log   u)/2}\rceil}$   and   $\LOWER   =   2^{\lfloor{(\log
-    u)/2}\rfloor}$.   Each level  of  the  van Emde  Boas  Tree has  a
-universe $u$ and  it contains $\HIGHER$ clusters/bottom  van Emde Boas
+allow universe sizes of any power of 2, we denote $\HIGHER =
+2^{\lceil{(\log u)/2}\rceil}$ and $\LOWER = 2^{\lfloor{(\log
+    u)/2}\rfloor}$.  Each level of the van Emde Boas Tree has a
+universe $u$ and it contains $\HIGHER$ clusters/bottom van Emde Boas
 trees of universe size $\LOWER$ and one auxilary van Emde Boas Tree of
 size $\HIGHER$ we denote top.  For each recursion the universe shrinks
 by $\sqrt{u}$.
 
-For each  tree we have two  attributes that store the  minimum and the
-maximum key.  The minimum  key cannot  be found in  any of  the bottom
-trees, neither  can the  maximum unless it  differs from  the minimum,
-which happens  if there  are more  than one element  in the  tree. The
+For each tree we have two attributes that store the minimum and the
+maximum key. The minimum key cannot be found in any of the bottom
+trees, neither can the maximum unless it differs from the minimum,
+which happens if there are more than one element in the tree. The
 attributes helps reduce the number of recursive calls, because one can
-in constant time decide if a  value lies within the range, without the
+in constant time decide if a value lies within the range, without the
 need to recurse.
 
-Van Emde Boas Trees utilizes that  keys are represented as bits and if
-we view a key $x$ as a  $\log u$-bit binary integer, we can divide the
-bits up in  a most significant and a least  significant part. The most
-significant   part  of   the   bit  vector   identifies  the   cluster
-$\lfloor{x/\sqrt{u}}\rfloor$ where $x$ will  apear in position $x \mod
-\sqrt{u}$ in the beforementioned bottom  tree. Let us denote $\HIGH(x)
-= \lfloor{x/\sqrt{u}}\rfloor$ and $\LOW(x) =  x \mod \sqrt{u}$ then we
+Van Emde Boas Trees utilizes that keys are represented as bits and if
+we view a key $x$ as a $\log u$-bit binary integer, we can divide the
+bits up in a most significant and a least significant part. The most
+significant part of the bit vector identifies the cluster
+$\lfloor{x/\sqrt{u}}\rfloor$ where $x$ will apear in position $x \mod
+\sqrt{u}$ in the beforementioned bottom tree. Let us denote $\HIGH(x)
+= \lfloor{x/\sqrt{u}}\rfloor$ and $\LOW(x) = x \mod \sqrt{u}$ then we
 get the identity $x = \HIGH(x) \sqrt{u} + \LOW(x)$.
 
-Below  is  the time-complexities  of  each  operation listed  for  the
-corresponding  data structure  and  let  $u$ denote  the  size of  the
+Below is the time-complexities of each operation listed for the
+corresponding data structure and let $u$ denote the size of the
 universe and $n$ the number of keys stored in the structure:
 
 \begin{center}
@@ -302,25 +302,17 @@ universe and $n$ the number of keys stored in the structure:
 
 \section{Finding minimum or maximum key}
 
-This is  a constant operation, since  the van Emde Boas  Tree directly
-stores the minimum and maximum element.
+This is a constant operation, since the van Emde Boas Tree directly stores the minimum and maximum element.
 
 \section{Finding a member}
 
-Finding  out  if  a  key  is  stored  in  a  van  Emde  Boas  Tree  is
-simple. Either the  key is the minimum or the  maximum element or else
-recurse until we find the element. It is easy to figure out which tree
-to recurse on, since this is  the $\HIGH(x)$-th tree, and we just have
-to search in the smaller tree for $\LOW(x)$.
+Finding out if a key is stored in a van Emde Boas Tree is simple. Either the key is the minimum or the maximum element or else recurse until we find the element. It is easy to figure out which tree to recurse on, since this is the $\HIGH(x)$-th tree, and we just have to search in the smaller tree for $\LOW(x)$.
 
-So how long does the search take in worst-case? The data structure can
-be described by the following recurrence function:
+So how long does the search take in worst-case? The data structure can be described by the following recurrence function: 
 \begin{align*}
     T(u) \leq T(\HIGHER) + \BigO{1}
 \end{align*}
-If we let $m = \log  u$ and realize that $\lceil{m/2}\rceil \leq 2m/3$
-for $m \geq 2$,  which is the leaf size of the van  Emde Boas Tree, we
-get:
+If we let $m = \log u$ and realize that $\lceil{m/2}\rceil \leq 2m/3$ for $m \geq 2$, which is the leaf size of the van Emde Boas Tree, we get:
 
 \begin{align*}
     T(u)  & \leq T(\HIGHER) + \BigO{1} \\
@@ -332,72 +324,34 @@ get:
     S(m) & \leq S(2m/3) + \BigO{1} \\
 \end{align*}
 
-By the  master thorem~\cite[p.  93]{ITA09}, has  the solution  $S(m) =
-\BigO{\log  m}$. Because  $T(u)  =  T(2^m)$ we  get  $\BigO{\log m}  =
-\BigO{\log \log  u}$. Therefore  the procedure takes  $\BigO{\log \log
-  u}$.
+By the master thorem~\cite[p. 93]{ITA09}, has the solution $S(m) = \BigO{\log m}$. Because $T(u) = T(2^m)$ we get $\BigO{\log m} = \BigO{\log \log u}$. Therefore the procedure takes $\BigO{\log \log u}$.
 
 \section{Finding a successor or a predecessor}
 
-As with finding a member, for the base case a successor or predecessor
-can be found in  constant time. If not, we have  to determine where to
-find  the next  element we  are searching  for. Finding  successor and
-predecessor is  completely analog  thus we  only describe  finding the
-successor for an element $x$.
+As with finding a member, for the base case a successor or predecessor can be found in constant time. If not, we have to determine where to find the next element we are searching for. Finding successor and predecessor is completely analog thus we only describe finding the successor for an element $x$.
 
-First,  we check  if  the sucessor  is  in the  bottom  tree at  index
-$\HIGH(x)$. This  check ban  be done  in constant time  since it  is a
-matter of checking  maximum for that tree. If maximum  exist and it is
-higher  than  $\LOW(x)$,  we  know  we  have  to  search  inside  that
-particular tree. This will take $\BigO{\log\log u}$ time.
+First, we check if the sucessor is in the bottom tree at index $\HIGH(x)$. This check ban be done in constant time since it is a matter of checking maximum for that tree. If maximum exist and it is higher than $\LOW(x)$, we know we have to search inside that particular tree. This will take $\BigO{\log\log u}$ time.
 
-If maximum does not exist or it  is less than $\LOW(x)$ we use the top
-tree to search for the successor to $\HIGH(x)$. If we can find such an
-element it will gives  us an index to a bottom  tree $b$. Hereafter it
-is a  constant lookup to  find $\Minimum(b)$.  This case also  runs in
-$\BigO{\log\log u}$ time since we have on search in top and a constant
-lookup. Therefore, the total running time of successor and predecessor
-is $\BigO{\log\log u}$.
+If maximum does not exist or it is less than $\LOW(x)$ we use the top tree to search for the successor to $\HIGH(x)$. If we can find such an element it will gives us an index to a bottom tree $b$. Hereafter it is a constant lookup to find $\Minimum(b)$. This case also runs in $\BigO{\log\log u}$ time since we have on search in top and a constant lookup. Therefore, the total running time of successor and predecessor is $\BigO{\log\log u}$.
 
 \section{Insert}
 
 Insert is pretty simple. One of the following can happen:
 
 \begin{itemize}
-\item The list  is empty, which can be discovered  in constant time by
-  checking the minimum attribute. If that is the case, insert just set
-  min and max.
-\item If not in the base case, find out if the bottom of $\HIGH(x)$ is
-  empty. If that is the case, we can just set min and max as above and
-  update the top structure. If not,  we just call insert on the bottom
-  tree for $\LOW(x)$.
+\item The list is empty, which can be discovered in constant time by checking the minimum attribute. If that is the case, insert just set min and max.
+\item If not in the base case, find out if the bottom of $\HIGH(x)$ is empty. If that is the case, we can just set min and max as above and update the top structure. If not, we just call insert on the bottom tree for $\LOW(x)$.
 \end{itemize}
 
-Always remember to  set max or swap  with min (because min  was not in
-the tree, but now has to be  since it would no longer be min). Either,
-the insert function  recurses on the top tree of  size $\HIGHER$ or on
-one of the  bottom trees of size $\LOWER$ but  not on both. Therefore,
-the running time is at most $\BigO{\log \log u}$.
+Always remember to set max or swap with min (because min was not in the tree, but now has to be since it would no longer be min). Either, the insert function recurses on the top tree of size $\HIGHER$ or on one of the bottom trees of size $\LOWER$ but not on both. Therefore, the running time is at most $\BigO{\log \log u}$.
 
 \section{Delete}
 
-If there is only one element or  universe size is 2 is easy to perform
-delete  in  constant  time.  Otherwise,  some  more  work  has  to  be
-done. Consider  what should be  done if we  try to delete  the minimum
-element. Since  min is  not stored in  the tree, we  have to  find the
-minimum element in the bottom trees and make sure we delete it so that
-it can be placed as the new min. Of course, it can happen that the the
-bottom tree becomes  empty so the top structure has  to be updated. It
-might  also be  that we  remove  max but  updating max  is a  constant
-operation.
+If there is only one element or universe size is 2 is easy to perform delete in constant time. Otherwise, some more work has to be done. Consider what should be done if we try to delete the minimum element. Since min is not stored in the tree, we have to find the minimum element in the bottom trees and make sure we delete it so that it can be placed as the new min. Of course, it can happen that the the bottom tree becomes empty so the top structure has to be updated. It might also be that we remove max but updating max is a constant operation.
 
-In the description  above we actually could make  two recursive calls;
-one to update the bottom tree and  possibly one to update the top. But
-if  we update  the top  then the  bottom tree  would only  contain one
-element. But  if that is the  case the first recursive  function takes
-constant time. Therefore delete runs in $\BigO{\log \log n}$.
+In the description above we actually could make two recursive calls; one to update the bottom tree and possibly one to update the top. But if we update the top then the bottom tree would only contain one element. But if that is the case the first recursive function takes constant time. Therefore delete runs in $\BigO{\log \log n}$.
 
-\chapter{Combining vEB tree and bit vectors}
+\chapter{van Emde Boas Tree with Bit-Vector}
 
 As mentioned in TODO, when $u$ becomes suffitiantly small it can be
 benifial to switch to a bit-vector or red black tree. This is possible
@@ -433,7 +387,148 @@ contain the element if it is present.
   \end{tabular}
 \end{center}
 
+\chapter{Testing trees}
 
+In this chapter we discuss the different tests we decided to implement plus the results of running said tests on our implemented trees. 
+
+\section{Deciding on test-size}
+We were asked to implement van Emde Boas trees with a universe of size $2^24$. The combo structure is also defined on this universe but in contrast the Red-Black Tree supports all numbers in the 32-bit integer-range.
+
+To make matters more difficult all operations on the Red-Black tree is bounded by the height of the tree which is $\log n$ where $n$ is the number of elements in the tree, where as the van Emde Boas Tree is bounded by the size of the recursive data-structure which is $\log \log u$ where $u$ is the size of the universe. Therefore, we need to express $n$ as an expression of $u$ or $u$ in terms of $n$. We chose the first approach and will refer to this as the fill rate.
+
+This also forces us to rethink how testing is done. One could for example do a test of the $\Insert$ operation by measuring the time of inserting the first 1000 elements, then 10.000 elements, 100.000 elements and so forth, which is one way to test the trees. Since the Red-Black tree time-complexity is bounded by the number of elements in it the van Emde Boas tree should take the same time no matter how many elements in the tree up to a constant, one could theorize that plotting in the results would yield two trendlines that would intersect for some x having the trendline for the Red-Black tree being below for small instances of x. What that measurement would give is then when, if one would do all inserts, it would be beneficial to use either in total time.
+
+That is certainly a valid answer, but we do not believe one would just insert many nodes into the tree and then stop using it in practice. Therefore, we wanted to know when the time of doing one operation in a tree is most beneficial compared to a certain fill rate. We therefore divided the universe up in 1000 parts, which would give an interval size of 16.777 elements = $EPP$ ($EPP$ = Elements per promille). Then every test is performed by first filling the tree up to a fixed promille and then doing the same operation one promille times. For example, testing how long it takes to insert elements for fill-rate 50 \%, we fill up the tree with $500 * EPP$ and then perform $EPP$ inserts. In our believes these tests makes more sense if the tree is mantained over a longer period, where the implementor knows roughly how many elements will be in the tree. As a sidenote, if the author has no intuition about the number of elements in the tree at all, it would probably be better to use the van Emde Boas Tree anyway as our results shows. All tests has been tested with fill-rates 1, 3, 5, 7, 9, 10, 30, 50, 70, 90, 100, 300, 500, 700, 900 EPP. $\Predecessor$ is not tested since this is completely analog to successor.
+
+\section{Measuring time}
+
+For this project we decided to change the way we measured time when running the tests. For one, we did not want the construction time of the van Emde Boas Tree taking into account since this is just a constant. This required us to measure time from within the program.
+
+Using the normal clock gives different results depending on the platform. On Ubuntu the result is rounded to the nearest 1000 clock-cycles but in OS X there is no rounding. We chose to measure time by using clock\_gettime which is included in time.h in Ubuntu with the argument CLOCK\_PROCESS\_CPUTIME which gives us the time the process has spent being active in nanoseconds.
+
+\section{Results}
+
+In this section we present our results for each test. As a reminder, all times are in nanoseconds and a fill-rate of 100 translates to $100 * EPP = 2^24/10$.
+
+\subsection{Results for testing $\Insert$}
+
+Testing $\Insert$ just fills the tree with random numbers from the entire univers and insert $EPP$ elements.
+
+\include{comp_0_300}
+
+The first test is testing inserts, and we can see that Bit-Vector is the fastest. This comes as no surpise since this can be done in constant time. All of the vEB trees insert in time independently of the fill-rate whereas the Red-Black tree takes longer time depending on how many elements that are in the tree.
+
+What is suprising though is that one layer and even two layers of vEB with bit-vectors as leafes performs very well. What is also suprising is that it only takes around 20 promille before the Red-Black tree is slower than all other tested data structures.
+
+\subsection{Results for testing $\Delete$}
+
+Testing $\Delete$ just fills the tree with random numbers from the entire universe and deletes $EPP$ elements. The graph is adjusted to only shwo the fill-rates for 1 to 50, which is no more 5 percent of $2^{24}$ number of elements.
+
+\include{comp_1_50}
+
+It is no suprise that the van Emde Boas Trees are constant with regards to the number of elements in the data structure, however it is suprisingly that $\Delete$ for the Red-Black tree almost is constant too - even for large number of elements. The explanation must be that we are asking to delete elements that exist in the tree such that the amount of misses is kept low and thereby not forcing the algorithm to of $\Delete$ to traverse all the way to the bottom too many times.
+
+$\Delete$ for the Bit-Vector may have to update min or max by using a $\Successor$ or $\Predecessor$ search. However, this is linear worst-case and with a small number of elements in the vector this performs very badly. However, after just 5 promille fill it the most effecient. 
+
+\subsection{Results for testing $\Successor$ with guaranteed find}
+
+Testing $\Successor$ by filling the tree with random numbers and then takes the first $EPP$ numbers in that sequence and ask for their successor. This test is designed so that we are certain the successor exists.
+
+\include{comp_2}
+
+In this test it is very clear that the more levels of van Emde Boas trees the slower the data structure will be performing $\Member$ search. We also see that the van Emde Boas tree implemented from ~\cite{ITA09} increases do not look constant. This is propably due to how the arithmetic calculations are implemented and we will discuss this later in the report.
+
+\subsection{Results for testing $\Successor$ with un-guaranteed find}
+
+Almost the same as above but we then generate another sequence of random numbers that we try to find the successor for. In this way we have no idea how easy it is to find the successor and might resemble a more general use-case.
+
+\include{comp_3}
+
+The results are pretty similar to the results above but but the lines seems more straight. This is probably due to the number of misses is higher such that searching in the interval is more consistent.
+
+\subsection{Results for testing $\Member$ with guaranteed find}
+
+Testing $\Member$ by filling the tree with random numbers and then takes the first $EPP$ numbers in that sequence and ask for membership. This test is designed so that we are certain the member exists.
+
+\include{comp_4_100}
+
+Here we have adjusted the graph to just show a fill-rate between 1 and 100. It is pretty obvious that the Red-Black Tree will continue to grow and take longer and longer time where the van Emde Boas tree is approaching constant time. The full graph can be found in the appendix.
+
+Again is is facinating that it only takes around 0.5 percent before the Bit-Vector and the van Emde Boas tree with one level has competitative running times.
+
+\subsection{Results for testing $\Member$ with un-guaranteed find}
+
+Almost the same as above but again we have another sequence of random numbers that we search for. In this way the probability of the element existing in the data-structure increases as the fill-rate increases.
+
+\include{comp_5_100}
+
+Compared to the results before where we had a guaranteed member there is almost no change for the Bit-Vectors and the 1 level van Emde Boas Tree, because the check that the Bit-Vector makes is the same no matter if an element is in the vector or not. 
+
+It is a bit disappointing not seeing a larger change for the Red-Black tree around 100 fill-rate which is about 1.6 million elements.
+
+\subsection{Results for testing $\Minimum$}
+
+Testing $\Minimum$ by calling $\Minimum$ $EPP$ times. The default implementation of a Red-Black Tree do not maintain min and max, so we expect the Red-Black tree to perform much worse than the other data structures when the amount of elements increases.
+
+\include{comp_6}
+
+As we can see, the Red-Black tree is slow, even for very small fill-rates. But the results do not entirely match what we anticipated. From fill-rate 100 to 500 the Red-Black Tree actually decreases before it finally rises again. The lowest point in this trendline is actually when the tree is filled with half of the universe.
+
+Every van Emde Boas tree also has something that looks like a similar pattern in the time usage when the tree is half-full. This seems strange since the, however we should note that the difference is around 0.1 of a millisecond.
+
+\paragraph{Minimum} 
+
+\chapter{Testing trees as if they where heaps}
+
+needs content.
+
+\chapter{Arithmetic operations}
+
+Everytime we recurse in our van Emde Boas trees we perform the same arithmetic operations to figure out where to divide the bits in an upper and lower half. As a result of the combo tree implementation, it was more natural to keep the universe in size of bits than having the universe in integer representation. 
+
+This lead us to investigate if there was a difference in how the computer calculated the operations. Corman et al writes in their implementation that higher can be found as $\HIGHER = 2^{\lceil{(\log u)/2}\rceil}$. A naive implementation might be something like:
+\begin{lstlisting}
+pow(2, (int)ceil((log2 (u))/2));
+\end{lstlisting}
+
+So this would make a few different calls to the math package being log2, ceil and power. log2 can be found by MSB which we have seen a constant time operation for, but we are trying to bring down the number of instructions and measure the total time. There is also a cast in there. It would be fun to see if we could do it faster. All tests has been run with a Clang compiler with 3rd level of optimization, so we do not expect to get results that are much higher . This is the different ways we calculate $\HIGHER$:
+
+\begin{lstlisting}
+1: pow(2, (int)ceil((log2 (u))/2));
+
+2: result = 1<<(int)ceil((log2 (u))/2);
+
+3: uint32_t b = log2 (u);
+   uint32_t h = (b >> 1) + (b & 1);
+   result = 1<<h;
+
+4: result = 1<<(int)ceil((log2_x86 (u))/2);
+
+5: uint32_t b = log2_x86 (u);
+   uint32_t h = (b >> 1) + (b & 1);
+   result = 1<<h;
+
+6: uint32_t b = log2_table (u);
+   uint32_t h = (b >> 1) + (b & 1);
+   result = 1<<h;
+
+\end{lstlisting}
+
+log2\_x86 is just the MSB instruction that can be found on x86 architectures with the assembly instruction bsr. log2\_table is a computed table that gives the result by a lookup. We are performing 100.000 calculations and then divide the total time by the same amount. We have compiled all the tests the Clang compiler without any optimizations and the Clang compiler with the most aggresive optimatization. We will use 1 as the measurement for how well the other test performs:
+
+\begin{center}
+  \begin{tabular}{ l | c | c | c | c }
+    Method & Clang no opt & Clang with opt & \% faster no opt & \% faster opt  \\ \hline
+    1 & 288 & 185 & 0 & 0 \\ 
+    2 & 179 & 171 & 38 & 8\\ 
+    3 & 178 & 170 & 38 & 8 \\ 
+    4 & 173 & 163 & 40 & 12\\ 
+    4 & 174 & 161 & 40 & 13 \\ 
+    6 & 182 & 164 & 37 & 11 \\ 
+  \end{tabular}
+\end{center}
+
+We must assume that the most people would compile their van Emde Boas trees with optimization turned on, if not, a better arithmetic approach could yield a 40 \% quicker tree. But still, if optimization is turned on, the crucial arithmetic used for seperating bits can still be made 13 \% quicker.
 
 \chapter{Conlusion}
 

@@ -1,0 +1,148 @@
+\begin{minipage}[c]{\textwidth}
+\advance\leftskip-2.5cm
+\begin{tikzpicture}
+        \begin{axis}[
+            xlabel = Fill-rate,
+            ylabel = Running time ns,
+            height=9cm,
+            width=15cm,
+            grid=major,
+            legend style={
+            at={(0.95,0.8)},
+            anchor=north west}]            
+            legend pos=center west
+    	]
+    		
+    		
+    	\addplot coordinates {
+(1,4711396)
+(3,8698329)
+(5,8568622)
+(7,8354674)
+(9,8653002)
+(10,8162417)
+(30,8702191)
+(50,8556110)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB}}
+
+                \addplot coordinates {
+(1,723552)
+(3,1167318)
+(5,655781)
+(7,897106)
+(9,704127)
+(10,1129387)
+(30,1418439)
+(50,1406950)
+
+    	};
+        
+    	\addlegendentry{\textsc{Red-Black}}
+
+        \addplot coordinates {
+(1,58614407)
+(3,217300)
+(5,343465)
+(7,328333)
+(9,403612)
+(10,374514)
+(30,160266)
+(50,181430)
+
+    	};
+        
+    	\addlegendentry{\textsc{Bit-Vector}}
+
+        \addplot coordinates {
+(1,35172148)
+(3,5874684)
+(5,1876093)
+(7,1320925)
+(9,1079576)
+(10,875917)
+(30,792136)
+(50,632336)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 1}}
+
+        \addplot coordinates {
+(1,2565916)
+(3,3774592)
+(5,4060337)
+(7,4014786)
+(9,3746261)
+(10,4064663)
+(30,4701598)
+(50,4025325)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 2}}
+
+        \addplot coordinates {
+(1,3472560)
+(3,5843431)
+(5,6045389)
+(7,6332641)
+(9,6166702)
+(10,6159200)
+(30,5962727)
+(50,6314767)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 3}}
+		
+        \addplot coordinates {
+(1,3846715)
+(3,9872965)
+(5,8503351)
+(7,8065790)
+(9,8297049)
+(10,8230956)
+(30,8796144)
+(50,9337988)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 4}}
+		
+        \addplot coordinates {
+(1,4163447)
+(3,10311220)
+(5,9880559)
+(7,9323526)
+(9,8461364)
+(10,8700218)
+(30,8956439)
+(50,9342468)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 5}}
+
+        \addplot coordinates {
+(1,4705049)
+(3,9327550)
+(5,9085712)
+(7,8847626)
+(9,8685672)
+(10,8663365)
+(30,8336582)
+(50,8760475)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 6}}
+		
+        \end{axis}
+
+    \end{tikzpicture}
+    \captionof{figure}{TITEL}
+    \label{fig:sample_figure}
+\end{minipage}
