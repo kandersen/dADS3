@@ -57,8 +57,13 @@ test_remove()
 void
 test_succ1()
 {
-  for (int i = 0; i < EPP; i++)
-    successor_key(n[i], t);
+  for (int i = 0; i < EPP; i++) {
+    if (n[i] > 0) {
+      successor_key(n[i]-1, t);
+    } else {
+      successor_key(n[i], t);
+    }
+  }
 }
 
 /* might not contain */

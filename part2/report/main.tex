@@ -360,12 +360,25 @@ In the description above we actually could make two recursive calls; one to upda
 
 \chapter{van Emde Boas Tree with Bit-Vector}
 
+<<<<<<< HEAD
 The van Emde Boas tree is dominated by the size of the universe it supports for all of it operations except $\Minimum$ and $\Maximum$. For each recursion of the structure, the universe size shrinks by $\sqrt{u}$ and it might be beneficial, when $u$ becomes sufficiantly small, to switch to another data-structure such as a bit-vector or a Red-Black tree. This is possible because of the recursive nature of vEB trees. 
 
 For example, to decide membership of an element over some universe is done by testing for inclusion in the first level. If it is not min or max we recurse to a descendant node that can either be a van Emde Boas tree or another structure that supports answering the same queries. The logic that goes into placing another structure on a specific level is not difficult to generalize such that the change can be implemented at an arbitrary level, where level is based on the size of the universe.
 
 We have implemented a van Emde Boas tree that allow switching to a bit-vector 
 when the universe falls below some constant and in our testing we will
+=======
+As mentioned in TODO, when $u$ becomes suffitiantly small it can be
+benifial to switch to a bit-vector or red black tree. This is possible
+because of the recursive nature of vEB trees. To decide membership of
+elements over some universe it is done by deciding it recursively over
+smaller universes until some minimum size is reached, thus it is no
+problem to switch to a different datastructure that enables the same
+queries as vEB trees for universes small enough.
+
+We have implemented as vEB tree that allows switching to bit-vectors
+when the universe falls below some constant, in our testing we will
+>>>>>>> e664bb03ab137e59653a7c257b3d758b2a269a92
 examine what the value of this constant means for the performance of
 our implementation. We will call a one-layered van Emde Boas Tree for van Emde Boas Combo 1, two layers for van Emde Boas Combo 2 and so forth.
 
@@ -505,6 +518,7 @@ In our last project we implemented four different heaps - A binary heap that use
   \end{tabular}
 \end{center}
 
+<<<<<<< HEAD
 \section{Designing tests}
 
 We made a series of tests in the previous project one being inserting a number of elements and deleting them again. The test had the following results:
@@ -620,6 +634,149 @@ log2\_x86 is just the MSB instruction that can be found on x86 architectures wit
   \end{tabular}
 \end{center}
 
+=======
+\chapter{Testing trees}
+
+In this chapter we discuss the different tests we decided to implement plus the results of running said tests on our implemented trees. 
+
+\section{Deciding on test-size}
+We were asked to implement van Emde Boas trees with a universe of size $2^24$. The combo structure is also defined on this universe but in contrast the Red-Black Tree supports all numbers in the 32-bit integer-range.
+
+To make matters more difficult all operations on the Red-Black tree is bounded by the height of the tree which is $\log n$ where $n$ is the number of elements in the tree, where as the van Emde Boas Tree is bounded by the size of the recursive data-structure which is $\log \log u$ where $u$ is the size of the universe. Therefore, we need to express $n$ as an expression of $u$ or $u$ in terms of $n$. We chose the first approach and will refer to this as the fill rate.
+
+This also forces us to rethink how testing is done. One could for example do a test of the $\Insert$ operation by measuring the time of inserting the first 1000 elements, then 10.000 elements, 100.000 elements and so forth, which is one way to test the trees. Since the Red-Black tree time-complexity is bounded by the number of elements in it the van Emde Boas tree should take the same time no matter how many elements in the tree up to a constant, one could theorize that plotting in the results would yield two trendlines that would intersect for some x having the trendline for the Red-Black tree being below for small instances of x. What that measurement would give is then when, if one would do all inserts, it would be beneficial to use either in total time.
+
+That is certainly a valid answer, but we do not believe one would just insert many nodes into the tree and then stop using it in practice. Therefore, we wanted to know when the time of doing one operation in a tree is most beneficial compared to a certain fill rate. We therefore divided the universe up in 1000 parts, which would give an interval size of 16.777 elements = $EPP$ ($EPP$ = Elements per promille). Then every test is performed by first filling the tree up to a fixed promille and then doing the same operation one promille times. For example, testing how long it takes to insert elements for fill-rate 50 \%, we fill up the tree with $500 * EPP$ and then perform $EPP$ inserts. In our believes these tests makes more sense if the tree is mantained over a longer period, where the implementor knows roughly how many elements will be in the tree. As a sidenote, if the author has no intuition about the number of elements in the tree at all, it would probably be better to use the van Emde Boas Tree anyway as our results shows. All tests has been tested with fill-rates 1, 3, 5, 7, 9, 10, 30, 50, 70, 90, 100, 300, 500, 700, 900 EPP. $\Predecessor$ is not tested since this is completely analog to successor.
+
+\section{Measuring time}
+
+For this project we decided to change the way we measured time when running the tests. For one, we did not want the construction time of the van Emde Boas Tree taking into account since this is just a constant. This required us to measure time from within the program.
+
+Using the normal clock gives different results depending on the platform. On Ubuntu the result is rounded to the nearest 1000 clock-cycles but in OS X there is no rounding. We chose to measure time by using clock\_gettime which is included in time.h in Ubuntu with the argument CLOCK\_PROCESS\_CPUTIME which gives us the time the process has spent being active in nanoseconds.
+
+\section{Results}
+
+In this section we present our results for each test. As a reminder, all times are in nanoseconds and a fill-rate of 100 translates to $100 * EPP = 2^24/10$.
+
+\subsection{Results for testing $\Insert$}
+
+Testing $\Insert$ just fills the tree with random numbers from the entire univers and insert $EPP$ elements.
+
+\include{comp_0_300}
+
+The first test is testing inserts, and we can see that Bit-Vector is the fastest. This comes as no surpise since this can be done in constant time. All of the vEB trees insert in time independently of the fill-rate whereas the Red-Black tree takes longer time depending on how many elements that are in the tree.
+
+What is suprising though is that one layer and even two layers of vEB with bit-vectors as leafes performs very well. What is also suprising is that it only takes around 20 promille before the Red-Black tree is slower than all other tested data structures.
+
+\subsection{Results for testing $\Delete$}
+
+Testing $\Delete$ just fills the tree with random numbers from the entire universe and deletes $EPP$ elements. The graph is adjusted to only shwo the fill-rates for 1 to 50, which is no more 5 percent of $2^{24}$ number of elements.
+
+\include{comp_1_50}
+
+It is no suprise that the van Emde Boas Trees are constant with regards to the number of elements in the data structure, however it is suprisingly that $\Delete$ for the Red-Black tree almost is constant too - even for large number of elements. The explanation must be that we are asking to delete elements that exist in the tree such that the amount of misses is kept low and thereby not forcing the algorithm to of $\Delete$ to traverse all the way to the bottom too many times.
+
+$\Delete$ for the Bit-Vector may have to update min or max by using a $\Successor$ or $\Predecessor$ search. However, this is linear worst-case and with a small number of elements in the vector this performs very badly. However, after just 5 promille fill it the most effecient. 
+
+\subsection{Results for testing $\Successor$ with guaranteed find}
+
+Testing $\Successor$ by filling the tree with random numbers and then takes the first $EPP$ numbers in that sequence and ask for their successor. This test is designed so that we are certain the successor exists.
+
+\include{comp_2}
+
+In this test it is very clear that the more levels of van Emde Boas trees the slower the data structure will be performing $\Member$ search. We also see that the van Emde Boas tree implemented from ~\cite{ITA09} increases do not look constant. This is propably due to how the arithmetic calculations are implemented and we will discuss this later in the report.
+
+\subsection{Results for testing $\Successor$ with un-guaranteed find}
+
+Almost the same as above but we then generate another sequence of random numbers that we try to find the successor for. In this way we have no idea how easy it is to find the successor and might resemble a more general use-case.
+
+\include{comp_3}
+
+The results are pretty similar to the results above but but the lines seems more straight. This is probably due to the number of misses is higher such that searching in the interval is more consistent.
+
+\subsection{Results for testing $\Member$ with guaranteed find}
+
+Testing $\Member$ by filling the tree with random numbers and then takes the first $EPP$ numbers in that sequence and ask for membership. This test is designed so that we are certain the member exists.
+
+\include{comp_4_100}
+
+Here we have adjusted the graph to just show a fill-rate between 1 and 100. It is pretty obvious that the Red-Black Tree will continue to grow and take longer and longer time where the van Emde Boas tree is approaching constant time. The full graph can be found in the appendix.
+
+Again is is facinating that it only takes around 0.5 percent before the Bit-Vector and the van Emde Boas tree with one level has competitative running times.
+
+\subsection{Results for testing $\Member$ with un-guaranteed find}
+
+Almost the same as above but again we have another sequence of random numbers that we search for. In this way the probability of the element existing in the data-structure increases as the fill-rate increases.
+
+\include{comp_5_100}
+
+Compared to the results before where we had a guaranteed member there is almost no change for the Bit-Vectors and the 1 level van Emde Boas Tree, because the check that the Bit-Vector makes is the same no matter if an element is in the vector or not. 
+
+It is a bit disappointing not seeing a larger change for the Red-Black tree around 100 fill-rate which is about 1.6 million elements.
+
+\subsection{Results for testing $\Minimum$}
+
+Testing $\Minimum$ by calling $\Minimum$ $EPP$ times. The default implementation of a Red-Black Tree do not maintain min and max, so we expect the Red-Black tree to perform much worse than the other data structures when the amount of elements increases.
+
+\include{comp_6}
+
+As we can see, the Red-Black tree is slow, even for very small fill-rates. But the results do not entirely match what we anticipated. From fill-rate 100 to 500 the Red-Black Tree actually decreases before it finally rises again. The lowest point in this trendline is actually when the tree is filled with half of the universe.
+
+Every van Emde Boas tree also has something that looks like a similar pattern in the time usage when the tree is half-full. This seems strange since the, however we should note that the difference is around 0.1 of a millisecond.
+
+\paragraph{Minimum} 
+
+\chapter{Testing trees as if they where heaps}
+
+needs content.
+
+\chapter{Arithmetic operations}
+
+Everytime we recurse in our van Emde Boas trees we perform the same arithmetic operations to figure out where to divide the bits in an upper and lower half. As a result of the combo tree implementation, it was more natural to keep the universe in size of bits than having the universe in integer representation. 
+
+This lead us to investigate if there was a difference in how the computer calculated the operations. Corman et al writes in their implementation that higher can be found as $\HIGHER = 2^{\lceil{(\log u)/2}\rceil}$. A naive implementation might be something like:
+\begin{lstlisting}
+pow(2, (int)ceil((log2 (u))/2));
+\end{lstlisting}
+
+So this would make a few different calls to the math package being log2, ceil and power. log2 can be found by MSB which we have seen a constant time operation for, but we are trying to bring down the number of instructions and measure the total time. There is also a cast in there. It would be fun to see if we could do it faster. All tests has been run with a Clang compiler with 3rd level of optimization, so we do not expect to get results that are much higher . This is the different ways we calculate $\HIGHER$:
+
+\begin{lstlisting}
+1: pow(2, (int)ceil((log2 (u))/2));
+
+2: result = 1<<(int)ceil((log2 (u))/2);
+
+3: uint32_t b = log2 (u);
+   uint32_t h = (b >> 1) + (b & 1);
+   result = 1<<h;
+
+4: result = 1<<(int)ceil((log2_x86 (u))/2);
+
+5: uint32_t b = log2_x86 (u);
+   uint32_t h = (b >> 1) + (b & 1);
+   result = 1<<h;
+
+6: uint32_t b = log2_table (u);
+   uint32_t h = (b >> 1) + (b & 1);
+   result = 1<<h;
+
+\end{lstlisting}
+
+log2\_x86 is just the MSB instruction that can be found on x86 architectures with the assembly instruction bsr. log2\_table is a computed table that gives the result by a lookup. We are performing 100.000 calculations and then divide the total time by the same amount. We have compiled all the tests the Clang compiler without any optimizations and the Clang compiler with the most aggresive optimatization. We will use 1 as the measurement for how well the other test performs:
+
+\begin{center}
+  \begin{tabular}{ l | c | c | c | c }
+    Method & Clang no opt & Clang with opt & \% faster no opt & \% faster opt  \\ \hline
+    1 & 288 & 185 & 0 & 0 \\ 
+    2 & 179 & 171 & 38 & 8\\ 
+    3 & 178 & 170 & 38 & 8 \\ 
+    4 & 173 & 163 & 40 & 12\\ 
+    4 & 174 & 161 & 40 & 13 \\ 
+    6 & 182 & 164 & 37 & 11 \\ 
+  \end{tabular}
+\end{center}
+
+>>>>>>> e664bb03ab137e59653a7c257b3d758b2a269a92
 We must assume that the most people would compile their van Emde Boas trees with optimization turned on, if not, a better arithmetic approach could yield a 40 \% quicker tree. But still, if optimization is turned on, the crucial arithmetic used for seperating bits can still be made 13 \% quicker.
 
 \chapter{Conlusion}

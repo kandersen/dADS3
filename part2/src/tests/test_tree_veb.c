@@ -54,8 +54,13 @@ test_remove()
 void
 test_succ1()
 {
-  for (int i = 0; i < EPP; i++)
-    succ(t, n[i]);
+  for (int i = 0; i < EPP; i++) {
+    if (n[i] > 0) {
+      succ(t, n[i]-1);
+    } else {
+      succ(t, n[i]);
+    }
+  }
 }
 
 /* might not contain */
