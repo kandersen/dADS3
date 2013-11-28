@@ -1,0 +1,204 @@
+\begin{minipage}[c]{\textwidth}
+\advance\leftskip-2.5cm
+\begin{tikzpicture}
+        \begin{axis}[
+            xlabel = Fill-rate,
+            ylabel = Running time ns,
+            height=9cm,
+            width=15cm,
+            grid=major,
+            legend style={
+            at={(0.95,0.8)},
+            anchor=north west}]            
+            legend pos=center west
+    	]
+    		
+    		
+    	\addplot coordinates {
+(1,411467)
+(3,419907)
+(5,418990)
+(7,345191)
+(9,426893)
+(10,329012)
+(30,484078)
+(50,393117)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB}}
+
+                \addplot coordinates {
+(1,1444271)
+(3,697573)
+(5,565651)
+(7,627716)
+(9,517436)
+(10,1181795)
+(30,696178)
+(50,780062)
+
+    	};
+        
+    	\addlegendentry{\textsc{Red-Black}}
+
+        \addplot coordinates {
+(1,525641)
+(3,429699)
+(5,1086857)
+(7,459766)
+(9,485019)
+(10,485650)
+(30,353656)
+(50,304776)
+
+    	};
+        
+    	\addlegendentry{\textsc{Bit-Vector}}
+
+        \addplot coordinates {
+(1,434133)
+(3,901876)
+(5,612788)
+(7,812396)
+(9,441655)
+(10,415051)
+(30,410095)
+(50,599370)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 1}}
+
+        \addplot coordinates {
+(1,418044)
+(3,436778)
+(5,392901)
+(7,540316)
+(9,629476)
+(10,365446)
+(30,451527)
+(50,506639)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 2}}
+
+        \addplot coordinates {
+(1,406402)
+(3,417654)
+(5,897772)
+(7,360605)
+(9,625768)
+(10,673639)
+(30,169161)
+(50,447536)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 3}}
+		
+        \addplot coordinates {
+(1,419638)
+(3,447134)
+(5,602287)
+(7,583223)
+(9,572636)
+(10,602073)
+(30,711592)
+(50,473060)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 4}}
+		
+        \addplot coordinates {
+(1,374544)
+(3,757789)
+(5,420380)
+(7,725510)
+(9,642733)
+(10,434190)
+(30,420070)
+(50,549607)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 5}}
+
+        \addplot coordinates {
+(1,365157)
+(3,323496)
+(5,593226)
+(7,494380)
+(9,488078)
+(10,598580)
+(30,425125)
+(50,265587)
+
+    	};
+        
+    	\addlegendentry{\textsc{vEB combo 6}}
+		
+        \addplot coordinates {
+(1,47109)
+(3,57735)
+(5,55106)
+(7,77634)
+(9,37275)
+(10,50996)
+(30,383042)
+(50,44659)
+
+    	};
+        
+    	\addlegendentry{\textsc{Binary Heap Array}}
+
+        \addplot coordinates {
+(1,27910)
+(3,303825)
+(5,214904)
+(7,28504)
+(9,38125)
+(10,27837)
+(30,77383)
+(50,36402)
+
+    	};
+        
+    	\addlegendentry{\textsc{Binary Heap Pointer}}
+
+        \addplot coordinates {
+(1,41858)
+(3,29639)
+(5,52048)
+(7,36365)
+(9,68282)
+(10,210583)
+(30,46546)
+(50,279261)
+
+    	};
+        
+    	\addlegendentry{\textsc{Fibonacci v1}}
+
+        \addplot coordinates {
+(1,60214)
+(3,47779)
+(5,505466)
+(7,39654)
+(9,193198)
+(10,68973)
+(30,35198)
+(50,251651)
+
+    	};
+        
+    	\addlegendentry{\textsc{Fibonacci v2}}
+
+        \end{axis}
+
+    \end{tikzpicture}
+    \captionof{figure}{TITEL}
+    \label{fig:sample_figure}
+\end{minipage}
