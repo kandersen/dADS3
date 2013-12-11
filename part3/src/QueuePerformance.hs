@@ -1,9 +1,6 @@
-module QueuePerformance where
+module Main where
 
 import Queue
-import SimpleQueue
-import SmartListQueue
-import StrictConstantQueue
 
 import Criterion.Main
 
@@ -11,5 +8,5 @@ import Criterion.Main
 data BTree = Leaf Int
            | Node BTree Int BTree
 
-bft :: Queue q => BTree -> q BTree -> [Int]
-bft = 
+main :: IO ()
+main = defaultMain []

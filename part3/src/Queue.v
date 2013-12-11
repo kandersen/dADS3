@@ -1,5 +1,20 @@
 Require Import Arith List.
 
+
+Extraction Language Haskell.
+Extract Inductive bool => "Prelude.Bool" ["Prelude.True" "Prelude.False"].
+Extract Inductive nat => "Prelude.Int" ["0" "Prelude.succ"].
+Extract Inductive option => "Prelude.Maybe" ["Prelude.Just" "Prelude.Nothing"].
+Extract Inductive list => "[]" ["[]" "(:)"].
+Extract Inductive prod => "(,)" ["(,)"].
+Extract Constant app => "(Prelude.++)".
+Extract Constant rev => "Prelude.reverse".
+Extract Constant andb => "(Prelude.&&)".
+Extract Constant negb => "Prelude.not".
+Extract Constant leb => "(Prelude.<=)".
+Extract Constant length => "Prelude.length".
+Extract Constant beq_nat => "(Prelude.==)".
+
 Module Type QUEUE.
   Parameter Q : Type -> Type.
   Parameter inv : forall A, Q A -> Prop.
@@ -202,6 +217,8 @@ Module BasicQueue <: QUEUE.
 
 End BasicQueue.
 
+Extraction "BasicQueue.hs" BasicQueue.
+
 Module PairQueue <: QUEUE.
 
   Definition Q := fun A : Type => ((list A) * (list A))%type.
@@ -365,6 +382,8 @@ Module PairQueue <: QUEUE.
     reflexivity.
   Qed.  
 End PairQueue.
+
+Extraction "PairQueue.hs" PairQueue.
 
 Module OkasakiQueue <: QUEUE.
 
@@ -586,6 +605,8 @@ Module OkasakiQueue <: QUEUE.
   Qed.
 End OkasakiQueue.
 
+Extraction "OkasakiQueue.hs" OkasakiQueue.
+(*
 Module HoodMelvilleQueue <: QUEUE.
   
   Definition Q (A : Type) :=
@@ -662,4 +683,5 @@ Module HoodMelvilleQueue <: QUEUE.
       inv _ q ->
       peak A q = Some x.
 
-End QUEUE.
+End HoodMelvilleQueue.
+*)

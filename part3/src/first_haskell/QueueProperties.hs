@@ -7,6 +7,9 @@ import Data.Function
 import Test.QuickCheck
 
 import Queue
+import SimpleQueue
+import SmartListQueue
+import StrictConstantQueue
 
 data Action = Inject Int
             | Pop
@@ -76,9 +79,9 @@ suite q = do quickCheck $ prop_PeakInject q
              quickCheck $ prop_InjectPopEmpty q
 
 runTests :: IO ()
-runTests = do test "SimpleQueue" (empty :: BasicQueue Int)
-              test "SmartListQueue" (empty :: PairQueue Int)
-              test "StrictConstantQueue" (empty :: OkasakiQueue Int)
+runTests = do test "SimpleQueue" (empty :: SimpleQueue Int)
+              test "SmartListQueue" (empty :: SmartListQueue Int)
+              test "StrictConstantQueue" (empty :: StrictConstantQueue Int)
   where
     test s q = do putStrLn $ "### Testing " ++ s ++ " ###"
                   suite q

@@ -20,22 +20,11 @@ instance Queue StrictConstantQueue where
     _ -> SCQ . adjust $ (p + 1, s, f, a, b, c, d, e)
     where
       adjust = fix . fix . fix . fix
-{-
-  pop :: Q a -> (Maybe a, Q a)
-  pop q@(Q _ _ [] _ _ _ _ _) = (Nothing, q)
-  pop q@(Q n m (x:f) a b c d e) = case g q of
-    q@(Q n m _ _ _ _ _ _) | n == m -> pop q
-    _ -> (Just x, g.g.g.g $ Q (n+1) m f a b c d e)
--}
   
   peak (SCQ (p, p',    [], _, [], [], (x:_), _)) | p == p' = Just x
   peak (SCQ (_,  _, (x:_), _,  _,  _,     _, _))           = Just x
   peak                                         _           = Nothing
   
-
-               
-
-
 fix :: QRep a -> QRep a
 fix (p, 0, f, [], b, (x:c), d, e) = (p, 0, f, [], b, c, (x:d), e)
 fix (p, s, f, a, (x:b), [], d, e) = (p, s + 1, f, (x:a), b, [], d, e)
