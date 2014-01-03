@@ -1,9 +1,12 @@
 Require Import Arith List.
 
-
 Extraction Language Haskell.
 Extract Inductive bool => "Prelude.Bool" ["Prelude.True" "Prelude.False"].
-Extract Inductive nat => "Prelude.Int" ["0" "Prelude.succ"].
+Extract Inductive nat => "Prelude.Int" ["0" "Prelude.succ"]
+  "(\fO fS n -> case n of {
+      0 -> fO ();
+      n -> fS ((Prelude.-) n 1) })".
+
 Extract Inductive option => "Prelude.Maybe" ["Prelude.Just" "Prelude.Nothing"].
 Extract Inductive list => "[]" ["[]" "(:)"].
 Extract Inductive prod => "(,)" ["(,)"].
@@ -14,6 +17,9 @@ Extract Constant negb => "Prelude.not".
 Extract Constant leb => "(Prelude.<=)".
 Extract Constant length => "Prelude.length".
 Extract Constant beq_nat => "(Prelude.==)".
+Extract Constant id => "Prelude.id".
+Extract Constant plus => "(Prelude.+)".
+Extract Constant minus => "(Prelude.-)".
 
 Module Type QUEUE.
   Parameter Q : Type -> Type.
@@ -134,8 +140,9 @@ Module BasicQueue <: QUEUE.
       inv _ (pop q).
   Proof. constructor. Qed.
  
-  Lemma empty_is_empty : forall A,
-    represents (empty A) nil.
+  Lemma empty_is_empty : 
+    forall A,
+      represents (empty A) nil.
   Proof.
     unfold represents.
     unfold to_list.
@@ -385,6 +392,16 @@ End PairQueue.
 
 Extraction "PairQueue.hs" PairQueue.
 
+Lemma length_O_is_nil :
+  forall A xs,
+    length xs = 0 ->
+    xs = @nil A.
+Proof.
+  induction xs; intros.
+  reflexivity.
+  inversion H.
+Qed.
+
 Module OkasakiQueue <: QUEUE.
 
   Definition Q (A : Type) :=
@@ -536,16 +553,6 @@ Module OkasakiQueue <: QUEUE.
     reflexivity.
   Qed.
 
-  Lemma length_O_is_nil :
-    forall A xs,
-      length xs = 0 ->
-      xs = @nil A.
-  Proof.
-    induction xs; intros.
-    reflexivity.
-    inversion H.
-  Qed.
-
   Lemma pop_xs :
     forall A q x xs,
       represents q (x::xs) ->
@@ -606,82 +613,226 @@ Module OkasakiQueue <: QUEUE.
 End OkasakiQueue.
 
 Extraction "OkasakiQueue.hs" OkasakiQueue.
-(*
-Module HoodMelvilleQueue <: QUEUE.
+
+Module RealTimeQueue <: QUEUE.
   
-  Definition Q (A : Type) :=
-    (nat * nat * list A * list A * list A * list A * list A * list A)%type.
+  Inductive RotationState {A : Type} :=
+  | Idle : RotationState
+  | Reversing : nat -> list A -> list A -> list A -> list A -> RotationState 
+  | Appending : nat -> list A -> list A -> RotationState 
+  | Done : list A -> RotationState.
   
-  Definition inv {A : Type} (q : Q A) : Prop :=
-    match q with  
-      | (p, s, f, a, b, c, d, e) =>
-        (length e + p) <= (length d + (NPeano.div (length a) 2))
-        /\ NPeano.div (2 * length b + length a + length c) 3 <= length f
-        /\ length f = length b + (s - p)
+  Definition exec {A : Type} (s : @RotationState A) :=
+    match s with
+      | Reversing ok (x :: f) f' (y :: r) r' => 
+        Reversing (ok + 1) f (x :: f') r (y :: r')
+      | Reversing ok nil f' (y :: nil) r' =>
+        Appending ok f' (y :: r')
+      | Appending 0 f' r' =>
+        Done r'
+      | Appending ok (x :: f') r' =>
+        Appending (ok - 1) f' (x :: r')
+      | _ => s
     end.
 
-  Definition empty {A : Type} :=
-    (0, 0, @nil A, @nil A, @nil A, @nil A, @nil A, @nil A).
+  Fixpoint nth {A : Type} n (f : A -> A) : A -> A:=
+    match n with
+      | O => id
+      | S n' => fun x => f ((nth n' f) x)
+    end.
 
-  Definition fix {A : Type} :=
-    match q with  
-      | (p, s, f, a, b, c, d, e) =>
-        
+  Definition Q (A : Type) :=
+    (nat * list A * @RotationState A * nat * list A)%type.
+                     
+  Definition invalidate {A : Type} (s : @RotationState A) :=
+    match s with
+      | Reversing ok f f' r r' =>
+        Reversing (ok - 1) f f' r r'
+      | Appending 0 f' (x :: r') =>
+        Done r'
+      | Appending ok f' r' =>
+        Appending (ok - 1) f' r'
+      | _ => s
+    end.
+  
+  Definition exec2 {A : Type} (inp : Q A) := 
+    match inp with 
+      | (lenf, f, state, lenr, r) =>
+        match exec (exec state) with
+          | Done newf => (lenf, newf, Idle, lenr, r)
+          | newstate => (lenf, f, newstate, lenr, r)
+        end
+    end.
 
-  Definition inject : forall A, A -> Q A -> Q A.
-  Parameter pop    : forall A, Q A -> Q A.
-  Parameter peak   : forall A, Q A -> option A.  
-  Parameter to_list : forall A, Q A -> list A.
+  Definition check {A : Type} (inp : Q A) :=
+    match inp with
+      | (lenf, f, state, lenr, r) =>
+        if leb lenr lenf 
+        then exec2 inp
+        else let newstate := Reversing 0 f nil r nil in
+             exec2 (lenf + lenr, f, newstate, 0, nil)
+    end.
+               
+  Definition inv {A : Type} (q : Q A) : Prop := 
+    match q with 
+      | (lenf, f, state, lenr, r) =>
+        leb lenr lenf = true /\ lenr = length r
+    end.
+
+  Definition empty {A : Type} : Q A :=
+    (0, @nil A, @Idle A, 0, @nil A).
+
+  Definition inject {A : Type} (a : A) (q : Q A) :=
+    match q with
+      | (lenf, f, state, lenr, r) =>
+        check (lenf, f, state, 1 + lenr, a :: r)
+    end.
+
+  Definition pop {A : Type} (q : Q A) :=
+    match q with
+      | (lenf, nil, state, lenr, r) => 
+        q
+      | (lenf, x :: f, state, lenr, r) =>
+        check (lenf - 1, f, invalidate state, lenr, r)
+    end.
+
+  Definition peak {A : Type} (q : Q A) :=
+    match q with
+      | (lenf, nil, state, lenr, r) => 
+        None
+      | (lenf, x :: f, state, lenr, r) =>
+        Some x
+    end.
+
+  Fixpoint drop {A : Type} n (xs : list A) :=
+    match n with
+      | O => xs
+      | S n =>
+        match xs with
+          | nil => nil
+          | _ :: xs' => drop n xs'
+        end
+    end.
+
+  Lemma unfold_drop_base : 
+    forall A xs, 
+      @drop A O xs = xs.
+  Proof. reflexivity. Qed.
+
+  Lemma unfold_drop_step :
+    forall A n xs,
+      @drop A (S n) xs = match xs with
+                           | nil => nil
+                           | x :: xs' => @drop A n xs'
+                         end.
+  Proof. reflexivity. Qed.
+
+  Lemma drop_nil :
+    forall A n,
+      @drop A n nil = nil.
+  Proof. destruct n; reflexivity. Qed.
+
+  Lemma drop_S_cons :
+    forall A n x xs,
+      @drop A (S n) (x :: xs) = @drop A n xs. 
+  Proof. reflexivity. Qed.
+
+  Definition elements_in {A : Type} (s : @RotationState A) :=
+    match s with
+      |  Appending 0 _ r' =>
+         r'
+      | Appending ok f' r' =>
+        drop ok (rev f' ++ r')
+      | Reversing ok f f' r r' =>
+        drop (S ok) (rev f' ++ f ++ rev r ++ r')
+      | _ => nil
+    end.
+
+  Definition to_list {A : Type} (q : Q A) :=
+    match q with
+      | (lenf, front, state, lenr, rear) =>
+        match state with
+          | Appending 0 _ r' =>
+            r'
+          | Appending ok f' r' => 
+            front ++ drop ok (rev f' ++ r')
+          | Reversing ok f f' r r' =>
+            front ++ drop (S ok) (rev f' ++ f ++ rev r ++ r')
+          | _ => front
+        end
+        ++ rev rear
+    end.
   
   Definition represents {A : Type} (q : Q A) (l : list A) : Prop :=
-    to_list _ q = l.
+    @to_list _ q = l.
 
-  Axiom empty_inv :
+  Lemma empty_inv :
     forall A, 
-      inv A (empty A).
+      inv (@empty A). 
+  Proof.
+    unfold inv, empty.
+    split; reflexivity.    
+  Qed.
+          
+  Lemma inject_inv :
+    forall A (q : Q A) x,
+      inv q ->
+      inv (inject x q).
+  Proof.
+    unfold inv.
+    destruct q as ((((lenf, f), state), lenr), r).
+    intros x [Hle Hlenr].
+    unfold inject.
+    unfold check.
+    case_eq (leb (1 + lenr) lenf).
+    intros.
+  Admitted.
+    
+  Lemma pop_inv :
+    forall A (q : Q A),
+      inv q ->
+      inv (pop q).
+  Proof. Admitted.
+    
+  Lemma empty_is_empty : 
+    forall A,
+      represents (@empty A) nil.
+  Proof. Admitted.
 
-  Axiom inject_inv :
-    forall A q x,
-      inv A q ->
-      inv _ (inject _ x q).
-
-  Axiom pop_inv :
-    forall A q,
-      inv A q ->
-      inv _ (pop _ q).
-  
-  Axiom empty_is_empty : forall A,
-    represents (empty A) nil.
-  
-  Axiom inject_spec :
-    forall A l q x,
+  Lemma inject_spec :
+    forall A l (q : Q A) x,
       represents q l ->
-      inv _ q ->
-      represents (inject A x q) (l ++ (x :: nil)).
-  
-  Axiom pop_empty :
-    forall A q,
+      inv q ->
+      represents (inject x q) (l ++ (x :: nil)).
+  Proof. Admitted.
+
+  Lemma pop_empty :
+    forall A (q : Q A),
       represents q nil ->
-      inv _ q ->
-      represents (pop A q) nil.
+      inv q ->
+      represents (pop q) nil.
+  Proof. Admitted.
 
-  Axiom pop_xs :
-    forall A q x xs,
+  Lemma pop_xs :
+    forall A (q : Q A) x xs,
       represents q (x::xs) ->
-      inv _ q ->
-      represents (pop A q) xs.
+      inv q ->
+      represents (pop q) xs.
+  Proof. Admitted.      
   
-  Axiom peak_empty_spec :
-    forall A q,
+  Lemma peak_empty_spec :
+    forall A (q : Q A),
       represents q nil ->
-      inv _ q -> 
-      peak A q = None.
+      inv q -> 
+      peak q = None.
+  Proof. Admitted.
 
-  Axiom peak_spec :
-    forall A q x xs,
+  Lemma peak_spec :
+    forall A (q : Q A) x xs,
       represents q (x::xs) ->
-      inv _ q ->
-      peak A q = Some x.
+      inv q ->
+      peak q = Some x.
+  Proof. Admitted.
+End RealTimeQueue.
 
-End HoodMelvilleQueue.
-*)
+Extraction "RealTimeQueue.hs" RealTimeQueue.

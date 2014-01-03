@@ -2,11 +2,13 @@ module Queue (
   Queue(..),
   BasicQueue,
   PairQueue,
-  OkasakiQueue) where
+  OkasakiQueue,
+  RealTimeQueue) where
 
 import qualified BasicQueue
 import qualified PairQueue
 import qualified OkasakiQueue
+import qualified RealTimeQueue
 
 class Queue q where
   empty  :: q a
@@ -38,4 +40,10 @@ instance Queue OkasakiQueue where
   pop      = OQ . OkasakiQueue.pop . unOQ
   peak     = OkasakiQueue.peak . unOQ
 
+newtype RealTimeQueue a = RQ { unRQ :: RealTimeQueue.Q a }
 
+instance Queue RealTimeQueue where
+  empty    = RQ RealTimeQueue.empty
+  inject x = RQ . RealTimeQueue.inject x . unRQ
+  pop      = RQ . RealTimeQueue.pop . unRQ
+  peak     = RealTimeQueue.peak . unRQ

@@ -56,7 +56,7 @@ equivFromEmpty q c c' =
         perform q (x ++ suff)
   in
    observe c == observe c'
-
+   
 prop_PeakInject q m n =
   equiv q [Inject m, Inject n, Peak] [Inject m, Peak, Inject n]
 prop_InjectPop q m n =
@@ -78,7 +78,8 @@ suite q = do quickCheck $ prop_PeakInject q
 runTests :: IO ()
 runTests = do test "SimpleQueue" (empty :: BasicQueue Int)
               test "SmartListQueue" (empty :: PairQueue Int)
-              test "StrictConstantQueue" (empty :: OkasakiQueue Int)
+              test "OkasakiQueue" (empty :: OkasakiQueue Int)
+              test "RealTimeQueue" (empty :: RealTimeQueue Int)
   where
     test s q = do putStrLn $ "### Testing " ++ s ++ " ###"
                   suite q
