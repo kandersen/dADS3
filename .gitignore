@@ -31,3 +31,5 @@
 #Haskell Junk
 *.hi
 *.o
+part3/src/Main
+part2/*.hs

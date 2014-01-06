@@ -1,0 +1,307 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[applemac]{inputenc}
+\usepackage[sc]{mathpazo}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{listings}
+\lstloadlanguages{Haskell}
+\lstnewenvironment{code}
+    {\lstset{}%
+      \csname lst@SetFirstLabel\endcsname}
+    {\csname lst@SaveFirstLabel\endcsname}
+    \lstset{
+      basicstyle=\small\ttfamily,
+      flexiblecolumns=false,
+      basewidth={0.5em,0.45em},
+      literate={+}{{$+$}}1 {/}{{$/$}}1 {*}{{$*$}}1 {=}{{$=$}}1
+               {>}{{$>$}}1 {<}{{$<$}}1 {\\}{{$\lambda$}}1
+               {\\\\}{{\char`\\\char`\\}}1
+               {->}{{$\rightarrow$}}2 {>=}{{$\geq$}}2
+               {<-}{{$\leftarrow$}}2
+               {<=}{{$\leq$}}2 {=>}{{$\Rightarrow$}}2 
+               {\ .}{{$\circ$}}2 {\ .\ }{{$\circ$}}2
+               {>>}{{>>}}2 {>>=}{{>>=}}2
+               {|}{{$\mid$}}1               
+    }
+
+\begin{document}
+Testing a data structure against a specification is traditionally done
+using some permutation of black-box and unit testing, as done in the
+previous reports. Implementations in C were tested against
+hit-and-miss unit tests at the whim of the programmers, to the extent
+that their imagination and endurance permitted.
+
+We can do one better with the levels of abstraction permitted by a
+functional language -- in particular the type system of Haskell.
+
+%TODO Insert ref to Hughes & Claessen
+We test the implementations by using a concept from operational
+semantics known as \emph{observational equivalence}, as detailed by
+John Hughes \& Koen Claessen REF. It uses the idea of an
+\emph{evaluation context}, a notion of ``the surrounding program'',
+and of \emph{observable results}, the effects visible to the
+surrounding program caused by running a particular piece of code. Two
+pieces of code are then observationally equivalent if they produce the
+same observable result in all evaluation contexts.
+
+We here, like the paper, restrict ourselves to ``queue programs'' --
+the subset of Haskell dealing only with our queue interface. While we,
+for correctness, should consider all of Haskell as evaluation
+contexts, we are interested in the behaviour of our implementations,
+and -- as opposed to C -- there is no way to manipulate the state of
+the queue without going through the interface. Without pointer
+arithmetic, side effects and associated suspects, we can be certain of
+the absence inadvertant mutation of the international structure of the
+queue.
+
+A queue is an inherently ``statefull'' object, and so is typically
+used in an imperative fashion. As such we consider imperative-style
+monadic programs of Haskell as the context, which only manipulates the
+queue through the interface, as argued above. We define a datatype for
+representing such contexts:
+
+\begin{lstlisting}
+data Action = Inject Int
+            | Pop
+            | Peak
+            | Return (Maybe Int)
+\end{lstlisting}
+
+representing an inject, a pop, a peak, and the binding of the result
+of a peak, respectively. This last action is needed to argue that
+instead of obtaining an element from a queue, if we know that element,
+we might as well explcitly write that element in the program
+ourselves.
+
+We then define a function ``executing'' an evaluation context on a
+given queue, collecting observables as it goes. It reads equationally
+as one would expect.
+
+\begin{lstlisting}
+perform :: Queue q => q Int -> [Action] -> [Maybe Int]
+perform q []     = []
+perform q (a:as) =
+  case a of
+    Inject n -> perform (inject n q) as
+    Pop      -> perform (pop q) as
+    Peak     -> peak q : perform q as
+    Return m -> m : perform q as
+\end{lstlisting}
+
+Finally, we define a testable property on queues, that asserts that in
+all evaluation contexts (prefixes and suffixes of actions on queues)
+we observe the same results from evaluating the queue in that context.
+
+\begin{lstlisting}
+equiv :: Queue q => q Int -> [Action] -> [Action] -> Property
+equiv q c c' =
+  forAll (actions 0) $ \pref ->
+  forAll (actions (delta (pref ++ c))) $ \suff ->
+  let
+    observe x =
+      perform q (pref ++ x ++ suff)
+  in
+   observe c == observe c'
+\end{lstlisting}
+
+%TODO REF
+Finally, we wire the property into the QuickCheck library (REF HUGHES)
+which generates random evaluation contexts, and verifies 5 assertions
+on queues, which according to Hughes \& Claeseen (REF) defines a
+suitable specification of queues:
+
+\begin{lstlisting}
+prop_PeakInject q m n =
+  equiv q [Inject m, Inject n, Peak] [Inject m, Peak, Inject n]
+prop_InjectPop q m n =
+  equiv q [Inject m, Inject n, Pop] [Inject m, Pop, Inject n]
+prop_PeakEmpty q =
+  equivFromEmpty q [Peak] [Return Nothing]
+
+prop_PeakInjectEmpty q m =
+  equivFromEmpty q [Inject m, Peak] [Inject m, Return (Just m)]
+prop_InjectPopEmpty q m =
+  equivFromEmpty q [Inject m, Pop] []
+\end{lstlisting}
+
+The essence of the argument for the specification is to ``bubble''
+peeks and pops towards the beginning of the program with the first 3
+properties, and then eliminate them with the 2 following properties,
+thus ``normalizing'' programs on queues.
+
+Finally we run the test for each of our 4 implementations, creating a
+hundred programs of an average length of 8 for each property for a
+total of $4 \cdot 5 \cdot 100 = 2000$ unit tests. These are just
+default settings and as good as any, but more tests naturally
+strengthen the claim that the implementations meet the specifications.
+
+\begin{lstlisting}
+runTests :: IO ()
+runTests = do test "SimpleQueue" (empty :: BasicQueue Int)
+              test "SmartListQueue" (empty :: PairQueue Int)
+              test "OkasakiQueue" (empty :: OkasakiQueue Int)
+              test "RealTimeQueue" (empty :: RealTimeQueue Int)
+  where
+    test s q = do putStrLn $ "### Testing " ++ s ++ " ###"
+                  suite q
+\end{lstlisting}
+
+It is unfortunate that the tests do not conclusively prove the
+correctness of our implementations. If only there was a way...
+
+It turns out, there is! As all our data structures are purely
+functional and do not use general recursion in the operations, we can
+implement the data structures in the Proof Assistant Coq. Which we
+did. Coq allows us to state properties on functional programs,
+\emph{conclusively prove them}, and then extract the functional
+programs to e.g. Haskell. As an added benefit, just by virtue of using
+Coq as an implementation we certify our functions total and
+terminating, as Coq does not accept partially defined functions.
+
+We start by giving an abstract module declaration of a queue
+implementaion.
+
+\begin{lstlisting}
+Module Type QUEUE.
+  Parameter Q       :           Type -> Type. 
+  Parameter inv     : forall A, Q A -> Prop.
+  Parameter empty   : forall A, Q A.
+  Parameter inject  : forall A, A -> Q A -> Q A.
+  Parameter pop     : forall A, Q A -> Q A.
+  Parameter peak    : forall A, Q A -> option A.  
+  Parameter to_list : forall A, Q A -> list A.
+\end{lstlisting}
+
+The \lstinline{inv} field is a predicate on a queue representing
+whatever invariants might be applicable for a given implementation,
+and the \lstinline{to_list} function is used to convert a queue to an
+ordered list of elements, which we shall use as our model for
+specifying queues. Using an abstract model (ordered lists) and then
+showing our expectations in the model are satisfied by the
+implementation is much in the spirit of observational equivalence: if
+looks like we expect in all ways we can measure it, it must be the same.
+
+Next, we define a series of proof obligations, to describe what must
+be proven about a given implementation. Among them are that the
+invariant is satisfied by an empty queue, and preserved by all
+operations. Do not be alarmed by the use of ``Axiom'': it means ``to
+be proven'', not ``to be assumed''.
+
+\begin{lstlisting}
+  Definition represents {A : Type} (q : Q A) (l : list A) : Prop :=
+    to_list _ q = l.
+
+  Axiom empty_inv :
+    forall A, 
+      inv A (empty A).
+
+  Axiom inject_inv :
+    forall A q x,
+      inv A q ->
+      inv _ (inject _ x q).
+
+  Axiom pop_inv :
+    forall A q,
+      inv A q ->
+      inv _ (pop _ q).
+\end{lstlisting}
+
+The \lstinline{represents} field is used to tie a given instance of a
+queue to its representation in the model. With that we can define the
+following proof obligations:
+
+\begin{lstlisting}
+  Axiom empty_is_empty : forall A,
+    represents (empty A) nil.
+\end{lstlisting}
+
+The above dictates an empty queue represents the empty list of elements.
+
+\begin{lstlisting}  
+  Axiom inject_spec :
+    forall A l q x,
+      represents q l ->
+      inv _ q ->
+      represents (inject A x q) (l ++ (x :: nil)).
+\end{lstlisting}
+
+The above states that injecting an element corresponds to postpending
+an element to the ordered list.
+
+\begin{lstlisting}  
+  Axiom pop_empty :
+    forall A q,
+      represents q nil ->
+      inv _ q ->
+      represents (pop A q) nil.
+\end{lstlisting}
+
+The above states that that popping the empty queue return the empty queue.
+
+\begin{lstlisting}  
+  Axiom pop_xs :
+    forall A q x xs,
+      represents q (x::xs) ->
+      inv _ q ->
+      represents (pop A q) xs.
+\end{lstlisting}
+
+The above states that popping an element from a queue which represents
+the list starting with \lstinline{x} followed by \lstinline{xs} yields
+a queue representing \lstinline{xs}.
+
+\begin{lstlisting}    
+  Axiom peak_empty_spec :
+    forall A q,
+      represents q nil ->
+      inv _ q -> 
+      peak A q = None.
+\end{lstlisting}
+
+The above states that peeking an element from an empty queue yields nothing.
+
+\begin{lstlisting}  
+  Axiom peak_spec :
+    forall A q x xs,
+      represents q (x::xs) ->
+      inv _ q ->
+      peak A q = Some x.
+
+End QUEUE.
+\end{lstlisting}
+
+Finally, we state that peeking from a queue representing the ordered
+sequence starting with \lstinline{x} yields that \lstinline{x}.
+
+The basic, naive functional queue is an implementation of our model,
+and so the proofs are largely uninteresting by construction. So are
+the naive implementation based on a pair of queues. We wont give a
+detailed account of the proofs of each implementation, as the proof
+scripts are quite monstrous to present in writing. We refer curious
+readers to \lstinline{Queue.v} in the accompanying code.
+
+Finally, when all proof obligations are satisfied we run
+e.g.
+\begin{lstlisting}
+Extraction "PairQueue.hs" PairQueue
+\end{lstlisting}
+to generate a Haskell file with the definitions given in the
+module. While slightly unidiomatic in style, the generated code is
+exactly as we would have handwritten, and so suffer no performance
+penalties.
+
+The generated files are exactly those used in our benchmarks and the
+previously outlined random testing, so it is no surprise it satisfied
+the previous specification!
+
+We might remark that Coq is a strict programming language which we use
+to reason about programs to be run in a lazy setting. This is
+inherently not a problem as none of the implementations exploit lazy
+capabilities of lazy evaluation but use it only to argue performance
+characteristics. We have just proven they have the desired semantics
+and so will behave the same in a lazy setting, with the added benefit
+of ``lazy performance''.
+
+\end{document}
