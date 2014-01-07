@@ -195,13 +195,22 @@ Reversing the list can be done in $\BigO{n}$ where $n$ is the size of the list B
 Catenation can be done in $\BigO{min(|K|,|L|)}$ although that requires maintaining the length of each queue. If $K$ has the fewest elements. then all elements from $K_B$ can be pushed to $L_A$ in constant time for each node, hereafter $K_B$ can be reversed and then pushed to $L_A$ which in total takes linear time in the size of $K$.
 If $|L|$ is smaller then $L_A$ can be added $K_B$ as before and the result can be added as $\cdr$ to the list of $L_B$ which in all takes linear time in the size of $L$. WHAT ABOUT POTENTIAL?
 
+\section{Converting to strict in Haskell}
+
+Skriv at denne kan laves strict i haskell ved at anvende !
+
 \chapter{Pair of lists with lazy evaluation}
 
 We were asked to implement a queue with lazy evaluation having amortized constant time for all operations except concatination. As so many implementations we have two lists; one representing the front and another representing the tail. At specific points we will rotate the elements from the tail onto the head by reversing the tail list and appending it. In Haskell the append and the reverse function is lazy giving us the desired evalution strategy.
 
 The trick with two lists has already been used in the previous chapter but we will use another trigger for the lazy implementation. We rotate whenever the length of the tail list is one greater than the length of the front list.
 
-To perform the amortized analysis we will again use the potential function, however, the potential function is no longer equivalent to the elements in the tail. 
+\section{Analyzing lazy evaluations}
+
+
+\section{Completing the analysis of the lazy queue}
+
+To perform the amortized analysis we will again use the potential function, however, the potential function is no longer equivalent to the elements in the tail. In fact, it is  
 
 As always, it should be the case that we add potential on inserts and release potential when deleting. We therefore define the potential to be:
 \begin{align*}
@@ -258,10 +267,58 @@ The recopying (or rotation) should be completed before the first element is need
   \end{tabular}
 \end{center}
 
+\chapter{Testing and correctness}
+
+\chapter{Time measurements}
+
+We have a total of five queues - three stricts and two lazy. We are asked to design experiments where a queue is only used once and also where the queue can be arbitrarily used. In this chapter we explain how we ensure lazy constructs are evaluated when testing, we describe the different tests that we apply to the queues and we discuss the results of said tests. 
+
+\section{Making sure that lazy evaluations gets evaluated}
+
+\section{One punch tests}
+
+In this chapter we define only the tests that uses queues ..
+
+We have designed two tests that enable us to directly measure tiem of insertions and deletions. However, a queue is useful for more things than theoretic time analysis so we are also using the queue to do Breadth-First search in graphs. 
+
+\subsection{Time of insert}
+
+This tests is analogue to the insert test we performed in Project 2. We would like to investigate, on average, how long it takes for a number of insertions to be inserted depending on the size of the queue. We fill up the queue to some amount $x$ and then perform a constant number of inserts. The total time is then divided by the constant and we have a measure for how long a single insert takes depending on the size of the queue.
+
+\subsection{Time of delete}
+
+This test is almost the same as testing time of insert, except that we delete a constant number of elements. The total time is then again divided by the constant and a measure for how long da single delete takes.
+
+\subsection{Breadth-First Search}
+
+One very good use of a queue is in the well-known breadth-first search algorithm for a graph. A breadth-first search has a starting vertex which is added to the queue. Then, as long as the queue is non-empty the first element and all adjacent vertices to this vertex, as long as it has not been visited so far, are enqueued and the algorithm is continued.
+
+We are not performing the test
+
+\section{Rocky tests (multiple punches - movie reference)}
+
+In this section we describe tests that perform more than one operation on the same queue. These experiments are necessary because of the persistent nature of queues and for a more in depth discussion see sectionXX.
+
+\subsection{Insert onto the same queue}
+
+This test is designed to hit worst cases on all our queue implementations, if hitting such a thing is possible. As in the single usage case, we fill the queue up to some length $n$. Herefter, we delete insert c times on the queue given as argument, then insert c on the queue given as argument, insert an element such that the size is $n+$ and do the same thing over again. We stop when we have performed the $2n$ iterations.
+
+\subsection{Merge sort}
+
+We define a version of merge-sort in terms of queues. Given $c$ queues of size $n$, where c i a constant and  where elements are ordered by apperance in the queue, merge all elements into a single queue.
+
+The elements of the queue is generated at random with numbers between the last element inserted in a list $q$ and $|q| \times M/n$. 
+
+For each iteration, a fold is applied to the list of queues where the accumulating information is the currently smallest element, the tail of the queue the pop was performed on and the index of the q in the list. The result is stored in a local variable. Hereafter, a map is performed on the same list, where all queues are passed along, except the one that had the smallest element, which is replaced by the tail of the previous queue. The mapped result is then given as argument to the next iteration.
+
+Performed on different initial lengths of the queues, we hope to see a number of expensive operations performed multiple times on the same queue.
+
+\section{Results}
+
 
 \chapter{Functional lists with index lookup}
 
-This exercise was posted in the theoretical project but solving this seemed natural considering this project is all about functional data structures.
+This exercise was posted in the theoretical project but solving it seemed natural considering this project is all about functional data structures.
 
 We are asked to describe a strict functional data structure supporting \\ $\Push$, $\Pop$ in $\BigO{1}$ and $\Lookup$ in time $\BigO{\log n}$ where $n$ is the number of elements in the list.
 
@@ -339,5 +396,7 @@ Clearly if $n=0$ it holds so we turn our attention to $n > 0$. Assume, to obtain
 \end{proof}
 
 Except for the two first trees in our list every size of the complete binary trees in the list is unique and in increasing order by construction. Therefore, the length of the list can not exceed $\lceil \log (n+1) \rceil$ by \ref{thm1}. Therefore, lookup will traverse at most $\BigO{\log n}$ elements in the list and perform a search in a single complete binary tree of height at most $\log n$.
+
+\chapter{Conclusion}
 
 \end{document}
