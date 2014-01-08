@@ -80,17 +80,32 @@
 
 \chapter{Introduction}
 
-needs content
+This is the third and final report in the Advanced Data Structures course at Aarhus University and we will in this project investigate the performance of queues in a functional language with the name of Haskell.
+
+We first present some terminology and then a total of five different queues where two only differs by one being lazy. Hereafter, we describe how we made the implementation and tested for correctness and why we can say thay our implentations are correct.
+
+We then describe how we measure running times in a lazely evaluated language and explain the different tests we have chosen for testing the running times of each queue.
+
+Finally, we will give an answer to the problem from the theoretic project of how to implement a data structure having push and pop in $\BigO{1}$ while also having index lookup in $\BigO{\log n}$ and conclude on the entire project.
 
 \section{Terminology}
 
-Purely functional
+We will use some specific phrases to describe properties, which we, for good measure, include below:
 
-Strict evelaution
+\paragraph{Purely functional}
+Purely functional is a term that is used to describe data structures where no operation perform destructive updates. Such a data structure is therefore said to be immutable or persistent (notice, in this course we further divide persistence in partial persistence or full persistence, where this is considered to be full persistence).
 
-Lazy evaluation
+\paragraph{Strict evelaution}
 
-Memoization
+Strict evaluation (eager evaluation) is where an expression is computed at the point where it is assigned to a variable or is passed as an argument.
+
+\paragraph{Lazy evaluation}
+
+Lazy evaluation delays the computation of a variable such that the expression is computed at the point where the variable is used. 
+
+\paragraph{Memoization}
+
+When an expression is bound to a variable that variable can be used multiple times. With a strict evaluation, the variable is assigned a specific variable. If a lazy evaluation strategy is used then the first time the value of a variable is needed, the computation will occur, but what about subsequent uses? Memoization says that when a value has been calculated once that value will be stored and subsequent uses will therefore not repeat any calculations. The combination of lazy evaluation with memoization is also called call-by-need. 
 
 \chapter{A purely functional list as a queue}
 
@@ -130,9 +145,10 @@ Elements can be inserted and removed from the front in constant time, but all ot
     \Pop & $\BigO{1}$ \\ 
     \Inject & $\BigO{n}$ \\ 
     \Eject & $\BigO{n}$ \\ 
-    \Catenate & $\BigO{|K|}$ \\ 
   \end{tabular}
 \end{center}
+
+Because a queue pop elements from the front and inject elements in the end, this is not the most efficient queue implementation.
 
 \chapter{Queue by a pair of lists}
 
@@ -167,77 +183,77 @@ A simple observation to make is that if we reverse the list of section 2, $\Inje
   \draw[*->] let \p1 = (D.two), \p2 = (D.center) in (\x1,\y2) -- (E);
 
 \end{tikzpicture}
-\captionof{figure}{Maintaining two lists - reverse on next pop}
+\captionof{figure}{Maintaining two lists - reverse B and place as A on next pop from A}
 \label{fig:two_lists_before_reverse}
 \end{center}
 
-When enqueueing nodes are pushed to the front of the list B and when elements are removed they are taken from the front of the list A which both performs in constant time. The only problem is what to do if A consists of only the empty list.
+When we enqueue nodes they are pushed to the front of list B and when elements are removed they are taken from the front of the list A. Both of these operations will normally take constant time. The only problem is what to do if A is the empty list.
 
-Figure ~\ref{fig:two_lists_before_reverse} shows a configuration of the queue where a pop will result in A becoming the empty list. Subsequent pops should remove from the end of B but that would take $\BigO{n}$ for every operation. It therefore makes 
+Figure \ref{fig:two_lists_before_reverse} shows a configuration of the queue where a pop will result in A becoming the empty list. Subsequent pops should remove from the end of B but that would take $\BigO{n}$ for every operation. It therefore makes 
 more sense to reverse the list once and place instead of A.
 
-POTENTIAL
+To analyze the running time we will use amortization and specifically use the Potential method \cite[p. 459]{ITA09}. We will use the length of the the tail list as the potential function. Every insert into tail is therefore an operation that takes a single step and increases the potential by one, so the amortized cost is two.
 
-Reversing the list can be done in $\BigO{n}$ where $n$ is the size of the list B. The length of B is the number of enqueues since the last reversal or construction of the list. By amortizing the cost of reversal over said enqueue-operations will result in all operations, except catenation, having $\BigO{1}$ time complexities:
+Reversing the list can be done in $\BigO{|tail|}$. The length of the tail is the number of enqueues since the last reversal or construction of the list. Thefore, we must have $|tail|$ unreleased potential, giving us that list can be reversed in $\BigO{1}$. The queue will have the following time complexities:
 
 \begin{center}
   \begin{tabular}{ l | c | c}
-    Operation & List & Two lists (amortized) \\ \hline
-    \MakeList & $\BigO{1}$ & $\BigO{1}$ \\ 
-    \Push & $\BigO{1}$ & $\BigO{1}$ \\ 
-    \Pop & $\BigO{1}$ & $\BigO{1}$ \\ 
-    \Inject & $\BigO{n}$ & $\BigO{1}$ \\ 
-    \Eject & $\BigO{n}$ & $\BigO{1}$ \\ 
-    \Catenate & $\BigO{|K|}$ & $\BigO{min(|K|,|L|)}$ \\ 
+    Operation & List & Two lists amortized / worst case  \\ \hline
+    \MakeList & $\BigO{1}$ & $\BigO{1}$ / $\BigO{1}$ \\ 
+    \Pop & $\BigO{1}$ & $\BigO{1}$ / $\BigO{n}$ \\ 
+    \Inject & $\BigO{n}$ & $\BigO{1}$ / $\BigO{1}$ \\ 
   \end{tabular}
 \end{center}
 
-Catenation can be done in $\BigO{min(|K|,|L|)}$ although that requires maintaining the length of each queue. If $K$ has the fewest elements. then all elements from $K_B$ can be pushed to $L_A$ in constant time for each node, hereafter $K_B$ can be reversed and then pushed to $L_A$ which in total takes linear time in the size of $K$.
-If $|L|$ is smaller then $L_A$ can be added $K_B$ as before and the result can be added as $\cdr$ to the list of $L_B$ which in all takes linear time in the size of $L$. WHAT ABOUT POTENTIAL?
-
 \section{Converting to strict in Haskell}
 
-Skriv at denne kan laves strict i haskell ved at anvende !
+Lazyness is a feature in Haskell. A queue might perform differently depending on the choice of evaluation. At the very least, the expensive operations will be performed at different runtime points in the program. By exclamating the function call (putting ! in front of it) we tell Haskell to enforce a strict evaluation of the function.
+Because of the way rotations happen only when needed, we might not see any differences between lazy or eager evaluation for this queue, nevertheless, we will perform tests on both the lazy and the strict version of this queue. We will delay (are we then lazy) the discussion about amortized running times for a lazy version of this queue to the next chapter.
 
 \chapter{Pair of lists with lazy evaluation}
 
-We were asked to implement a queue with lazy evaluation having amortized constant time for all operations except concatination. As so many implementations we have two lists; one representing the front and another representing the tail. At specific points we will rotate the elements from the tail onto the head by reversing the tail list and appending it. In Haskell the append and the reverse function is lazy giving us the desired evalution strategy.
+We were asked to implement a queue with lazy evaluation having amortized constant time for $\Inject$ and $\Pop$. We already have one such implementation but it might be fun to have another where rotation occurs at points in execution where the list reversion can be delayed.
+
+Like other functional queues we have two lists; one representing the front and another representing the tail. At specific points we will rotate the elements from the tail onto the head by reversing the tail list and appending it. In Haskell the append and the reverse function is lazy giving us the desired evalution strategy.
 
 The trick with two lists has already been used in the previous chapter but we will use another trigger for the lazy implementation. We rotate whenever the length of the tail list is one greater than the length of the front list.
 
 \section{Analyzing lazy evaluations}
 
+When we calculated the potential in the previous section we made the assumption that a queue was used ephemerally, we made no discussion about amortized running times when using the queue multiple times. Consider a queue that has a lot of potential stored and the triggering of a revertion of the tail list is imminent. The queue is persistent, meaning, that performing $\Pop$ on the same queue is non-destructive. Therefore, the expensive operation can be computed multiple times if we pass the original queue as argument to different operations. The released potential can only be used once, thereby ruining our amortized analysis.
+
+There is no way to avoid this computation in language having call-by-value or call-by-name without using side effects, but for lazy evalutations with memoization, which we call call-by-need, the expensive operation is only carried out once. However, memoization is a side effect and thus, some of our arguing might be considered a test of faith.
+
+It is inadequate to do amortized analysis for lazy amortized data structures by arguing as if they were strict \cite{OKA96}. We divide the cost of an operation two categories; unshared cost and shared cost. Unshared cost is the cost the operation takes, with the assumption that all lazy constructions of the datastructure, that will be used, has been computed. The shared cost of an operation is the time it would take to execute every suspension created but not evaluated by the operation. The sum of both is called the complete cost.
+
+To adjust he Potential function we have to replace the savings function $\Phi$ (we store potential) with a function $\Psi$ representing the upper bound on accumulated debt. The amortized cost of an operation will therefore be the complete cost of an operation - the change in potential. With this change we can calculate the complete cost of an operation as if it is strict.
+
 
 \section{Completing the analysis of the lazy queue}
 
-To perform the amortized analysis we will again use the potential function, however, the potential function is no longer equivalent to the elements in the tail. In fact, it is  
-
-As always, it should be the case that we add potential on inserts and release potential when deleting. We therefore define the potential to be:
+We will analyze the lazy queue with our modified potential function $\Psi$. As always, it should be the case that we add potential on inserts and release potential when deleting. We therefore define:
 \begin{align*}
-  \Phi(Q) = tail(Q) + notreversed(Q)
+  \Psi(Q) = |notreversed(F)| + |R|
 \end{align*}
 
-Appending the reversed elements from the tail onto the head makes no change to the potential. Potential is released when a lazy list is demanded. Since any lazy list demanded will origin from the tail, the number of operations is completely specified by the amount of inserts and thus the release of potential pays for the reverting the list.
+Let us analyze the amortized cost of an $\Inject$ operation and let us consider the case where no rotation occurs. The operation takes one step and also have to pay to the potential function, which is a total cost of 2. The enqueue that creates a rotation also takes one step when adding and also have to pay the cost of increasing the potential. When the rotation occurs the potential described by $|R|$ will be released by the same amount that $|notreversed(F)|$ increases resulting in no additional change in potential. Finally, we have to remember to pay for initiating the rotation which gives a total of 3.
+
+Analyzing $\Pop$ is straight forward, however there are four cases. The case where $\Pop$ do not force an un-evaluated expression only has the cost of removing the first element. If $\Pop$ forces a rotation, the cost is 2 per the argument above. If $\Pop$ evaluate an un-evaluated expression, the operation will take $\BigO{n}$, but the potential will decrease with the same amount, giving us a total cost of 2. Finally, if $\Pop$ rotates and forces an un-evaluted expression to be computed, the final cost will be 3.
 
 The above analysis assumes that when a demand for the first element of a lazy list not yet reversed, the list is reversed and all subsequent calls to the list will work in constant time. The latter part assumes therefore that lazy lists are memoized. We can now present the time complexities for the lazy algorithm:
 
 \begin{center}
   \begin{tabular}{ l | c | c | c }
-    Operation & List & \specialcell{Two lists\\(amortized)} & \specialcell{Lazy\\(amortized)} \\ \hline
-    \MakeList & $\BigO{1}$ & $\BigO{1}$ & $\BigO{1}$ \\ 
-    \Push & $\BigO{1}$ & $\BigO{1}$ & $\BigO{1}$ \\ 
-    \Pop & $\BigO{1}$ & $\BigO{1}$ & $\BigO{1}$ \\ 
-    \Inject & $\BigO{n}$ & $\BigO{1}$ & $\BigO{1}$ \\ 
-    \Eject & $\BigO{n}$ & $\BigO{1}$ & $\BigO{1}$ \\ 
-    \Catenate & $\BigO{|K|}$ & $\BigO{min(|K|,|L|)}$ & $\BigO{1}$ \\ 
+    Operation & List & \specialcell{Two lists\\ amortized / worst case} & \specialcell{Lazy\\ amortized / worst case} \\ \hline
+    \MakeList & $\BigO{1}$ & $\BigO{1}$ / $\BigO{1}$  & $\BigO{1}$ / $\BigO{1}$ \\ 
+    \Pop & $\BigO{1}$ & $\BigO{1}$ / $\BigO{n}$ & $\BigO{1}$ / $\BigO{n}$ \\ 
+    \Inject & $\BigO{n}$ & $\BigO{1}$ / $\BigO{1}$  & $\BigO{1}$ / $\BigO{1}$ \\ 
   \end{tabular}
 \end{center}
 
-Catenating two queues can be done in constant time by appending the head of $L$ and the reversed tail of $L$ onto the head of $K$ because append and reverse are lazy thus the functions returns immediately. We assume that all unreleased potential of $L$ can be transferred to $K$.
-
 \chapter{$\BigO{1}$ lists with worst case $\BigO{1}$ enqueue and dequeue with strict evaluation}
 
-All of the queues described above have worst case running times $\BigO{n}$ which is unacceptable in some situations thus there exist a need for real times queues where all operations have worst case running times $\BigO{1}$. We have chosen to implement the Hood-Melville real time queue[REF].
+All of the queues described above have worst case running times $\BigO{n}$ which is unacceptable in some situations thus there exist a need for real times queues where all operations have worst case running times $\BigO{1}$. We have chosen to implement the Hood-Melville real time queue \cite{HOM80}.
 
 There is a few key insights to this algorithm. First, reversing a list incrementally can be done by having two lists and transferring elements from one to the other. Second, one can incrementally append two lists by applying the trick. If one will would like to append two lists $xs$ and $ys$, one can reverse $xs$ to $xs'$ and then reverse $xs'$ onto $ys$. Additionally, one can reverse $xs$ on to the reverse of $ys$ by reversing $xs$ and $ys$ in parallel and then continue as before.
 
@@ -249,25 +265,299 @@ Initially, the queue will have two lists forming the head $H$ and tail $T$ and t
 \item Reverse $H_R$ onto $H'$
 \end{enumerate}
 
-One should be able to convince himself (or herself) that queue order is preserved after the third step. However, the queue will not remain constant when performing the rotation (which is a weird phrase in [REF] since the incremental rotation only occurs when changes occur), but basically, it means that we have to maintain the state of the current rotation and provide the user the ability to still make alterations to the queue. 
+One should be able to convince himself (or herself) that queue order is preserved after the third step. However, the queue will not remain constant when performing the rotation (which is a weird phrase in \cite{HOM80} since the incremental rotation only occurs when changes occur), but basically, it means that we have to maintain the state of the current rotation and provide the user the ability to still make alterations to the queue. 
 
-Allowing the user to enqueue elements is easily done by just having a new tail list. Dequeueing is bit harder because we are currently reversing the $H$ into $H_R$. The answer is two have two lists; one being the a working copy of the old list and one being the list we are reversing. This again introduce some maintenance because removing an element from the working copy somehow has to be synchronized with the list we are reversing. To correct this, we use a counter that describe how many valid elements to be copied from $H_R$. A total of six lists is therefore necessary for this data structure.
+Allowing the user to enqueue elements is easily done by just having a new tail list. Dequeueing is bit harder because we are currently reversing the $H$ into $H_R$. The answer is to have two lists; one being a working copy of the old list and one being the list we are reversing. This again introduce some maintenance because removing an element from the working copy somehow has to be synchronized with the list we are reversing. To correct this, we use a counter that describe how many valid elements to be copied from $H_R$. A total of six lists is therefore necessary for this data structure.
 
-The recopying (or rotation) should be completed before the first element is needed. We will rotate elements when the tail list becomes one longer than the head list, therefore, rotating elements will take $2m + 1$ operations where $m$ is the number of elements in head and tail. Therefore $2m + 1$ incremental operations must be performed in at most $m$ queue operations. By performing the two first rotation steps starting the rotation process and hereafter perform two incremental steps for each queue operation. In total, this gives $2(m+1) = 2m + 2$ steps, which is greater than $2m + 1$. We therefore perform constant work for every queue operation sans catenation:
+The recopying (or rotation) should be completed before the first element is needed. We will rotate elements when the tail list becomes one longer than the head list, therefore, rotating elements will take $m+1$ operations to complete 1. and $m$ operations to complete 2. Since these can be done in parallel the total time is $m+1$. Completing three will take additional $m$ operations giving a total of $2m+1$. Therefore $2m + 1$ incremental operations must be performed in at most $m$ queue operations. By performing the two first rotation steps starting the rotation process and hereafter perform two incremental steps for each queue operation we should be on the safe side. In total this gives $2(m+1) = 2m + 2$ steps, which is greater than $2m + 1$. We therefore perform constant work for every queue operation.
 
 \begin{center}
-  \begin{tabular}{ l | c | c | c | c}
-    Operation & List & \specialcell{Two lists\\(amortized)} & \specialcell{Lazy\\(amortized)} & Hood-Melville \\ \hline
-    \MakeList & $\BigO{1}$ & $\BigO{1}$ & $\BigO{1}$ & $\BigT{1}$ \\ 
-    \Push & $\BigO{1}$ & $\BigO{1}$ & $\BigO{1}$ & $\BigT{1}$ \\ 
-    \Pop & $\BigO{1}$ & $\BigO{1}$ & $\BigO{1}$ & $\BigT{1}$ \\ 
-    \Inject & $\BigO{n}$ & $\BigO{1}$ & $\BigO{1}$ & $\BigT{1}$ \\ 
-    \Eject & $\BigO{n}$ & $\BigO{1}$ & $\BigO{1}$ & $\BigT{1}$ \\ 
-    \Catenate & $\BigO{|K|}$ & $\BigO{min(|K|,|L|)}$ & $\BigO{1}$ & \\ 
+  \begin{tabular}{ l | c | c | c | c }
+    Operation & List & \specialcell{Two lists\\ amortized/worst} & \specialcell{Lazy\\ amortized/worst} & \specialcell{Hood\\Melville} \\ \hline
+    \MakeList & $\BigO{1}$ & $\BigO{1}$ / $\BigO{1}$  & $\BigO{1}$ / $\BigO{1}$ & $\BigO{1}$ \\ 
+    \Pop & $\BigO{1}$ & $\BigO{1}$ / $\BigO{n}$ & $\BigO{1}$ / $\BigO{n}$ & $\BigO{1}$ \\ 
+    \Inject & $\BigO{1}$ & $\BigO{1}$ / $\BigO{1}$  & $\BigO{1}$ / $\BigO{1}$ & $\BigO{1}$ \\ 
   \end{tabular}
 \end{center}
 
 \chapter{Testing and correctness}
+
+Testing a data structure against a specification is traditionally done
+using some permutation of black-box and unit testing, as done in the
+previous reports. Implementations in C were tested against
+hit-and-miss unit tests at the whim of the programmers, to the extent
+that their imagination and endurance permitted.
+
+We can do one better with the levels of abstraction permitted by a
+functional language -- in particular the type system of Haskell.
+
+%TODO Insert ref to Hughes & Claessen
+We test the implementations by using a concept from operational
+semantics known as \emph{observational equivalence}, as detailed by
+John Hughes \& Koen Claessen REF. It uses the idea of an
+\emph{evaluation context}, a notion of ``the surrounding program'',
+and of \emph{observable results}, the effects visible to the
+surrounding program caused by running a particular piece of code. Two
+pieces of code are then observationally equivalent if they produce the
+same observable result in all evaluation contexts.
+
+We here, like the paper, restrict ourselves to ``queue programs'' --
+the subset of Haskell dealing only with our queue interface. While we,
+for correctness, should consider all of Haskell as evaluation
+contexts, we are interested in the behaviour of our implementations,
+and -- as opposed to C -- there is no way to manipulate the state of
+the queue without going through the interface. Without pointer
+arithmetic, side effects and associated suspects, we can be certain of
+the absence inadvertant mutation of the international structure of the
+queue.
+
+A queue is an inherently ``statefull'' object, and so is typically
+used in an imperative fashion. As such we consider imperative-style
+monadic programs of Haskell as the context, which only manipulates the
+queue through the interface, as argued above. We define a datatype for
+representing such contexts:
+
+\begin{lstlisting}
+data Action = Inject Int
+            | Pop
+            | Peak
+            | Return (Maybe Int)
+\end{lstlisting}
+
+representing an inject, a pop, a peak, and the binding of the result
+of a peak, respectively. This last action is needed to argue that
+instead of obtaining an element from a queue, if we know that element,
+we might as well explcitly write that element in the program
+ourselves.
+
+We then define a function ``executing'' an evaluation context on a
+given queue, collecting observables as it goes. It reads equationally
+as one would expect.
+
+\begin{lstlisting}
+perform :: Queue q => q Int -> [Action] -> [Maybe Int]
+perform q []     = []
+perform q (a:as) =
+  case a of
+    Inject n -> perform (inject n q) as
+    Pop      -> perform (pop q) as
+    Peak     -> peak q : perform q as
+    Return m -> m : perform q as
+\end{lstlisting}
+
+Finally, we define a testable property on queues, that asserts that in
+all evaluation contexts (prefixes and suffixes of actions on queues)
+we observe the same results from evaluating the queue in that context.
+
+\begin{lstlisting}
+equiv :: Queue q => q Int -> [Action] -> [Action] -> Property
+equiv q c c' =
+  forAll (actions 0) $ \pref ->
+  forAll (actions (delta (pref ++ c))) $ \suff ->
+  let
+    observe x =
+      perform q (pref ++ x ++ suff)
+  in
+   observe c == observe c'
+\end{lstlisting}
+
+%TODO REF
+Finally, we wire the property into the QuickCheck library (REF HUGHES)
+which generates random evaluation contexts, and verifies 5 assertions
+on queues, which according to Hughes \& Claeseen (REF) defines a
+suitable specification of queues:
+
+\begin{lstlisting}
+prop_PeakInject q m n =
+  equiv q [Inject m, Inject n, Peak] [Inject m, Peak, Inject n]
+prop_InjectPop q m n =
+  equiv q [Inject m, Inject n, Pop] [Inject m, Pop, Inject n]
+prop_PeakEmpty q =
+  equivFromEmpty q [Peak] [Return Nothing]
+
+prop_PeakInjectEmpty q m =
+  equivFromEmpty q [Inject m, Peak] [Inject m, Return (Just m)]
+prop_InjectPopEmpty q m =
+  equivFromEmpty q [Inject m, Pop] []
+\end{lstlisting}
+
+The essence of the argument for the specification is to ``bubble''
+peeks and pops towards the beginning of the program with the first 3
+properties, and then eliminate them with the 2 following properties,
+thus ``normalizing'' programs on queues.
+
+Finally we run the test for each of our 4 implementations, creating a
+hundred programs of an average length of 8 for each property for a
+total of $4 \cdot 5 \cdot 100 = 2000$ unit tests. These are just
+default settings and as good as any, but more tests naturally
+strengthen the claim that the implementations meet the specifications.
+
+\begin{lstlisting}
+runTests :: IO ()
+runTests = do test "SimpleQueue" (empty :: BasicQueue Int)
+              test "SmartListQueue" (empty :: PairQueue Int)
+              test "OkasakiQueue" (empty :: OkasakiQueue Int)
+              test "RealTimeQueue" (empty :: RealTimeQueue Int)
+  where
+    test s q = do putStrLn $ "### Testing " ++ s ++ " ###"
+                  suite q
+\end{lstlisting}
+
+It is unfortunate that the tests do not conclusively prove the
+correctness of our implementations. If only there was a way...
+
+It turns out, there is! As all our data structures are purely
+functional and do not use general recursion in the operations, we can
+implement the data structures in the Proof Assistant Coq. Which we
+did. Coq allows us to state properties on functional programs,
+\emph{conclusively prove them}, and then extract the functional
+programs to e.g. Haskell. As an added benefit, just by virtue of using
+Coq as an implementation we certify our functions total and
+terminating, as Coq does not accept partially defined functions.
+
+We start by giving an abstract module declaration of a queue
+implementaion.
+
+\begin{lstlisting}
+Module Type QUEUE.
+  Parameter Q       :           Type -> Type. 
+  Parameter inv     : forall A, Q A -> Prop.
+  Parameter empty   : forall A, Q A.
+  Parameter inject  : forall A, A -> Q A -> Q A.
+  Parameter pop     : forall A, Q A -> Q A.
+  Parameter peak    : forall A, Q A -> option A.  
+  Parameter to_list : forall A, Q A -> list A.
+\end{lstlisting}
+
+The \lstinline{inv} field is a predicate on a queue representing
+whatever invariants might be applicable for a given implementation,
+and the \lstinline{to_list} function is used to convert a queue to an
+ordered list of elements, which we shall use as our model for
+specifying queues. Using an abstract model (ordered lists) and then
+showing our expectations in the model are satisfied by the
+implementation is much in the spirit of observational equivalence: if
+looks like we expect in all ways we can measure it, it must be the same.
+
+Next, we define a series of proof obligations, to describe what must
+be proven about a given implementation. Among them are that the
+invariant is satisfied by an empty queue, and preserved by all
+operations. Do not be alarmed by the use of ``Axiom'': it means ``to
+be proven'', not ``to be assumed''.
+
+\begin{lstlisting}
+  Definition represents {A : Type} (q : Q A) (l : list A) : Prop :=
+    to_list _ q = l.
+
+  Axiom empty_inv :
+    forall A, 
+      inv A (empty A).
+
+  Axiom inject_inv :
+    forall A q x,
+      inv A q ->
+      inv _ (inject _ x q).
+
+  Axiom pop_inv :
+    forall A q,
+      inv A q ->
+      inv _ (pop _ q).
+\end{lstlisting}
+
+The \lstinline{represents} field is used to tie a given instance of a
+queue to its representation in the model. With that we can define the
+following proof obligations:
+
+\begin{lstlisting}
+  Axiom empty_is_empty : forall A,
+    represents (empty A) nil.
+\end{lstlisting}
+
+The above dictates an empty queue represents the empty list of elements.
+
+\begin{lstlisting}  
+  Axiom inject_spec :
+    forall A l q x,
+      represents q l ->
+      inv _ q ->
+      represents (inject A x q) (l ++ (x :: nil)).
+\end{lstlisting}
+
+The above states that injecting an element corresponds to postpending
+an element to the ordered list.
+
+\begin{lstlisting}  
+  Axiom pop_empty :
+    forall A q,
+      represents q nil ->
+      inv _ q ->
+      represents (pop A q) nil.
+\end{lstlisting}
+
+The above states that that popping the empty queue return the empty queue.
+
+\begin{lstlisting}  
+  Axiom pop_xs :
+    forall A q x xs,
+      represents q (x::xs) ->
+      inv _ q ->
+      represents (pop A q) xs.
+\end{lstlisting}
+
+The above states that popping an element from a queue which represents
+the list starting with \lstinline{x} followed by \lstinline{xs} yields
+a queue representing \lstinline{xs}.
+
+\begin{lstlisting}    
+  Axiom peak_empty_spec :
+    forall A q,
+      represents q nil ->
+      inv _ q -> 
+      peak A q = None.
+\end{lstlisting}
+
+The above states that peeking an element from an empty queue yields nothing.
+
+\begin{lstlisting}  
+  Axiom peak_spec :
+    forall A q x xs,
+      represents q (x::xs) ->
+      inv _ q ->
+      peak A q = Some x.
+
+End QUEUE.
+\end{lstlisting}
+
+Finally, we state that peeking from a queue representing the ordered
+sequence starting with \lstinline{x} yields that \lstinline{x}.
+
+The basic, naive functional queue is an implementation of our model,
+and so the proofs are largely uninteresting by construction. So are
+the naive implementation based on a pair of queues. We wont give a
+detailed account of the proofs of each implementation, as the proof
+scripts are quite monstrous to present in writing. We refer curious
+readers to \lstinline{Queue.v} in the accompanying code.
+
+Finally, when all proof obligations are satisfied we run
+e.g.
+\begin{lstlisting}
+Extraction "PairQueue.hs" PairQueue
+\end{lstlisting}
+to generate a Haskell file with the definitions given in the
+module. While slightly unidiomatic in style, the generated code is
+exactly as we would have handwritten, and so suffer no performance
+penalties.
+
+The generated files are exactly those used in our benchmarks and the
+previously outlined random testing, so it is no surprise it satisfied
+the previous specification!
+
+We might remark that Coq is a strict programming language which we use
+to reason about programs to be run in a lazy setting. This is
+inherently not a problem as none of the implementations exploit lazy
+capabilities of lazy evaluation but use it only to argue performance
+characteristics. We have just proven they have the desired semantics
+and so will behave the same in a lazy setting, with the added benefit
+of ``lazy performance''.
 
 \chapter{Time measurements}
 
@@ -301,7 +591,7 @@ In this section we describe tests that perform more than one operation on the sa
 
 \subsection{Insert onto the same queue}
 
-This test is designed to hit worst cases on all our queue implementations, if hitting such a thing is possible. As in the single usage case, we fill the queue up to some length $n$. Herefter, we delete insert c times on the queue given as argument, then insert c on the queue given as argument, insert an element such that the size is $n+$ and do the same thing over again. We stop when we have performed the $2n$ iterations.
+This test is designed to hit worst cases on all our queue implementations, if hitting such a thing is possible. As in the single usage case, we fill the queue up to some length $n$. Herefter, we delete insert c times on the queue given as argument, then insert c on the queue given as argument, insert an element such that the size is $n+1$ and do the same thing over again. We stop when we have performed the $2n$ iterations.
 
 \subsection{Merge sort}
 
@@ -322,9 +612,9 @@ This exercise was posted in the theoretical project but solving it seemed natura
 
 We are asked to describe a strict functional data structure supporting \\ $\Push$, $\Pop$ in $\BigO{1}$ and $\Lookup$ in time $\BigO{\log n}$ where $n$ is the number of elements in the list.
 
-By using a standard list composed by cons we will have a $\Push$ and $\Pop$ in constant time, so how do we solve lookups in $\BigO{\log n}$? A binary tree would give us the desired running times. The problem is how to combine the two. Okasaki solved this problem by having a collection of complete binary trees.
+By using a standard list composed by $\cons$ we will have a $\Push$ and $\Pop$ in constant time, so how do we solve lookups in $\BigO{\log n}$? A binary tree would give us the desired running times. The problem is how to combine the two. Okasaki solved this problem by having a collection of complete binary trees~\cite{OKA96}.
 
-For each entry in our list we store a tuple consisting of the size of the tree and a complete binary tree. Thus the size of the trees is on the form $2^k-1$. Whenever two adjacent elements are at the front of the list and another element is pushed, the trees are joined with the newly added element as the root which gives us that the elements in any of the binary trees is stored in preorder. Elements 1 to $\lfloor n / 2 \rfloor$ will be in the left part of the tree and $\lceil n / 2 \rceil$ to $n-1$ will be in the right part.
+For each entry in our list we store a tuple consisting of a complete binary tree and the size the tree. Thus, the size of the trees is on the form $2^k-1$. Whenever two adjacent elements are at the front of the list and another element is pushed, the trees are joined with the newly added element as the root which gives us that the elements in any of the binary trees is stored in preorder. Elements 1 to $\lfloor n / 2 \rfloor$ will be in the left part of the tree and $\lceil n / 2 \rceil$ to $n-1$ will be in the right part.
 
 \begin{center}
   \begin{tikzpicture}[level distance=1.5cm,
@@ -363,7 +653,7 @@ For each entry in our list we store a tuple consisting of the size of the tree a
 \label{fig:two_lists_before_reverse}
 \end{center}
 
-Inserting new elements can at most join two trees. Since the left child of the resulting tree will be the first tree in the list and the right child will be the second tree, the tree can be constructed in constant time. Similarly, it can be destructed into two parts by just removing the root and cons the right child followed by the left child onto the list.
+Inserting new elements can at most join two trees. Since the left child of the resulting tree will be the first tree in the list and the right child will be the second tree, the tree can be constructed in constant time. Similarly, it can be destructed into two parts by just removing the root and $\cons$ the right child followed by the left child onto the list.
 
 Looking up and element by index can be done by simply iterating the list until the containing tree has been found. If the index to search for is smaller than the size of the tree at the current position said tree will contain the element, otherwise subtract the size from the index and continue searching.
 
@@ -398,5 +688,9 @@ Clearly if $n=0$ it holds so we turn our attention to $n > 0$. Assume, to obtain
 Except for the two first trees in our list every size of the complete binary trees in the list is unique and in increasing order by construction. Therefore, the length of the list can not exceed $\lceil \log (n+1) \rceil$ by \ref{thm1}. Therefore, lookup will traverse at most $\BigO{\log n}$ elements in the list and perform a search in a single complete binary tree of height at most $\log n$.
 
 \chapter{Conclusion}
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{plain} 
+\bibliography{report}
 
 \end{document}
