@@ -75,6 +75,13 @@
 \newcommand{\Eject}{\textsc{eject}(L)}
 \newcommand{\Catenate}{\textsc{catenate}(K,L)}
 
+\newcommand{\List}{\textsc{List}}
+\newcommand{\PairsLazy}{\textsc{Pairs-Lazy}}
+\newcommand{\PairsStrict}{\textsc{Pairs-Strict}}
+\newcommand{\RotationLazy}{\textsc{Rotation-Lazy}}
+\newcommand{\RotationStrict}{\textsc{Rotation-Strict}}
+\newcommand{\HoodMelville}{\textsc{Hood-Melville}}
+
 \newtheorem{prop}{Property}
 \newtheorem{theorem}{Theorem}
 
@@ -799,7 +806,7 @@ sectionXX.
 
 \subsection{Insert onto the same queue}
 
-This test is designed to hit worst cases on all our queue
+ This test is designed to hit worst cases on all our queue
 implementations, if hitting such a thing is possible. As in the single
 usage case, we fill the queue up to some length $n$. Herefter, we
 delete insert c times on the queue given as argument, then insert c on
@@ -837,18 +844,23 @@ queue.
 
 \subsection{Results of Breadth-First Search}
 
-\input{results_BST}
+Below is the graph-plot of the Breadth-First Search results. (Maybe logarithmic x-scale?)
+
+\input{results_BST_nolist}
+
+Comparing the lazy evalution results we can see that $\RotationLazy$ performs worse than $\PairsLazy$, which almost performs almost the same as $\HoodMelville$. The reason has something to do with the amount of rotations that is performed. For $\PairsLazy$ there is exactly one rotation per level, giving us 15 in total, which is easy to see because when a level is completed, the tail list will contain all childs for the next level and the head list will be empty. 
+
+For $\RotationLazy$, there will be two rotations for each level. We will give a simple argument. In the very best case, beginning on a new level, all elements $n$ will be in the head list $H$. This is the farthest from a rotation we can be. Since every dequeue will add two new elements to the tail a rotation will occur in the $n/2$ step when adding the left child to the queue. After rotation and the completed $n/2$ steps,we have $|H| = n - n/2 + n - 1 = 3/2n-1$ and $|T| = 1$, with the remaining $n/2$ nodes of the level yet to be dequeued. After $n/2$ dequeues the $|H|=n-1$ if no rotation happens but the tail would be $|T|=n+1$ and another rotation would therefore have happened. There is no way of avoiding at least two rotations per level.
 
 \section{Rocky tests (multiple punches - movie reference)}
 
 \subsection{Insert onto the same queue}
 
-\input{results_WorstCase}
+\input{results_WorstCase_nolist}
 
 \subsection{Merge sort}
 
 \input{results_QueueSort}
-
 
 \chapter{Functional lists with index lookup}
 
