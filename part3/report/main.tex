@@ -112,9 +112,9 @@ Haskell.
 We first present some terminology and then a total of five different
 queues where two only differs by one being lazy. Hereafter, we
 describe how we made the implementation and tested for correctness and
-why we can say that our implentations are correct.
+why we can say that our implementations are correct.
 
-We then describe how we measure running times in a lazely evaluated
+We then describe how we measure running times in a lazily evaluated
 language and explain the different tests we have chosen for testing
 the running times of each queue.
 
@@ -135,7 +135,7 @@ is said to be immutable or persistent. Notice that, in this course, we
 further divide persistence into partial persistence and full
 persistence, where this is considered to be full persistence.
 
-\paragraph{Strict evelaution}
+\paragraph{Strict evaluation}
 Strict evaluation (eager evaluation) is where an expression is
 computed at the point where it is assigned to a variable or is passed
 as an argument.
@@ -202,8 +202,8 @@ all operations with the corresponding time-complexities shown:
   \end{tabular}
 \end{center}
 
-Because a queue pops elements from the front and injects elements in the
-end, this is not the most efficient queue implementation.
+Because a queue pops elements from the front and injects elements in
+the end, this is not the most efficient queue implementation.
 
 \chapter{Queue by a pair of lists}
 A simple observation to make is that if we reverse the list of section
@@ -280,12 +280,12 @@ needed. The queue will have the following time complexities:
 
 \section{Converting to strict in Haskell}
 
-Lazyness is a feature in Haskell. A queue might perform differently
+Laziness is a feature in Haskell. A queue might perform differently
 depending on the choice of evaluation. At the very least, the
 expensive operations will be performed at different runtime points in
 the program. By placing strictness annotations the right places,
 (putting ! in front of the two constituent lists) we tell Haskell to
-enforce a strict evaluation of the datastructure. That is, a value
+enforce a strict evaluation of the data structure. That is, a value
 representing this type of queue will never contain any \emph{thunks}
 or unevaluated values.  Because of the way rotations happen only when
 needed, we might not see any differences between lazy or eager
@@ -305,7 +305,7 @@ Like other functional queues we have two lists; one representing the
 front and another representing the tail. At specific points we will
 rotate the elements from the tail onto the head by reversing the tail
 list and appending it. In Haskell the append and the reverse function
-is lazy, giving us the desired evalution strategy.
+is lazy, giving us the desired evaluation strategy.
 
 The trick with two lists has already been used in the previous chapter
 but we will use another trigger for the lazy implementation. We rotate
@@ -327,7 +327,7 @@ ruining our amortized analysis.
 
 There is no way to avoid this computation in language having
 call-by-value or call-by-name without using side effects, but for lazy
-evalutations with memoization, which we call call-by-need, the
+evaluations with memoization, which we call call-by-need, the
 expensive operation is only carried out once. However, memoization is
 a side effect and thus, some of our arguing might be considered a test
 of faith.
@@ -336,7 +336,7 @@ It is inadequate to do amortized analysis for lazy amortized data
 structures by arguing as if they were strict \cite{OKA96}. We divide
 the cost of an operation two categories; unshared cost and shared
 cost. Unshared cost is the cost the operation takes, with the
-assumption that all lazy constructions of the datastructure, that will
+assumption that all lazy constructions of the data structure, that will
 be used, has been computed. The shared cost of an operation is the
 time it would take to execute every suspension created but not
 evaluated by the operation. The sum of both is called the complete
@@ -370,12 +370,12 @@ resulting in no additional change in potential. Finally, we have to
 remember to pay for initiating the rotation which gives a total of 3.
 
 Analyzing $\Pop$ is straight forward, however there are four
-cases. The case where $\Pop$ does not force an un-evaluated expression
+cases. The case where $\Pop$ does not force an unevaluated expression
 only has the cost of removing the first element. If $\Pop$ forces a
 rotation, the cost is 2 per the argument above. If $\Pop$ evaluates an
-un-evaluated expression, the operation will take $\BigO{n}$, but the
+unevaluated expression, the operation will take $\BigO{n}$, but the
 potential will decrease by the same amount, giving us a total cost
-of 2. Finally, if $\Pop$ rotates and forces an un-evaluted expression
+of 2. Finally, if $\Pop$ rotates and forces an unevaluated expression
 to be computed, the final cost will be 3.
 
 The above analysis assumes that, when a demand for the first element of
@@ -430,7 +430,7 @@ the current rotation and provide the user the ability to still make
 alterations to the queue.
 
 Allowing the user to enqueue elements is easily done by just having a
-new tail list. Dequeueing is bit harder because we are currently
+new tail list. Dequeuing is bit harder because we are currently
 reversing the $H$ into $H_R$. The answer is to have two lists: one
 being a working copy of the old list and one being the list we are
 reversing. This again introduces some maintenance because removing an
@@ -439,7 +439,7 @@ list we are reversing. To correct this, we use a counter that describes
 how many valid elements to be copied from $H_R$. A total of six lists
 is therefore necessary for this data structure.
 
-The recopying (or rotation) should be completed before the first
+The copying (or rotation) should be completed before the first
 element is needed. We will rotate elements when the tail list becomes
 one longer than the head list. Therefore, rotating elements will take
 $m+1$ operations to complete Step 1 and $m$ operations to complete
@@ -490,13 +490,13 @@ contexts, we are interested in the behaviour of our implementations,
 and -- as opposed to C -- there is no way to manipulate the state of
 the queue without going through the interface. Without pointer
 arithmetic, side effects and associated suspects, we can be certain of
-the absence inadvertant mutation of the international structure of the
+the absence inadvertent mutation of the international structure of the
 queue.
 
-A queue is an inherently ``statefull'' object, and so is typically
+A queue is an inherently ``stateful'' object, and so is typically
 used in an imperative fashion. As such we consider imperative-style
 monadic programs of Haskell as the context, which only manipulates the
-queue through the interface, as argued above. We define a datatype for
+queue through the interface, as argued above. We define a data type for
 representing such contexts:
 
 \begin{lstlisting}
@@ -509,7 +509,7 @@ data Action = Inject Int
 representing an inject, a pop, a peak, and the binding of the result
 of a peak, respectively. This last action is needed to argue that
 instead of obtaining an element from a queue, if we know that element,
-we might as well explcitly write that element in the program
+we might as well explicitly write that element in the program
 ourselves.
 
 We then define a function ``executing'' an evaluation context on a
@@ -543,10 +543,10 @@ equiv q c c' =
    observe c == observe c'
 \end{lstlisting}
 
-Finally, we wire the property into the QuickCheck library (REF HUGHES)
+Finally, we wire the property into the QuickCheck library \cite{CLA00}
 which generates random evaluation contexts, and verifies 5 assertions
-on queues, which according to Hughes \& Claeseen \cite{CLA02} defines a
-suitable specification of queues:
+on queues, which according to Hughes \& Claeseen \cite{CLA02} defines
+a suitable specification of queues:
 
 \begin{lstlisting}
 prop_PeakInject q m n =
@@ -783,40 +783,79 @@ This test is almost the same as testing time of insert, except that we delete a 
 
 \subsection{Breadth-First Search}
 
-One very good use of a queue is in the well-known breadth-first search algorithm for a graph. A breadth-first search has a starting vertex which is added to the queue. Then, as long as the queue is non-empty the first element and all adjacent vertices to this vertex, as long as it has not been visited so far, are enqueued and the algorithm is continued.
-
-We are not performing the test
+A classic application of queues in functional programming is in a
+breadth first traversal of a tree. We made a test case that traversed
+a complete balanced binary tree of increasing depths. The case
+exercises the queue with an even mix of injects and pops, where every
+element is enqueued and popped exactly once for a total of $2^d$ of
+each operations for a tree of depth $d$.
 
 \section{Rocky tests (multiple punches - movie reference)}
 
-In this section we describe tests that perform more than one operation on the same queue. These experiments are necessary because of the persistent nature of queues and for a more in depth discussion see sectionXX.
+In this section we describe tests that perform more than one operation
+on the same queue. These experiments are necessary because of the
+persistent nature of queues and for a more in depth discussion see
+sectionXX.
 
 \subsection{Insert onto the same queue}
 
-This test is designed to hit worst cases on all our queue implementations, if hitting such a thing is possible. As in the single usage case, we fill the queue up to some length $n$. Herefter, we delete insert c times on the queue given as argument, then insert c on the queue given as argument, insert an element such that the size is $n+1$ and do the same thing over again. We stop when we have performed the $2n$ iterations.
+This test is designed to hit worst cases on all our queue
+implementations, if hitting such a thing is possible. As in the single
+usage case, we fill the queue up to some length $n$. Herefter, we
+delete insert c times on the queue given as argument, then insert c on
+the queue given as argument, insert an element such that the size is
+$n+1$ and do the same thing over again. We stop when we have performed
+the $2 \cdot n$ iterations.
 
 \subsection{Merge sort}
 
-We define a version of merge-sort in terms of queues. Given $c$ queues of size $n$, where c i a constant and  where elements are ordered by apperance in the queue, merge all elements into a single queue.
+We define a version of merge-sort in terms of queues. Given $c$ queues
+of size $n$, where c i a constant and where elements are ordered by
+apperance in the queue, merge all elements into a single queue.
 
-The elements of the queue is generated at random with numbers between the last element inserted in a list $q$ and $|q| \times M/n$. 
+The elements of the queue is generated at random with numbers between
+the last element inserted in a list $q$ and $|q| \times M/n$.
 
-For each iteration, a fold is applied to the list of queues where the accumulating information is the currently smallest element, the tail of the queue the pop was performed on and the index of the q in the list. The result is stored in a local variable. Hereafter, a map is performed on the same list, where all queues are passed along, except the one that had the smallest element, which is replaced by the tail of the previous queue. The mapped result is then given as argument to the next iteration.
+For each iteration, a fold is applied to the list of queues where the
+accumulating information is the currently smallest element, the tail
+of the queue the pop was performed on and the index of the q in the
+list. The result is stored in a local variable. Hereafter, a map is
+performed on the same list, where all queues are passed along, except
+the one that had the smallest element, which is replaced by the tail
+of the previous queue. The mapped result is then given as argument to
+the next iteration.
 
-Performed on different initial lengths of the queues, we hope to see a number of expensive operations performed multiple times on the same queue.
+Performed on different initial lengths of the queues, we hope to see a
+number of expensive operations performed multiple times on the same
+queue.
 
 \section{Results}
 
 
 \chapter{Functional lists with index lookup}
 
-This exercise was posted in the theoretical project but solving it seemed natural considering this project is all about functional data structures.
+This exercise was posted in the theoretical project but solving it
+seemed natural considering this project is all about functional data
+structures.
 
-We are asked to describe a strict functional data structure supporting \\ $\Push$, $\Pop$ in $\BigO{1}$ and $\Lookup$ in time $\BigO{\log n}$ where $n$ is the number of elements in the list.
+We are asked to describe a strict functional data structure supporting
+\\ $\Push$, $\Pop$ in $\BigO{1}$ and $\Lookup$ in time $\BigO{\log n}$
+where $n$ is the number of elements in the list.
 
-By using a standard list composed by $\cons$ we will have a $\Push$ and $\Pop$ in constant time, so how do we solve lookups in $\BigO{\log n}$? A binary tree would give us the desired running times. The problem is how to combine the two. Okasaki solved this problem by having a collection of complete binary trees~\cite{OKA96}.
+By using a standard list composed by $\cons$ we will have a $\Push$
+and $\Pop$ in constant time, so how do we solve lookups in $\BigO{\log
+  n}$? A binary tree would give us the desired running times. The
+problem is how to combine the two. Okasaki solved this problem by
+having a collection of complete binary trees~\cite{OKA96}.
 
-For each entry in our list we store a tuple consisting of a complete binary tree and the size the tree. Thus, the size of the trees is on the form $2^k-1$. Whenever two adjacent elements are at the front of the list and another element is pushed, the trees are joined with the newly added element as the root which gives us that the elements in any of the binary trees is stored in preorder. Elements 1 to $\lfloor n / 2 \rfloor$ will be in the left part of the tree and $\lceil n / 2 \rceil$ to $n-1$ will be in the right part.
+For each entry in our list we store a tuple consisting of a complete
+binary tree and the size the tree. Thus, the size of the trees is on
+the form $2^k-1$. Whenever two adjacent elements are at the front of
+the list and another element is pushed, the trees are joined with the
+newly added element as the root which gives us that the elements in
+any of the binary trees is stored in preorder. Elements 1 to $\lfloor
+n / 2 \rfloor$ will be in the left part of the tree and $\lceil n / 2
+\rceil$ to $n-1$ will be in the right part.
 
 \begin{center}
   \begin{tikzpicture}[level distance=1.5cm,
@@ -855,21 +894,46 @@ For each entry in our list we store a tuple consisting of a complete binary tree
 \label{fig:two_lists_before_reverse}
 \end{center}
 
-Inserting new elements can at most join two trees. Since the left child of the resulting tree will be the first tree in the list and the right child will be the second tree, the tree can be constructed in constant time. Similarly, it can be destructed into two parts by just removing the root and $\cons$ the right child followed by the left child onto the list.
+Inserting new elements can at most join two trees. Since the left
+child of the resulting tree will be the first tree in the list and the
+right child will be the second tree, the tree can be constructed in
+constant time. Similarly, it can be destructed into two parts by just
+removing the root and $\cons$ the right child followed by the left
+child onto the list.
 
-Looking up and element by index can be done by simply iterating the list until the containing tree has been found. If the index to search for is smaller than the size of the tree at the current position said tree will contain the element, otherwise subtract the size from the index and continue searching.
+Looking up and element by index can be done by simply iterating the
+list until the containing tree has been found. If the index to search
+for is smaller than the size of the tree at the current position said
+tree will contain the element, otherwise subtract the size from the
+index and continue searching.
 
-If we only have on complete binary tree looking up an element can clearly be done in $\BigO{\log n}$ time so we have to show that the length of the list will never be longer than $\log n$.
+If we only have on complete binary tree looking up an element can
+clearly be done in $\BigO{\log n}$ time so we have to show that the
+length of the list will never be longer than $\log n$.
 
-An integer on the form $2^k-1$ is called a skew-binary term, and if $t$ is such a term then the next skew-binary term will be $2t+1$. A decomposition of an integer $n$ greater or equal to zero will be a multiset of skew-binary terms $\{t_1,t_2,\cdots,t_m\}$ where $n = t_1 + t_2 + \cdots + t_m$. Such a decomposition is said to be greedy if the largest term is as large as possible and the remaining part of the decomposition is greedy as well. In other words a collection of skew-binary terms is greedy if no subset of lesser terms sums to a larger term. We will describe such a greedy decomposition of $n$ as $G(n)$.
+An integer on the form $2^k-1$ is called a skew-binary term, and if
+$t$ is such a term then the next skew-binary term will be $2t+1$. A
+decomposition of an integer $n$ greater or equal to zero will be a
+multiset of skew-binary terms $\{t_1,t_2,\cdots,t_m\}$ where $n = t_1
++ t_2 + \cdots + t_m$. Such a decomposition is said to be greedy if
+the largest term is as large as possible and the remaining part of the
+decomposition is greedy as well. In other words a collection of
+skew-binary terms is greedy if no subset of lesser terms sums to a
+larger term. We will describe such a greedy decomposition of $n$ as
+$G(n)$.
 
 \begin{prop}
 \label{prop1}
 Every integer $n \geq 0$ has a unique greedy decomposition.
 \end{prop}
 \begin{proof}
-$G(0)$ will have the empty set which is unique. For $G(n)$ where $n>0$, we know, that no subset of skew-binary terms may sum to a larger term thus the it must include the largest possible term $t$ such that $t \leq n$. We add $t$ to the set and continue searching for $G(n-t)$.
-Notice, that no subset of $G(n-t)$ can sum to $t$ otherwise it would not be the largest term respecting $t \leq n$.  
+
+$G(0)$ will have the empty set which is unique. For $G(n)$ where
+  $n>0$, we know, that no subset of skew-binary terms may sum to a
+  larger term thus the it must include the largest possible term $t$
+  such that $t \leq n$. We add $t$ to the set and continue searching
+  for $G(n-t)$.  Notice, that no subset of $G(n-t)$ can sum to $t$
+  otherwise it would not be the largest term respecting $t \leq n$.
 \end{proof}
 
 \begin{prop} A skew-binary decomposition is greedy iif every term is unique except \label{prop2}
@@ -884,10 +948,22 @@ $\Leftarrow$ Again, because the next skew-binary term for any term $t$ is on the
 \label{thm1}
 \end{theorem}
 \begin{proof}
-Clearly if $n=0$ it holds so we turn our attention to $n > 0$. Assume, to obtain a contradiction, that $|G(n)|$ contains more than $k=\lceil \log (n+1) \rceil$. Then, by \ref{prop2} and by how a greedy decomposition is defined, it must be that $G(n)$ contains a term at least as large as $2^k-1 \geq n$. Then, because $|G(n)|$ contains more than $k$ terms there is at least one more term and therefore the sum of terms in $G(n)$ will strictly exceed $n$ and we obtain a contradiction.
+Clearly if $n=0$ it holds so we turn our attention to $n > 0$. Assume,
+to obtain a contradiction, that $|G(n)|$ contains more than $k=\lceil
+\log (n+1) \rceil$. Then, by \ref{prop2} and by how a greedy
+decomposition is defined, it must be that $G(n)$ contains a term at
+least as large as $2^k-1 \geq n$. Then, because $|G(n)|$ contains more
+than $k$ terms there is at least one more term and therefore the sum
+of terms in $G(n)$ will strictly exceed $n$ and we obtain a
+contradiction.
 \end{proof}
 
-Except for the two first trees in our list every size of the complete binary trees in the list is unique and in increasing order by construction. Therefore, the length of the list can not exceed $\lceil \log (n+1) \rceil$ by \ref{thm1}. Therefore, lookup will traverse at most $\BigO{\log n}$ elements in the list and perform a search in a single complete binary tree of height at most $\log n$.
+Except for the two first trees in our list every size of the complete
+binary trees in the list is unique and in increasing order by
+construction. Therefore, the length of the list can not exceed $\lceil
+\log (n+1) \rceil$ by \ref{thm1}. Therefore, lookup will traverse at
+most $\BigO{\log n}$ elements in the list and perform a search in a
+single complete binary tree of height at most $\log n$.
 
 \chapter{Conclusion}
 
