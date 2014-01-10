@@ -1,0 +1,142 @@
+\begin{minipage}[c]{\textwidth}
+\advance\leftskip-2.5cm
+\begin{tikzpicture}
+        \begin{axis}[
+            xlabel = n,
+            ylabel = Running time ns,
+            height=9cm,
+            width=15cm,
+            grid=major,
+            legend style={
+            at={(0.95,0.8)},
+            anchor=north west}]            
+            legend pos=center west
+    	]
+    		
+  
+                \addplot coordinates {
+(1,9)
+(2,1)
+(4,0)
+(8,0)
+(16,3)
+(32,2)
+(64,2)
+(128,0)
+(256,4)
+(512,6)
+(1024,0)
+(2048,2)
+(4096,8)
+(8192,8)
+(16384,3)
+(32768,2)
+(65536,3)
+(131072,3)
+
+    	};
+        
+    	\addlegendentry{\textsc{Pair-Strict}}
+
+        \addplot coordinates {
+(1,0)
+(2,1)
+(4,0)
+(8,0)
+(16,2)
+(32,10)
+(64,0)
+(128,1)
+(256,2)
+(512,4)
+(1024,0)
+(2048,6)
+(4096,8)
+(8192,2)
+(16384,4)
+(32768,2)
+(65536,2)
+(131072,2)
+
+    	};
+        
+    	\addlegendentry{\textsc{Pair-Lazy}}
+
+        \addplot coordinates {
+(1,0)
+(2,0)
+(4,1)
+(8,3)
+(16,6)
+(32,5)
+(64,2)
+(128,20)
+(256,1)
+(512,10)
+(1024,4)
+(2048,3)
+(4096,6)
+(8192,11)
+(16384,6)
+(32768,7)
+(65536,6)
+(131072,6)
+
+    	};
+        
+    	\addlegendentry{\textsc{Okasaki-Strict}}
+
+        \addplot coordinates {
+(1,1)
+(2,8)
+(4,4)
+(8,4)
+(16,21)
+(32,1)
+(64,4)
+(128,1)
+(256,0)
+(512,5)
+(1024,4)
+(2048,7)
+(4096,5)
+(8192,10)
+(16384,6)
+(32768,8)
+(65536,5)
+(131072,6)
+
+    	};
+        
+    	\addlegendentry{\textsc{Okasaki-Lazy}}
+
+        \addplot coordinates {
+(1,4)
+(2,2)
+(4,9)
+(8,0)
+(16,3)
+(32,2)
+(64,3)
+(128,1)
+(256,4)
+(512,6)
+(1024,8)
+(2048,10)
+(4096,7)
+(8192,10)
+(16384,5)
+(32768,6)
+(65536,5)
+(131072,6)
+
+    	};
+
+    	\addlegendentry{\textsc{Hood-Melville}}
+
+        \end{axis}
+
+    \end{tikzpicture}
+    \captionof{figure}{Time per insert operation when queue is of size $n$}
+    \label{fig:sample_figure}
+\end{minipage}
