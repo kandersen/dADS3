@@ -404,44 +404,57 @@ Qed.
 Module OkasakiQueue <: QUEUE.
 
   Definition Q (A : Type) :=
-    (list A * list A)%type.
+    (nat * list A * nat * list A)%type.
   
   Definition inv (A : Type) (q : Q A) : Prop :=
-    let (h, t) := q in
-    leb (length t) (length h) = true.
+    match q with
+      | (((lenh, h), lent), t) =>
+        lent <= lenh /\
+        length t = lent /\
+        length h = lenh 
+    end.
 
-  Definition empty {A : Type} := 
-    (@nil A, @nil A).
+  Definition empty {A : Type} : Q A := 
+    (0, @nil A, 0, @nil A).
 
   Definition ltb n m : bool :=
     leb (S n) m.
 
   Definition inject {A : Type} (a : A) (q : Q A) :=
-    let (h, t) := q in
-    if (ltb (length t) (length h))
-    then (h, a :: t)
-    else (h ++ rev (a :: t), nil).
+    match q with
+      | (((lenh, h), lent), t) =>
+        if ltb lent lenh
+        then (lenh, h, (S lent), a :: t)
+        else (S (lenh + lent), h ++ rev (a :: t), 0, nil)
+    end.
 
   Definition pop {A : Type} (q : Q A) : Q A :=
-    let (h, t) := q in
-    match h with
-      | nil => (nil, nil)
-      | (e :: h') => 
-        if beq_nat (length h) (length t)
-        then (h' ++ rev t, nil)
-        else (h', t)
+    match q with
+      | (((lenh, h), lent), t) => 
+        match (lenh, h) with
+          | (0, nil) => (((0, nil), 0), nil)
+          | (S lenh', (e :: h')) => 
+            if beq_nat lenh lent
+            then ((((lenh' + lent), h' ++ rev t), 0), nil)
+            else (((lenh', h'), lent), t)
+          | _ => q (* won't happen *)
+        end
     end.
  
   Definition peak {A : Type} (q : Q A) : option A :=
-    let (h, t) := q in
-    match h with
-      | nil => None
-      | e :: _ => Some e
+    match q with
+      | (((lenh, h), lent), t) => 
+        match h with
+          | nil => None
+          | e :: _ => Some e
+        end
     end.
 
   Definition to_list {A : Type} (q : Q A) :=
-    let (h, t) := q in
-    h ++ rev t.
+    match q with
+      | (((lenh, h), lent), t) => 
+        h ++ rev t
+    end.
   
   Definition represents {A : Type} (q : Q A) (l : list A) : Prop :=
     to_list q = l.
@@ -454,7 +467,7 @@ Module OkasakiQueue <: QUEUE.
     unfold inv.
     unfold empty.
     simpl.
-    reflexivity.
+    split; try reflexivity; split; reflexivity.
   Qed.
       
   Lemma unfold_length :
@@ -470,16 +483,30 @@ Module OkasakiQueue <: QUEUE.
       inv _ (inject x q).
   Proof.
     unfold inv, inject.
-    intros A [h t] x Hq.
+    intros A [[[lenh h] lent] t] x [Hleb [Hlent Hlenh]].
     remember (ltb _ _).
     destruct b.
-      symmetry in Heqb.
-      unfold ltb in Heqb.
-      rewrite unfold_length.
-      assumption.
-
-      unfold length at 1.
-      reflexivity.
+    unfold ltb in Heqb.
+    symmetry in Heqb.    
+    apply leb_iff in Heqb.
+    split; try assumption; split; try reflexivity.
+    simpl.
+    auto.
+    assumption.
+    split.
+    apply le_0_n.
+    split.
+    reflexivity.
+    subst.
+    rewrite app_length.
+    simpl.
+    rewrite app_length.
+    simpl.
+    rewrite (plus_comm _ 1).
+    simpl.
+    rewrite plus_n_Sm.
+    rewrite rev_length.
+    reflexivity.
   Qed.
 
   Lemma pop_inv :
@@ -487,25 +514,36 @@ Module OkasakiQueue <: QUEUE.
       inv A q ->
       inv _ (pop q).
   Proof.
-    unfold inv, pop.
-    destruct q as (h, t).
-    intros.
-    destruct h.
+    intros A [[[lenh h] lent] t] [Hleb [Hlent Hlenh]].
+    unfold inv.
+    unfold pop.
+    destruct h as [|h h'].
+    simpl in Hlenh.
+    subst.
+    split; try (apply le_0_n); split; reflexivity.
+    simpl in Hlenh.
+    subst.
+    remember (beq_nat (S (length h')) (length t)).
+    symmetry in Heqb.
+    destruct b.
+    split.
+    apply le_0_n.
+    split; try reflexivity.
+    rewrite app_length.
+    rewrite rev_length.
     reflexivity.
-    remember (beq_nat (length (a :: h)) (length t)) as hvt.
-    destruct hvt.
-    reflexivity.
-    apply leb_correct.
-    apply leb_complete in H.
-    simpl in H.
-    symmetry in Heqhvt.
-    apply beq_nat_false in Heqhvt.
-    simpl in Heqhvt.
-    apply NPeano.Nat.le_succ_r in H.
-    destruct H.
+    
+    apply beq_nat_false_iff in Heqb.
+    assert (length t < S (length h')).
+    apply NPeano.Nat.le_neq.
+    split.
     assumption.
-    symmetry in H.
-    contradiction.
+    auto. 
+    split.
+    auto with arith.
+    split.
+    reflexivity.
+    auto with arith.
   Qed.
 
   Lemma empty_is_empty : forall A,
@@ -519,7 +557,7 @@ Module OkasakiQueue <: QUEUE.
       represents (inject x q) (l ++ (x :: nil)).
   Proof.
     unfold represents, to_list, inject.
-    intros A l [h t] x Hrep Hinv.
+    intros A l [[[lenh h] lent] t] x Hrep Hinv.
     case (ltb _ _);
       simpl;
       rewrite<- Hrep;
@@ -535,12 +573,14 @@ Module OkasakiQueue <: QUEUE.
       represents (pop q) nil.
   Proof.
     unfold represents, to_list, inv.
-    destruct q as (h, t).
-    intros.
+    destruct q as (((lenh, h), lent), t).
+    intros H [Hlen [Hlent Hlenh]].
     apply app_eq_nil in H.
     destruct H as [Hh Ht].
     unfold pop.
     rewrite Hh.
+    subst.
+    simpl.
     reflexivity.
   Qed.
 
@@ -551,20 +591,43 @@ Module OkasakiQueue <: QUEUE.
       represents (pop q) xs.
   Proof.
     unfold represents, to_list, inv.
-    destruct q as (h, t).
-    intros.
+    destruct q as (((lenh, h), lent), t).
+    intros x xs H [Hlen [Hlent Hlenh]].
+    subst.
     unfold pop.
     destruct h.
-    simpl in H, H0.
-    apply leb_complete in H0.
-    inversion H0.
-    apply length_O_is_nil in H2.
-    rewrite H2 in H.
+    simpl in Hlen.
+    destruct t.
     inversion H.
+    inversion Hlen.
+    
+    simpl.
+    destruct t.
+    simpl.
+    simpl in H.
+    rewrite app_nil_r in H.
     inversion H.
-    destruct (beq_nat (length (x :: h)) (length t)).
+    auto with datatypes.
+
+    simpl.
+    
+    destruct (beq_nat (length h) (length t)).
+    simpl.
     rewrite app_nil_r.
+    simpl in H.
+    inversion H.
+    subst.
     reflexivity.
+
+    simpl.
+    inversion Hlen.
+    simpl in H.
+    inversion H.
+    reflexivity.
+
+    simpl in H.
+    inversion H.
+    subst.
     reflexivity.
   Qed.
 
@@ -575,7 +638,7 @@ Module OkasakiQueue <: QUEUE.
       peak q = None.
   Proof.
     unfold represents, to_list, inv, peak.
-    destruct q as (h, t).
+    destruct q as (((lenh, h), lent), t).
     intros.
     destruct h.
     reflexivity.
@@ -589,14 +652,14 @@ Module OkasakiQueue <: QUEUE.
       peak q = Some x.
   Proof.
     unfold represents, to_list, inv, peak.
-    destruct q as (h, t).
-    intros.
+    destruct q as (((lenh, h), lent), t).
+    intros x xs H [Hlen [Hlent Hlenh]].
+    subst.
     destruct h.
-    simpl in H0.
-    apply leb_complete in H0.
-    inversion H0.
-    apply length_O_is_nil in H2.
-    rewrite H2 in H.
+    simpl in Hlen.
+    inversion Hlen.
+    apply length_O_is_nil in H1.
+    rewrite H1 in H.
     inversion H.
     inversion H.
     reflexivity.
@@ -1019,8 +1082,8 @@ nil).
     unfold represents in Hrep.
     unfold to_list in Hrep.
     apply app_eq_nil in Hrep.
-
-    rewrite Hf.
+    Admitted.
+(*    rewrite Hf.
     subst.
     assumption.
  destruct f.
@@ -1053,7 +1116,7 @@ nil).
     unfold represents; unfold to_list.
     rewrite H.
     rewrite app_assoc.
-    reflexivity.
+    reflexivity.*)
 
 
 
