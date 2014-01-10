@@ -425,7 +425,7 @@ Testing $\Insert$ just fills the tree with random numbers from the entire univer
 
 \input{comp_0_300}
 
-The first test is testing inserts, and we can see that Bit-Vector is the fastest. This comes as no surmise since this can be done in constant time. All of the vEB trees insert in time independently of the fill-rate whereas the Red-Black tree takes longer time depending on how many elements that are in the tree.
+The first test is testing inserts, and we can see that Bit-Vector is the fastest. This comes as no surprise since this can be done in constant time. All of the vEB trees insert in time independently of the fill-rate whereas the Red-Black tree takes longer time depending on how many elements that are in the tree.
 
 What is surprising though is that one layer and even two layers of vEB with bit-vectors as leafs performs very well. What is also surprising is that it only takes around 20 promille before the Red-Black tree is slower than all other tested data structures.
 
@@ -543,7 +543,7 @@ Here we can clearly see that the heaps do perform the best, only interrupted by 
 
 \subsection{Results for testing $\Delete$}
 
-In this test we fill the data-structures with elements and then remove one promille (~16.777) from the data-structure. The deleted keys are guaranteed to be in the structure since our heaps require an existing item to use for deletion. The most action happens inside 50 EPP:
+In this test we fill the data-structures with elements and then remove one promille (16.777) from the data-structure. The deleted keys are guaranteed to be in the structure since our heaps require an existing item to use for deletion. The most action happens inside 50 EPP:
 
 \input{heap_1_50}
 

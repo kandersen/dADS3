@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{ITA09}
+Thomas~H. Cormen, Charles~E. Leiserson, Roland~L. Rivest, and Clifford Stein.
+\newblock {\em Introduction to algorithms}.
+\newblock The MIT Press, third edition, 2009.
+
+\bibitem{VEB04}
+Gudmund~S. Frandsen.
+\newblock Dynamic algorithms, van emde boas trees.
+\newblock 2004.
+
+\end{thebibliography}
