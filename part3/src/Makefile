@@ -5,7 +5,7 @@ run-tests: extract
 	runhaskell QueueProperties.hs
 
 run-benchmarks: extract compile
-	./QueuePerformance -o finalfinalfinalnolist10012014.html -u finalfinalfinalnolist10012014.csv -s 5 +RTS -N -K2G -RTS
+	./QueuePerformance -o trialrun.html -u trialrun.csv -s 5 +RTS -N -K1G -RTS
 
 compile_and_extract:
 	coqc Queue.v
