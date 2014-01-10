@@ -838,9 +838,17 @@ queue.
 
 \section{Results}
 
+In this section we present the results of our experiments. The running time for the $\List$ grows much faster than the others, making it harder for us to distinguish between the rest of the queues. Therefore, the $\List$ running times are from all of our graphs, but the original graphs can be found in the appendix.
+
 \subsection{Time of insert}
 
+\input{results_Inserts_nolist}
+
 \subsection{Time of delete}
+
+\input{results_Deletes_nolist}
+
+All plots lies in the interval of $-80ms$ to $80ms$ and one cannot find any trending lines that would give rise to not concluding that the delete operation takes time not related to the size of the queue.
 
 \subsection{Results of Breadth-First Search}
 
@@ -860,7 +868,9 @@ For $\RotationLazy$, there will be two rotations for each level. We will give a 
 
 \subsection{Merge sort}
 
-\input{results_QueueSort}
+\input{results_QueueSort_nolist}
+
+Here, all queues takes about the same time to perform the sorting that is complet
 
 \chapter{Functional lists with index lookup}
 
