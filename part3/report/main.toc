@@ -22,13 +22,13 @@
 \contentsline {section}{\numberline {7.3}Rocky tests (multiple punches - movie reference)}{17}
 \contentsline {subsection}{\numberline {7.3.1}Insert onto the same queue}{17}
 \contentsline {subsection}{\numberline {7.3.2}Merge sort}{17}
-\contentsline {section}{\numberline {7.4}Results}{18}
+\contentsline {section}{\numberline {7.4}Results}{17}
 \contentsline {subsection}{\numberline {7.4.1}Time of insert}{18}
 \contentsline {subsection}{\numberline {7.4.2}Time of delete}{18}
-\contentsline {subsection}{\numberline {7.4.3}Results of Breadth-First Search}{18}
-\contentsline {section}{\numberline {7.5}Rocky tests (multiple punches - movie reference)}{19}
-\contentsline {subsection}{\numberline {7.5.1}Insert onto the same queue}{19}
-\contentsline {subsection}{\numberline {7.5.2}Merge sort}{19}
-\contentsline {chapter}{\numberline {8}Functional lists with index lookup}{20}
-\contentsline {chapter}{\numberline {9}Conclusion}{23}
-\contentsline {chapter}{Bibliography}{23}
+\contentsline {subsection}{\numberline {7.4.3}Results of Breadth-First Search}{19}
+\contentsline {section}{\numberline {7.5}Rocky tests (multiple punches - movie reference)}{20}
+\contentsline {subsection}{\numberline {7.5.1}Insert onto the same queue}{20}
+\contentsline {subsection}{\numberline {7.5.2}Merge sort}{20}
+\contentsline {chapter}{\numberline {8}Functional lists with index lookup}{22}
+\contentsline {chapter}{\numberline {9}Conclusion}{25}
+\contentsline {chapter}{Bibliography}{25}

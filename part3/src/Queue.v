@@ -700,12 +700,12 @@ Module RealTimeQueue <: QUEUE.
                      
   Definition invalidate {A : Type} (s : @RotationState A) :=
     match s with
-      | Reversing ok f f' r r' =>
-        Reversing (ok - 1) f f' r r'
+      | Reversing (S ok) f f' r r' =>
+        Reversing (ok ) f f' r r'
       | Appending 0 f' (x :: r') =>
         Done r'
-      | Appending ok f' r' =>
-        Appending (ok - 1) f' r'
+      | Appending (S ok) f' r' =>
+        Appending ok f' r'
      | _ => s
     end.
   
@@ -727,12 +727,25 @@ Module RealTimeQueue <: QUEUE.
              exec2 (lenf + lenr, f, 0, nil, newstate)
     end.
 
-  Definition inv_state {A : Type} (s : @RotationState A) : Prop :=
-    match s with
-      | Idle => True
-      | Done _ => True
-      | Reversing ok f f' r r' => (length f' = length r') /\ (S (length f) = length r)
-      | Appending ok f' r' => True
+  Definition ltb n m : bool :=
+    leb (S n) m.
+
+  Definition inv_state {A : Type} (q : @Q A) : Prop :=
+    match q with
+      | (lenf, f, _, _, Idle)      => 
+        lenf = length f
+      | (lenf, _, _, _, Done newf) => 
+        False
+      | (lenf, _, _, _, Reversing ok f f' r r') => 
+        (length f' = length r') /\ 
+        (S (length f) = length r) /\
+        leb ok (length f') = true /\
+        ltb 1 ok = true /\
+        lenf = ok + length f + length r + length r'
+      | (lenf, _, _, _, Appending ok f' r') => 
+        ltb (length f') (length r') = true /\
+        leb ok (length f') = true /\
+        lenf = ok + length r'
     end.
     
   Definition idling {A : Type} (s : @RotationState A) : Prop :=
@@ -741,15 +754,14 @@ Module RealTimeQueue <: QUEUE.
       | _ => False
     end.
 
-
   Definition inv {A : Type} (q : Q A) : Prop := 
     match q with 
       | (lenf, f, lenr, r, state) =>
         leb lenr lenf = true /\ 
         lenr = length r /\ 
-        inv_state state /\
-        (idling state -> lenf = length f) /\
-        (not (idling state) -> leb (S lenr) lenf = true)          
+        inv_state q /\
+        (not (idling state) -> leb (S lenr) lenf = true) /\ 
+        (not (idling state) -> not(length f = 0))   
     end.
 
   Definition empty {A : Type} : Q A :=
@@ -777,6 +789,7 @@ Module RealTimeQueue <: QUEUE.
         Some x
     end.
 
+  Compute (inject 1 (inject 2 (inject 3 empty))).
 
   Fixpoint take {A : Type} n (xs : list A) :=
     match n with
@@ -787,52 +800,166 @@ Module RealTimeQueue <: QUEUE.
           | x::xs' =>  x :: (take n' xs')
         end
     end.
-               
 
-  Fixpoint drop {A : Type} n (xs : list A) :=
-    match n with
-      | O => xs
-      | S n =>
-        match xs with
-          | nil => nil
-          | _ :: xs' => drop n xs'
-        end
-    end.
+  Lemma rev_nil :
+    forall A,
+      rev nil = (nil : list A).
+  Proof.
+    auto.
+  Qed.
 
-  Lemma unfold_drop_base : 
-    forall A xs, 
-      @drop A O xs = xs.
-  Proof. reflexivity. Qed.
+  Lemma rev_cons :
+    forall A xs (x : A),
+      rev (x::xs) = rev xs ++ x :: nil.
+  Proof.
+    auto.
+  Qed.
 
-  Lemma unfold_drop_step :
-    forall A n xs,
-      @drop A (S n) xs = match xs with
-                           | nil => nil
-                           | x :: xs' => @drop A n xs'
-                         end.
-  Proof. reflexivity. Qed.
+  Lemma rev_eq_nil :
+    forall A (l : list A),
+      rev l = nil -> l = nil.
+  Proof.
+    intros.
+    destruct l; auto.
+    rewrite rev_cons in H.
+    apply app_eq_nil in H.
+    destruct H as [_ Habsurd].
+    inversion Habsurd.
+  Qed.
 
-  Lemma drop_nil :
-    forall A n,
-      @drop A n nil = nil.
-  Proof. destruct n; reflexivity. Qed.
+  Lemma length_cons :
+    forall A xs (x:A),
+      length (x::xs) = S (length xs).
+  Proof.
+    auto.
+  Qed.
 
-  Lemma drop_S_cons :
-    forall A n x xs,
-      @drop A (S n) (x :: xs) = @drop A n xs. 
-  Proof. reflexivity. Qed.
+  Lemma n_eq_m :
+    forall n (m : nat),
+      n = m <-> (S n) = (S m).
+    split; intro H.
+    rewrite H; reflexivity.
+    apply eq_nat_is_eq in H.
+    simpl in H.
+    apply eq_nat_is_eq in H.
+    assumption.
+  Qed.
+    
+  Lemma leb_Sn_Sm :
+    forall n m b,
+      (leb (S n) (S m) = b) <-> leb n m = b.
+  Proof.
+    intros.
+    split.
+    intro h.
+    auto.
+    intro h.
+    auto.
+  Qed.
 
-  Definition elements_in {A : Type} (s : @RotationState A) :=
-    match s with
-      |  Appending 0 _ r' =>
-         r'
-      | Appending ok f' r' =>
-        drop ok (rev f' ++ r')
-      | Reversing ok f f' r r' =>
-        drop (S ok) (rev f' ++ f ++ rev r ++ r')
+  Lemma leb_Sn_n :
+    forall m n,
+      leb (S n) m = true -> leb n m = true.
+  Proof.
+    intros m n H.
+    apply leb_iff.
+    apply leb_iff in H.
+    apply le_Sn_le.
+    assumption.
+  Qed.
 
-      | _ => nil
-    end.
+  Lemma leb_m_Sm :
+    forall m n,
+      leb n m = true -> leb n (S m) = true.
+  Proof.
+    intros m n H.
+    destruct n.
+    auto.
+    destruct m.
+    inversion H.
+    apply leb_Sn_n.
+    apply leb_Sn_Sm.
+    assumption.
+  Qed.
+
+  Lemma leb_n_n :
+    forall n,
+      leb n n = true.
+  Proof.
+    intro n.
+    induction n; auto.
+  Qed.
+
+  Lemma leb_n_Sn :
+    forall n,
+      leb n (S n) = true.
+  Proof.
+    intro n.
+    induction n; auto.
+  Qed.
+
+  Lemma leb_n_SSn :
+    forall n,
+      leb n (S (S n)) = true.
+  Proof.
+    intro n.
+    induction n; auto.
+  Qed.
+
+  Lemma take_cons :
+    forall A n (x:A) xs,
+      take (S n) (x::xs) = x :: (take n xs).
+  Proof.
+    auto.
+  Qed.
+
+  Lemma take_nil :
+    forall (A : Type) n,
+      take n nil = (@nil A).
+  Proof.
+    intros.
+    destruct n;
+      auto.
+  Qed.
+  
+  Lemma take_O :
+    forall A (l : list A),
+      take O l = nil.
+  Proof.
+    auto.
+  Qed.
+
+  Lemma take_rev_cons :
+    forall A n l,
+      leb (S n) (length l) = true ->
+      exists (x:A), 
+        rev (take (S n) l) = x :: rev (take n l).
+  Proof.
+    intros A n. 
+    induction n.
+      intros [ | hd l'] Hleb.
+        simpl in Hleb.
+        discriminate Hleb.
+        
+        exists hd.
+        simpl.
+        reflexivity.
+
+      intros [ | hd l'] Hleb.
+        simpl in Hleb.
+        discriminate Hleb.
+
+        rewrite ? take_cons.
+        rewrite ? rev_cons.
+        rewrite ? length_cons in Hleb.
+        apply leb_Sn_Sm in Hleb.
+        specialize (IHn l' Hleb).
+        destruct IHn.
+        exists x.
+        rewrite app_comm_cons.
+        rewrite H.
+        reflexivity.
+  Qed.
 
   Definition to_list {A : Type} (q : Q A) :=
     match q with
@@ -853,104 +980,278 @@ Module RealTimeQueue <: QUEUE.
   Definition represents {A : Type} (q : Q A) (l : list A) : Prop :=
     @to_list _ q = l.
 
-  Lemma exec_changes_nothing :
+  Lemma check_doesnt_change_invariant :
+    forall A lenf (f : list A) lenr r state,
+      inv (lenf, f, lenr, r, state) ->
+      inv (check (lenf, f, lenr, r, state)).
+  Proof.
+    assert (Hfalse : False -> False); auto.
+    intros A lenf f lenr r state Hinv.
+    assert (Hinv' : inv (lenf, f, lenr, r, state)). exact Hinv.
+    destruct Hinv as [Hinv1 [Hinv2 [Hinv3 [Hinv4 Hinv5]]]].
+    unfold inv_state in Hinv3.
+    destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
+    
+      unfold check.
+      rewrite Hinv1.
+      unfold exec2.
+      unfold exec.
+      assumption.
+
+      destruct Hinv3 as [Hinv3a [Hinv3b [Hinv3c [Hinv3d Hinv3e]]]].
+      specialize (Hinv4 Hfalse).
+      specialize (Hinv5 Hfalse).
+      unfold check.
+      rewrite Hinv1.
+      unfold exec2.
+      unfold exec at 2.
+      destruct front.
+      destruct rear.
+      unfold exec.
+      assumption.
+      destruct rear.
+      unfold exec.
+      destruct valid.
+      inversion Hinv3d.
+      destruct front'.
+      inversion Hinv3c.
+      destruct valid.
+      inversion Hinv3d.
+      destruct front'.
+      unfold length in Hinv3c.
+      inversion Hinv3c.
+      unfold inv; repeat split; try intro H; try assumption.
+      unfold ltb.
+      rewrite ? length_cons.
+      rewrite <- Hinv3a.
+      rewrite ? length_cons.
+      apply leb_Sn_Sm.
+      apply leb_Sn_Sm.
+      apply leb_n_SSn.
+      unfold exec.
+      unfold inv; repeat split; try intro H; try assumption.
+      rewrite Hinv3e.
+      rewrite ? length_cons.
+      simpl.
+      ring.
+      destruct rear.
+      unfold exec.
+      unfold inv; repeat split; try intro H; try assumption.
+      unfold exec.
+      unfold inv; repeat split; try intro H; try assumption.
+      destruct rear.
+      unfold exec.
+      unfold inv; repeat split; try intro H; try assumption.
+      unfold exec.
+      destruct front.
+      destruct rear.
+      inversion Hinv3b.
+      destruct rear.
+      unfold inv; repeat split; try intro H; try assumption.
+      rewrite ? length_cons.
+      rewrite Hinv3a.
+      apply leb_Sn_Sm.
+      apply leb_Sn_Sm.
+      apply leb_n_n.
+      rewrite Hinv3e.
+      rewrite ? length_cons.
+      simpl.
+      ring.
+      inversion Hinv3b.
+      destruct rear.
+      inversion Hinv3b.
+      unfold inv; repeat split; try intro H; try assumption.
+      simpl.
+      rewrite Hinv3a.
+      reflexivity.
+      rewrite ? length_cons in Hinv3b.
+      apply <- n_eq_m in Hinv3b.
+      apply <- n_eq_m in Hinv3b.
+      exact Hinv3b.
+      rewrite Hinv3e.
+      rewrite ? length_cons.
+      simpl.
+      ring.
+      
+      destruct Hinv3 as [Hinv3a [Hinv3b Hinv3c]].
+      specialize (Hinv4 Hfalse).
+      specialize (Hinv5 Hfalse).
+      unfold check.
+      rewrite Hinv1.
+      unfold exec2.
+      unfold exec.
+      destruct valid.
+      unfold inv; repeat split; try intro H; try assumption.
+      unfold idling, not in H.
+      specialize (H I).
+      inversion H.
+      destruct front'.
+      unfold inv; repeat split; try intro H; try assumption.
+      destruct valid.
+      unfold inv; repeat split; try intro H; try assumption.
+      unfold idling, not in H.
+      specialize (H I).
+      inversion H.
+      destruct front'.
+      unfold length in Hinv3b.
+      apply -> leb_Sn_Sm in Hinv3b.
+      inversion Hinv3b.
+      unfold inv; repeat split; try intro H; try assumption.
+
+      rewrite 2 length_cons in Hinv3a.
+      rewrite 2 length_cons.
+      unfold ltb.
+      unfold ltb in Hinv3a.
+      apply leb_Sn_n in Hinv3a.
+      apply leb_Sn_n in Hinv3a.
+      apply leb_m_Sm in Hinv3a.
+      apply leb_m_Sm in Hinv3a.
+      assumption.
+      rewrite Hinv3c.
+      rewrite 2 length_cons.
+      ring.
+
+      inversion Hinv3.
+  Qed.
+
+  Lemma exec_doesnt_change_representation :
     forall A lenf (f : list A) lenr r state l,
       represents (lenf, f, lenr, r, state) l ->
       represents (lenf, f, lenr, r, (exec state)) l.
-    Proof.
-      intros A lenf f lenr r state l Hrep.
-      unfold represents in Hrep.
-      unfold to_list in Hrep.
-      destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
+  Proof.
+    intros A lenf f lenr r state l Hrep.
+    unfold represents, to_list in Hrep.
+    destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
+    
+      unfold exec.
+      assumption.
 
-        unfold exec.
-        assumption.
+      unfold exec, represents, to_list.
+      destruct front.
+      destruct rear.
+      destruct valid;
+      assumption.
+      destruct rear.
+      destruct valid;
+      assumption.
+      assumption.
+      destruct rear.
+      assumption.
+      rewrite <- Hrep.
+      simpl.
+      rewrite <-? app_assoc.
+      rewrite <-? (app_comm_cons nil).
+      rewrite ? app_nil_l.
+      rewrite <- (app_comm_cons _ _ a).
+      rewrite ? app_assoc.
+      reflexivity.
+      unfold exec.
+      unfold represents; unfold to_list.
+      rewrite <- Hrep.
+      destruct valid.
+      reflexivity.
+      destruct front'.
+      reflexivity.
+      destruct valid.
+      reflexivity.
+      simpl.
+      remember (match front' with
+                  | nil => nil
+                  | x :: xs' => x :: take valid xs'
+                end).
+      rewrite <-? app_assoc.
+      rewrite <-? (app_comm_cons nil).
+      rewrite app_nil_l.
+      rewrite app_comm_cons.
+      reflexivity.
+      
+      unfold exec.
+      rewrite <- Hrep.
+      reflexivity.
+  Qed.
 
-        unfold exec.
-        unfold represents; unfold to_list.
-        rewrite <- Hrep.
-        destruct front.
-        destruct rear.
-        reflexivity.
-        destruct rear.
-        destruct valid. 
-        reflexivity.
-        reflexivity.
-        reflexivity.
-        destruct rear.
-        reflexivity.
-        simpl.
-        rewrite <-? app_assoc.
-        rewrite <-? (app_comm_cons nil).
-        rewrite ? app_nil_l.
-        rewrite <- (app_comm_cons _ _ a).
-        rewrite ? app_assoc.
-        reflexivity.
-
-        unfold exec.
-        unfold represents; unfold to_list.
-        rewrite <- Hrep.
-        destruct valid.
-        reflexivity.
-        destruct front'.
-        reflexivity.
-        destruct valid.
-        reflexivity.
-        simpl.
-        remember (match front' with
-                     | nil => nil
-                     | x :: xs' => x :: take valid xs'
-                   end).
-        rewrite <-? app_assoc.
-        rewrite <-? (app_comm_cons nil).
-        rewrite app_nil_l.
-        rewrite app_comm_cons.
-        reflexivity.
-        
-        unfold exec.
-        rewrite <- Hrep.
-        reflexivity.
-    Qed.
-
-  Lemma exec2_changes_nothing :
+  Lemma exec2_doesnt_change_representation :
     forall A lenf (f : list A) lenr r state l,
       represents (lenf, f, lenr, r, state) l ->
       represents (exec2 (lenf, f, lenr, r, state)) l.
-    Proof.
-      unfold exec2.
-      intros.
-      case_eq (exec (exec state));
-      intros;
-      apply exec_changes_nothing in H;
-      apply exec_changes_nothing in H;
-      rewrite H0 in H;
-      unfold represents, to_list in H;
-      unfold represents, to_list;
-      assumption.      
-    Qed.
-    
+  Proof.
+    unfold exec2.
+    intros.
+    case_eq (exec (exec state));
+    intros;
+    apply exec_doesnt_change_representation in H;
+    apply exec_doesnt_change_representation in H;
+    rewrite H0 in H;
+    unfold represents, to_list in H;
+    unfold represents, to_list;
+    assumption.      
+  Qed.
+  
   Lemma empty_inv :
     forall A, 
       inv (@empty A). 
   Proof.
-  Admitted.
-
+    intro A.
+    unfold inv.
+    split.
+    auto.
+    split.
+    auto.
+    split.
+    unfold inv_state.
+    simpl.
+    auto.
+    split;
+      simpl;
+      unfold not;
+      intro;
+      assert (Ht : True);
+      auto;
+      specialize (H Ht);
+      inversion H.
+  Qed.
           
   Lemma inject_inv :
     forall A (q : Q A) x,
       inv q ->
       inv (inject x q).
   Proof.
-    unfold inv.
-    destruct q as ((((lenf, f), lenr), r), state).
-  Admitted.
+    assert (Hfalse : False -> False). auto.
+    intros A q x Hinv.
+    destruct q as [[[[lenf f] lenr] r] state].
+    assert (Hinv' : inv (lenf, f, lenr, r, state)). exact Hinv.
+    destruct Hinv as [Hinv1 [Hinv2 [Hinv3 [Hinv4 Hinv5]]]].
+    unfold inv_state in Hinv3.
+    unfold inject.
+    apply check_doesnt_change_invariant.
+    destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
 
-    
+      admit.
+      
+      destruct Hinv3 as [Hinv3a [Hinv3b [Hinv3c [Hinv3d Hinv3e]]]].
+      specialize (Hinv5 Hfalse).
+      specialize (Hinv4 Hfalse).
+      unfold inv; repeat split; try intro H; try assumption.
+      admit.
+      admit.
+      
+
+      destruct Hinv3 as [Hinv3a [Hinv3b Hinv3c]].
+      specialize (Hinv5 Hfalse).
+      specialize (Hinv4 Hfalse).
+      unfold inv; repeat split; try intro H; try assumption.
+      admit.
+      admit.
+      
+      inversion Hinv3.
+  Qed.    
+
   Lemma pop_inv :
     forall A (q : Q A),
       inv q ->
       inv (pop q).
-  Proof. Admitted.
+  Proof. 
+Admitted.
     
   Lemma empty_is_empty : 
     forall A,
@@ -979,14 +1280,14 @@ Module RealTimeQueue <: QUEUE.
     destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
     remember (leb (S _) _).
     destruct b.
-    apply exec2_changes_nothing.
+    apply exec2_doesnt_change_representation.
     rewrite <- Hrep.
     unfold represents; unfold to_list.
     rewrite H.
     rewrite app_assoc.
     reflexivity.
 
-    apply exec2_changes_nothing.
+    apply exec2_doesnt_change_representation.
     rewrite <- Hrep.
     unfold represents; unfold to_list.
     rewrite H.
@@ -995,8 +1296,8 @@ Module RealTimeQueue <: QUEUE.
     rewrite app_assoc.
     reflexivity.
 
-    rewrite Hinv5.
-    apply exec2_changes_nothing.
+    rewrite Hinv4.
+    apply exec2_doesnt_change_representation.
     rewrite <- Hrep.
     unfold represents; unfold to_list.
     rewrite H.
@@ -1005,8 +1306,8 @@ Module RealTimeQueue <: QUEUE.
     reflexivity.
     auto.
 
-    rewrite Hinv5.
-    apply exec2_changes_nothing.
+    rewrite Hinv4.
+    apply exec2_doesnt_change_representation.
     rewrite <- Hrep.
     unfold represents; unfold to_list.
     rewrite H.
@@ -1014,16 +1315,80 @@ Module RealTimeQueue <: QUEUE.
     reflexivity.
     auto.
     
-    rewrite Hinv5.
-    apply exec2_changes_nothing.
+    rewrite Hinv4.
+    apply exec2_doesnt_change_representation.
     rewrite <- Hrep.
     unfold represents; unfold to_list.
     rewrite H.
     rewrite app_assoc.
     reflexivity.
     auto.
-Qed.
-  
+  Qed.
+
+
+  Lemma represents_nil :
+    forall A lenf (f : list A) lenr r state,
+        represents (lenf, f, lenr, r, state) nil ->
+        inv (lenf, f, lenr, r, state) ->
+        f = nil.
+  Proof.
+    assert (Hfalse: False -> False). auto.
+    intros A lenf f lenr r state Hrep Hinv.
+    destruct Hinv as [Hinv1 [Hinv2 [Hinv3 [Hinv4 Hinv5]]]].
+    unfold represents, to_list in Hrep.
+    unfold inv_state in Hinv3.
+    destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
+
+    apply app_eq_nil in Hrep.
+    destruct Hrep as [Hf _].
+    assumption.
+    
+    destruct Hinv3 as [Hinv3a [Hinv3b [Hinv3c Hinv3d]]].
+    specialize (Hinv4 Hfalse).
+    specialize (Hinv5 Hfalse).
+    destruct rear.
+    simpl in Hinv3b.
+    inversion Hinv3b.
+    rewrite rev_cons in Hrep.
+    rewrite <-? app_assoc in Hrep.
+    remember (rear' ++ rev r) as tl.
+    rewrite ->? app_assoc in Hrep.
+    remember ((rev (take valid front') ++ front) ++ rev rear) as hd.
+    rewrite <- app_assoc in Hrep.
+    rewrite <- app_comm_cons in Hrep.
+    rewrite app_nil_l in Hrep.
+    apply app_eq_nil in Hrep.
+    destruct Hrep as [_ Habsurd].
+    inversion Habsurd.
+
+    destruct Hinv3 as [Hinv3a [Hinv3b Hinv3c]].
+    specialize (Hinv4 Hfalse).
+    specialize (Hinv5 Hfalse).
+    destruct valid.
+    apply app_eq_nil in Hrep.
+    destruct Hrep as [Hrear Hr].
+    unfold plus in Hinv3c.
+    rewrite Hinv3c in Hinv4.
+    destruct rear'.
+    unfold length in Hinv4.
+    inversion Hinv4.
+    inversion Hrear.
+    destruct front'.
+    inversion Hinv3b.
+    rewrite take_cons in Hrep.
+    rewrite rev_cons in Hrep.
+    rewrite <-? app_assoc in Hrep.
+    remember (rear' ++ rev r) as tl.
+    remember (rev (take valid front')) as hd.
+    rewrite <- app_comm_cons in Hrep.
+    rewrite app_nil_l in Hrep.
+    apply app_eq_nil in Hrep.
+    destruct Hrep as [_ Habsurd].
+    inversion Habsurd.
+    
+    inversion Hinv3.
+  Qed.
+    
   Lemma pop_empty :
     forall A (q : Q A),
       represents q nil ->
@@ -1032,92 +1397,17 @@ Qed.
   Proof.
     intros A [[[[lenf f] lenr] r] state].
     intros Hrep Hinv.
-    destruct Hinv as [Hinv1 [Hinv2 [Hinv3 [Hinv4 Hinv5]]]].
 
     assert (Hf : f = nil).
-      unfold represents in Hrep.
-      unfold to_list in Hrep.
-      destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
-        apply app_eq_nil in Hrep.
-        destruct Hrep; assumption.
-        unfold inv_state in Hinv3.
-        destruct Hinv3 as [Hinv3A Hinv3B].
-        apply app_eq_nil in Hrep.
-        destruct Hrep.
-        apply app_eq_nil in H.
-        destruct H.
-        apply app_eq_nil in H1.
-        destruct H1.
-        subst.
-        simpl in Hinv3B.
-        apply app_eq_nil in H2.
-        destruct H2.
-        assert (forall A (xs : list A), rev xs = nil -> xs = 
-nil).
-        intros.
-        destruct xs.
-        reflexivity.
-        simpl in H3.
-        apply app_eq_nil in H3.
-        destruct H3.
-        inversion H4.
-        rewrite (H3 _ rear) in Hinv3B.
-        inversion Hinv3B.
-        assumption.
-        
 
-    subst.
-
-    unfold idling in Hinv5.
-    unfold not in Hinv5.
-    assert (False -> False).
-    intro F.
-    apply F.
-    specialize (Hinv5 H).
-    unfold inv_state in Hinv3.
-
-
+    apply (represents_nil A lenf f lenr r state).
+    assumption.
+    assumption.
     unfold pop.
-
-    unfold represents in Hrep.
-    unfold to_list in Hrep.
-    apply app_eq_nil in Hrep.
-    Admitted.
-(*    rewrite Hf.
     subst.
     assumption.
- destruct f.
-    unfold represents.
-    unfold to_list.
-    unfold represents in Hrep; unfold to_list in Hrep.
 
-    assumption.
-    assumption.
-    assumption.
-    assumption.
-    unfold check.
-    remember (leb lenr (lenf - 1)) as b.
-    destruct b.
-    apply exec2_changes_nothing.
-
-    unfold represents.
-    unfold to_list.
-    unfold represents in Hrep; unfold to_list in Hrep.
-    unfold check.
-    remember
-    destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
-
-
-
-    remember (leb (S _) _).
-    destruct b.
-    apply exec2_changes_nothing.
-    rewrite <- Hrep.
-    unfold represents; unfold to_list.
-    rewrite H.
-    rewrite app_assoc.
-    reflexivity.*)
-
+  Qed.
 
 
   Lemma pop_xs :
@@ -1125,7 +1415,159 @@ nil).
       represents q (x::xs) ->
       inv q ->
       represents (pop q) xs.
-  Proof. Admitted.      
+  Proof. 
+    assert (Hfalse : False -> False). auto.
+
+    assert (Hrev: forall A (xs : list A), rev xs = nil -> xs = nil).
+      intros A' xs Hxs.
+      destruct xs.
+      reflexivity.
+      simpl in Hxs.
+      apply app_eq_nil in Hxs.
+      destruct Hxs as [Hxs Habsurd].
+      inversion Habsurd.
+
+    intros A [[[[lenf f] lenr] r] state] x xs.
+    intros Hrep Hinv.
+    destruct Hinv as [Hinv1 [Hinv2 [Hinv3 [Hinv4 Hinv5]]]].
+    unfold inv_state in Hinv3.
+
+    destruct state as [ | valid front front' rear rear'| valid front' rear' | front].
+    
+      unfold represents in Hrep; unfold to_list in Hrep.
+      unfold pop.
+      destruct f.
+        destruct r.
+         simpl in Hrep.
+         inversion Hrep.
+         
+         subst.
+         unfold length in Hinv1.
+         unfold leb in Hinv1.
+         inversion Hinv1.
+         auto.
+       
+       unfold check.
+       remember (leb lenr (lenf - 1)).
+       destruct b.
+       apply exec2_doesnt_change_representation.
+       unfold represents, to_list.
+       unfold invalidate.
+       rewrite <- app_comm_cons in Hrep.
+       inversion Hrep.
+       reflexivity.
+       apply exec2_doesnt_change_representation.
+       unfold represents, to_list.
+       unfold take.
+       unfold rev at 1 3.
+       simpl.
+       rewrite ? app_nil_r.
+       inversion Hrep.
+       reflexivity.
+
+       unfold pop.
+       specialize (Hinv4 Hfalse).
+       specialize (Hinv5 Hfalse).
+       destruct f.
+
+       simpl in Hinv5.
+       unfold not in Hinv5.
+       assert (0 = 0); auto.
+       specialize (Hinv5 H).
+       inversion Hinv5.
+
+       unfold check.
+       destruct lenf.
+       inversion Hinv4.
+       remember (S lenf - 1).
+       simpl in Heqn.
+       rewrite <- minus_n_O in Heqn.
+       subst.
+       simpl in Hinv4.
+       rewrite Hinv4.
+       apply exec2_doesnt_change_representation.
+       unfold invalidate.
+       
+
+       destruct valid.
+       destruct Hinv3 as [Hinv3a [Hinv3b [Hinv3c [Hinv3d Hinv3e]]]].
+       inversion Hinv3d.
+       unfold represents, to_list in Hrep.
+       destruct Hinv3 as [Hinv3a [Hinv3b [Hinv3c [Hinv3d Hinv3e]]]].
+       destruct (take_rev_cons A valid front' Hinv3c).
+       rewrite H in Hrep.
+       rewrite <-? app_comm_cons in Hrep.
+       rewrite <-? app_assoc in Hrep.
+       inversion Hrep.
+       unfold represents, to_list.
+       rewrite <-? app_assoc.
+       reflexivity.
+       
+       specialize (Hinv4 Hfalse).
+       specialize (Hinv5 Hfalse).
+       destruct f.
+       simpl in Hinv5.
+       unfold not in Hinv5.
+       assert (0 = 0); auto.
+       specialize (Hinv5 H).
+       inversion Hinv5.
+       clear Hinv5.
+       
+       destruct Hinv3 as [Hinv3a [Hinv3b Hinv3c]].
+       destruct valid.
+       destruct rear'.
+       simpl in Hinv3c.
+       rewrite Hinv3c in Hinv4.
+       inversion Hinv4.
+       unfold pop.
+       unfold invalidate.
+       unfold check.
+       remember (leb lenr (lenf - 1)).
+       symmetry in Heqb.
+       apply leb_Sn_Sm in Heqb.
+       assert (S (lenf - 1) = lenf).
+       destruct lenf.
+       inversion Hinv3c.
+       simpl.
+       rewrite <- minus_n_O.
+       reflexivity.
+       rewrite H in Heqb.
+       rewrite Hinv4 in Heqb.
+       rewrite <- Heqb.
+       apply exec2_doesnt_change_representation.
+       unfold represents, to_list.
+       unfold represents, to_list in Hrep.
+       rewrite <- app_comm_cons in Hrep.
+       inversion Hrep.
+       reflexivity.
+
+       unfold pop.
+       unfold check.
+       destruct lenf.
+       inversion Hinv4.
+       remember (S lenf - 1).
+       simpl in Heqn.
+       rewrite <- minus_n_O in Heqn.
+       subst.
+       simpl in Hinv4.
+       rewrite Hinv4.
+       apply exec2_doesnt_change_representation.
+       unfold invalidate.
+       unfold represents, to_list in Hrep.
+       destruct (take_rev_cons A valid front' Hinv3b).
+       rewrite H in Hrep.
+       rewrite <-? app_comm_cons in Hrep.
+       rewrite <-? app_assoc in Hrep.
+       inversion Hrep.
+       unfold represents, to_list.
+       destruct valid.
+       simpl.
+       auto.
+       rewrite <-? app_assoc.
+       reflexivity.
+
+       inversion Hinv3.
+  Qed.
   
   Lemma peak_empty_spec :
     forall A (q : Q A),
