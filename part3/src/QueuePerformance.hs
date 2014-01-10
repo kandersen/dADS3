@@ -36,7 +36,7 @@ basicInsertSetup x n = do
 basicInsert :: (NFData (q Int), Queue q) => Int -> Int -> IO (q Int)
 basicInsert x n = do
   (q, elems) <- basicInsertSetup x n
-  (rnf q, rnf elems) `seq` (return $ foldl' (flip inject) q elems)
+  (rnf elems) `seq` (return $ foldl' (flip inject) q elems)
 
 basicDeleteSetup :: Queue q => Int -> IO (q Int)
 basicDeleteSetup = generate . queueOfLength
@@ -44,7 +44,7 @@ basicDeleteSetup = generate . queueOfLength
 basicDelete :: (NFData (q Int), Queue q) => Int -> Int -> IO (q Int)
 basicDelete x n = do
   q <- basicDeleteSetup x
-  (rnf q) `seq` (return $ iterate pop q !! n)
+  return $ iterate pop q !! n
 
                                                                           
 generateInsertionTests :: (NFData (q Int), Queue q) => q Int -> [(Int, Int)] -> [(IO (q Int, [Int]), IO (q Int), Int, Int)]
@@ -74,7 +74,7 @@ queueSortSetup q n = generate $ vectorOf n (queueOfLength n)
 queueSortTest :: (NFData (q Int), Queue q) => q Int -> Int -> IO [Int]
 queueSortTest q n = do
   qs <- queueSortSetup q n
-  (rnf qs) `seq` (return $ queueSort qs)
+  return $ queueSort qs
 
 generateQueueSortTests q = map (\n -> (queueSortSetup q n, queueSortTest q n, n)) queueSortSizes
 
@@ -104,7 +104,7 @@ worstCaseSetup q = generate . queueOfLength
 
 worstCaseTest q n = do
   q <- worstCaseSetup q n
-  (rnf q) `seq` (return $ execState (worstCase (n + n)) q)
+  return $ execState (worstCase (n + n)) q
 
 generateWorstCaseTests q = map (\n -> (worstCaseSetup q n, worstCaseTest q n, n)) worstCaseSizes
 
@@ -150,11 +150,11 @@ bftSetup = generate . btOfDepth
 bftTest :: (Queue q) => q BT -> Int -> IO ([Int])
 bftTest q n = do
   bt <- bftSetup n
-  return $ evalState (bft [1]) (inject bt q)
+  (rnf bt) `seq` (return $ evalState (bft [1]) (inject bt q))
 
 generateBftTests q = 
   map (\n -> (bftSetup n, bftTest q n, n)) bftSizes
-
+ 
 generateBftBenchmarks q = 
   map benches (generateBftTests q)
   where
@@ -162,29 +162,47 @@ generateBftBenchmarks q =
       bgroup ("Traverse a balanced tree of depth " ++ show n) $
         [bench "setup" $ nfIO setup, bench "test" $ nfIO test]
 
-powersOf2 = iterate (*2) 1
-basicBenchmarkSizes = zip (take 8 $ drop 15 powersOf2) [100,100..] --, 10000, 50000] [100,100..] --, 100000, 200000, 1000000] [100,100..]
-bftSizes = [] --take 1 $ drop 5 $ powersOf2
-worstCaseSizes = take 4 . drop 12 $ powersOf2 --[60,120..4000] -- [100,200..1000] ++ [2000]
-queueSortSizes = [] -- take 4 . drop 8 $ powersOf2 -- [3,6..160] -- [20,40..100] -- [20,40..200] --[100,200..1000]
+simpleSetup :: Int -> IO [Int]
+simpleSetup n = generate $ vectorOf n arbitrarySizedIntegral
+
+simpleTest :: (Queue q) => q Int -> Int -> IO (q Int)
+simpleTest q n = do
+  elems <- simpleSetup n
+  (rnf elems) `seq` return $ iterate pop (foldl (flip inject) q elems) !! n
+  
+generateSimpleTests q =
+  map (\n -> (simpleSetup n, simpleTest q n, n)) simpleSizes
+
+generateSimpleBenchmarks q = 
+  map benches (generateSimpleTests q)
+  where
+    benches (setup, test, n) = 
+      bgroup ("Insert " ++ show n ++ " followed by as many deletes") $
+        [bench "setup" $ nfIO setup, bench "test" $ nfIO test]
 
 generateBenchmarkSuite name q bftq =
   bgroup name [
-    bgroup "Inserts"   $ generateInsertionBenchmarks q,
-    bgroup "Deletes"   $ generateDeletionBenchmarks  q,
-    bgroup "BST"       $ generateBftBenchmarks       bftq,
-    bgroup "WorstCase" $ generateWorstCaseBenchmarks q,
-    bgroup "QueueSort" $ generateQueueSortBenchmarks q
+    bgroup "InsertsDeletes" $ generateSimpleBenchmarks    q,
+    bgroup "Inserts"        $ generateInsertionBenchmarks q,
+    bgroup "BST"            $ generateBftBenchmarks       bftq,
+    bgroup "WorstCase"      $ generateWorstCaseBenchmarks q,
+    bgroup "QueueSort"      $ generateQueueSortBenchmarks q
   ]
+
+powersOf2           = iterate (*2) 1
+simpleSizes         = take 2 powersOf2
+basicBenchmarkSizes = zip (take 22 powersOf2) [0,0..]
+bftSizes            = [1,2,4,6,8,10,12,14,16,18]
+worstCaseSizes      = take 12 powersOf2
+queueSortSizes      = [1, 2, 4, 8, 16, 32, 64, 128, 96, 128, 160, 192, 224, 256]
 
 main :: IO ()
 main = defaultMain [
---  generateBenchmarkSuite "BasicQueue"         (empty :: BasicQueue         Int) (empty :: BasicQueue         BT),
+--generateBenchmarkSuite "BasicQueue"         (empty :: BasicQueue         Int) (empty :: BasicQueue         BT),
   generateBenchmarkSuite "PairQueue"          (empty :: PairQueue          Int) (empty :: PairQueue          BT),
   generateBenchmarkSuite "OkasakiQueue"       (empty :: OkasakiQueue       Int) (empty :: OkasakiQueue       BT),
   generateBenchmarkSuite "RealTimeQueue"      (empty :: RealTimeQueue      Int) (empty :: RealTimeQueue      BT),
   generateBenchmarkSuite "StrictPairQueue"    (empty :: StrictPairQueue    Int) (empty :: StrictPairQueue    BT),
   generateBenchmarkSuite "StrictOkasakiQueue" (empty :: StrictOkasakiQueue Int) (empty :: StrictOkasakiQueue BT)
-
   ]
 
