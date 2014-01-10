@@ -1,0 +1,6 @@
+Run `make` to check the proofs, extract the code and compile the
+benchmarks.
+
+Run `make run-benchmarks` to perform benchmarks. 
+
+Run `make run-tests` to run correctness tests.
